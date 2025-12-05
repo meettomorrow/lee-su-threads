@@ -47,9 +47,6 @@
   "confirmClear": {
     "message": "すべてのキャッシュされたプロフィールをクリアしますか？"
   },
-  "openThreads": {
-    "message": "Threads.com を開く \u2192"
-  },
   "rateLimitWarning": {
     "message": "⚠️ 地域クエリが多すぎます。Threadsに制限されました。30分間自動取得を休止します。必要に応じてボタンをクリックして手動でお試しください"
   },
@@ -64,5 +61,14 @@
   },
   "filterPlaceholder": {
     "message": "地域で絞り込み..."
+  },
+  "exportTitle": {
+    "message": "JSONをエクスポート"
+  },
+  "copyTitle": {
+    "message": "コピー"
+  },
+  "clearTitle": {
+    "message": "キャッシュをクリア"
   }
 }

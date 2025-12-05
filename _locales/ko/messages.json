@@ -1,68 +1,74 @@
-  {
-    "extName": {
-      "message": "Lee-Su-Threads"
-    },
-    "extDescription": {
-      "message": "Threads 게시물 작성자의 위치 정보를 자동으로 표시"
-    },
-    "noLocation": {
-      "message": "위치 없음"
-    },
-    "popupTitle": {
-      "message": "Threads 위치 정보"
-    },
-    "popupSubtitle": {
-      "message": "피드의 위치 정보 보기"
-    },
-    "profiles": {
-      "message": "프로필"
-    },
-    "thisSession": {
-      "message": "이번 추출"
-    },
-    "exportJson": {
-      "message": "JSON으로 내보내기"
-    },
-    "copyClipboard": {
-      "message": "클립보드에 복사"
-    },
-    "clearCache": {
-      "message": "캐시 지우기"
-    },
-    "emptyState": {
-      "message": "아직 추출된 프로필이 없습니다.\nThreads를 탐색하여 정보를 추출하세요."
-    },
-    "exportSuccess": {
-      "message": "내보내기 성공!"
-    },
-    "copySuccess": {
-      "message": "클립보드에 복사됨!"
-    },
-    "copyFailed": {
-      "message": "복사 실패"
-    },
-    "cacheCleared": {
-      "message": "캐시 지워짐!"
-    },
-    "confirmClear": {
-      "message": "모든 캐시된 프로필을 지우시겠습니까?"
-    },
-    "openThreads": {
-      "message": "Threads.com 열기 \u2192"
-    },
-    "rateLimitWarning": {
-      "message": "⚠️ 위치 조회가 너무 많습니다. Threads에 의해 제한되었습니다. 30분간 자동 가져오기를 일시 중지합니다. 필요시 버튼을 클릭하여 수동으로 시도해 보세요"
-    },
-    "rateLimitResume": {
-      "message": "자동 가져오기 재개"
-    },
-    "joined": {
-      "message": "가입일"
-    },
-    "autoQuery": {
-      "message": "자동 조회"
-    },
-    "filterPlaceholder": {
-      "message": "위치로 필터..."
-    }
+{
+  "extName": {
+    "message": "Lee-Su-Threads"
+  },
+  "extDescription": {
+    "message": "Threads 게시물 작성자의 위치 정보를 자동으로 표시"
+  },
+  "noLocation": {
+    "message": "위치 없음"
+  },
+  "popupTitle": {
+    "message": "Threads 위치 정보"
+  },
+  "popupSubtitle": {
+    "message": "피드의 위치 정보 보기"
+  },
+  "profiles": {
+    "message": "프로필"
+  },
+  "thisSession": {
+    "message": "이번 추출"
+  },
+  "exportJson": {
+    "message": "JSON으로 내보내기"
+  },
+  "copyClipboard": {
+    "message": "클립보드에 복사"
+  },
+  "clearCache": {
+    "message": "캐시 지우기"
+  },
+  "emptyState": {
+    "message": "아직 추출된 프로필이 없습니다.\nThreads를 탐색하여 정보를 추출하세요."
+  },
+  "exportSuccess": {
+    "message": "내보내기 성공!"
+  },
+  "copySuccess": {
+    "message": "클립보드에 복사됨!"
+  },
+  "copyFailed": {
+    "message": "복사 실패"
+  },
+  "cacheCleared": {
+    "message": "캐시 지워짐!"
+  },
+  "confirmClear": {
+    "message": "모든 캐시된 프로필을 지우시겠습니까?"
+  },
+  "rateLimitWarning": {
+    "message": "⚠️ 위치 조회가 너무 많습니다. Threads에 의해 제한되었습니다. 30분간 자동 가져오기를 일시 중지합니다. 필요시 버튼을 클릭하여 수동으로 시도해 보세요"
+  },
+  "rateLimitResume": {
+    "message": "자동 가져오기 재개"
+  },
+  "joined": {
+    "message": "가입일"
+  },
+  "autoQuery": {
+    "message": "자동 조회"
+  },
+  "filterPlaceholder": {
+    "message": "위치로 필터..."
+  },
+  "exportTitle": {
+    "message": "JSON 내보내기"
+  },
+  "copyTitle": {
+    "message": "복사"
+  },
+  "clearTitle": {
+    "message": "캐시 지우기"
   }
+}

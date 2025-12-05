@@ -47,9 +47,6 @@
   "confirmClear": {
     "message": "确定要清除所有缓存的个人资料吗？"
   },
-  "openThreads": {
-    "message": "打开 Threads.com \u2192"
-  },
   "rateLimitWarning": {
     "message": "⚠️ 地点查询太多次，被 Threads 限制了，30 分钟内不会自动查，若有需要请手动点击按钮查看看"
   },
@@ -64,5 +61,14 @@
   },
   "filterPlaceholder": {
     "message": "筛选地点..."
+  },
+  "exportTitle": {
+    "message": "导出 JSON"
+  },
+  "copyTitle": {
+    "message": "复制"
+  },
+  "clearTitle": {
+    "message": "清除缓存"
   }
 }

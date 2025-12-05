@@ -41,6 +41,13 @@ document.addEventListener('DOMContentLoaded', () => {
         el.textContent = msg;
       }
     });
+    // Localize title attributes
+    document.querySelectorAll('[data-i18n-title]').forEach(el => {
+      const msg = browserAPI.i18n.getMessage(el.dataset.i18nTitle);
+      if (msg) {
+        el.title = msg;
+      }
+    });
   }
   localizeUI();
 

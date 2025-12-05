@@ -313,15 +313,20 @@
 
     <div class="footer">
       <div class="footer-actions">
-        <button class="btn-icon" id="exportBtn" title="Export JSON">📥</button>
-        <button class="btn-icon" id="copyBtn" title="Copy">📋</button>
-        <button class="btn-icon btn-icon-danger" id="clearBtn" title="Clear">
+        <button class="btn-icon" id="exportBtn" data-i18n-title="exportTitle">
+          📥
+        </button>
+        <button class="btn-icon" id="copyBtn" data-i18n-title="copyTitle">
+          📋
+        </button>
+        <button
+          class="btn-icon btn-icon-danger"
+          id="clearBtn"
+          data-i18n-title="clearTitle"
+        >
           🗑️
         </button>
       </div>
-      <a href="https://www.threads.com" target="_blank" data-i18n="openThreads"
-        >Open Threads.com →</a
-      >
     </div>
 
     <script src="popup.js"></script>

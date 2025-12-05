@@ -47,9 +47,6 @@
   "confirmClear": {
     "message": "確定要清除所有快取的個人檔案嗎？"
   },
-  "openThreads": {
-    "message": "開啟 Threads.com →"
-  },
   "rateLimitWarning": {
     "message": "⚠️ 地點查詢太多次，被 Threads 限制了，30 分鐘內不會自動查，若有需要請手動點擊按鈕查看看"
   },
@@ -64,5 +61,14 @@
   },
   "filterPlaceholder": {
     "message": "篩選地點..."
+  },
+  "exportTitle": {
+    "message": "匯出 JSON"
+  },
+  "copyTitle": {
+    "message": "複製"
+  },
+  "clearTitle": {
+    "message": "清除快取"
   }
 }

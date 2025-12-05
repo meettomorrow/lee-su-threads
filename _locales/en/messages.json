@@ -47,9 +47,6 @@
   "confirmClear": {
     "message": "Are you sure you want to clear all cached profiles?"
   },
-  "openThreads": {
-    "message": "Open Threads.com \u2192"
-  },
   "rateLimitWarning": {
     "message": "⚠️ Too many location queries. Rate limited by Threads. Auto-fetch paused for 30 minutes. Click the button to try manually if needed."
   },
@@ -64,5 +61,14 @@
   },
   "filterPlaceholder": {
     "message": "Filter by location..."
+  },
+  "exportTitle": {
+    "message": "Export JSON"
+  },
+  "copyTitle": {
+    "message": "Copy"
+  },
+  "clearTitle": {
+    "message": "Clear cache"
   }
 }
