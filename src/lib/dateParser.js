@@ -46,6 +46,8 @@ export function parseJoinedDate(joinedStr) {
 }
 
 // Check if user joined within the last N months
+// Note: Uses local timezone for date comparison. Since we only have month/year precision
+// from the API and a 2-month threshold, timezone differences have minimal impact.
 export function isNewUser(joinedStr, monthsThreshold = 2, referenceDate = new Date()) {
   const joinedDate = parseJoinedDate(joinedStr);
   if (!joinedDate) return false;
