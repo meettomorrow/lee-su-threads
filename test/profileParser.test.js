@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { parseProfileResponse } from '../lib/profileParser.js';
+import { parseProfileResponse } from '../src/lib/profileParser.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -53,6 +53,19 @@ describe('parseProfileResponse', () => {
       expect(result.username).toBe('testverified');
       expect(result.joined).toBe('July 2023');
       expect(result.location).toBe('United States');
+    });
+  });
+
+  describe('hidden location', () => {
+    it('should parse Chinese profile with hidden location (未分享)', () => {
+      const response = loadFixture('profile-hidden-location-zh.txt');
+      const result = parseProfileResponse(response);
+
+      expect(result.username).toBe('ggu__kim');
+      expect(result.displayName).toBe('金針菇🇰🇷ㅊㅓㄴㄱㅜ');
+      expect(result.joined).toBe('2023年7月');
+      expect(result.location).toBe('未分享');
+      expect(result.profileImage).toContain('cdninstagram.com');
     });
   });
 

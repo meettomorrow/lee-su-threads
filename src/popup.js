@@ -1,4 +1,6 @@
 // Popup script for Threads Profile Extractor
+import { isNewUser } from './lib/dateParser.js';
+import { escapeHtml } from './lib/utils.js';
 
 // Cross-browser compatibility: use browser.* API if available (Firefox), fallback to chrome.*
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -136,21 +138,27 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sort by timestamp (most recent first)
     entries.sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
 
-    profileListEl.innerHTML = entries.map(([username, data]) => `
-      <div class="profile-item" data-username="${escapeHtml(username)}">
-        ${data.profileImage
-          ? `<img src="${escapeHtml(data.profileImage)}" class="profile-avatar" alt="${escapeHtml(username)}" />`
-          : `<div class="profile-avatar"></div>`
-        }
-        <div class="profile-info">
-          <div class="profile-name">${escapeHtml(data.displayName || username)}</div>
-          <div class="profile-meta">
-            @${escapeHtml(username)}
-            ${data.location ? ` • 📍 ${escapeHtml(data.location)}` : ''}
+    const newLabel = browserAPI.i18n.getMessage('newUser') || 'NEW';
+
+    profileListEl.innerHTML = entries.map(([username, data]) => {
+      const isNew = isNewUser(data.joined);
+      const newTag = isNew ? `<span class="new-user-tag">[${escapeHtml(newLabel)}]</span>` : '';
+      return `
+        <div class="profile-item" data-username="${escapeHtml(username)}">
+          ${data.profileImage
+            ? `<img src="${escapeHtml(data.profileImage)}" class="profile-avatar" alt="${escapeHtml(username)}" />`
+            : `<div class="profile-avatar"></div>`
+          }
+          <div class="profile-info">
+            <div class="profile-name">${escapeHtml(data.displayName || username)}${newTag}</div>
+            <div class="profile-meta">
+              @${escapeHtml(username)}
+              ${data.location ? ` • 📍 ${escapeHtml(data.location)}` : ''}
+            </div>
           </div>
         </div>
-      </div>
-    `).join('');
+      `;
+    }).join('');
 
     // Add click handlers
     profileListEl.querySelectorAll('.profile-item').forEach(item => {
@@ -227,12 +235,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2000);
   }
 
-  // Escape HTML
-  function escapeHtml(text) {
-    const div = document.createElement('div');
-    div.textContent = text || '';
-    return div.innerHTML;
-  }
+  // escapeHtml is imported from lib/utils.js
 
   // Render location stats
   function renderLocationStats() {

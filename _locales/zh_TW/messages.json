@@ -79,5 +79,8 @@
   },
   "noLocationStats": {
     "message": "尚無地點資料。\n瀏覽 Threads 以擷取地點資訊。"
+  },
+  "newUser": {
+    "message": "新帳號"
   }
 }

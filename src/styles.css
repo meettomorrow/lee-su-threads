@@ -11,7 +11,8 @@
   font-size: 15px;
   line-height: 21px;
   color: rgb(119, 119, 119);
-  font-family: system-ui, -apple-system, "system-ui", Roboto, Helvetica, Arial, sans-serif;
+  font-family: system-ui, -apple-system, "system-ui", Roboto, Helvetica, Arial,
+    sans-serif;
   vertical-align: baseline;
 }
 
@@ -99,13 +100,21 @@
   color: rgb(119, 119, 119);
   vertical-align: baseline;
   cursor: default;
-  font-family: system-ui, -apple-system, "system-ui", Roboto, Helvetica, Arial, sans-serif;
+  font-family: system-ui, -apple-system, "system-ui", Roboto, Helvetica, Arial,
+    sans-serif;
 }
 
 /* Separator dot before badge */
 .threads-profile-info-badge::before {
   content: " · ";
   color: rgb(119, 119, 119);
+}
+
+/* New user tag */
+.threads-new-user-tag {
+  margin-left: 4px;
+  color: rgb(239, 68, 68);
+  font-weight: 600;
 }
 
 /* Floating panel */

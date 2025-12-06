@@ -79,5 +79,8 @@
   },
   "noLocationStats": {
     "message": "まだ地域データがありません。\nThreads を閲覧して地域情報を取得してください。"
+  },
+  "newUser": {
+    "message": "新規"
   }
 }

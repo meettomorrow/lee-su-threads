@@ -79,5 +79,8 @@
   },
   "noLocationStats": {
     "message": "No location data yet.\nBrowse Threads to capture profile locations."
+  },
+  "newUser": {
+    "message": "NEW"
   }
 }

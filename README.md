@@ -30,6 +30,8 @@
 <details>
 <summary>手動安裝（開發者）</summary>
 
+**從 Release 安裝：**
+
 1. 前往 [Releases 頁面](https://github.com/meettomorrow/lee-su-threads/releases) 下載最新版本的 ZIP 檔
 2. 解壓縮 ZIP 檔
 3. 開啟 Chrome，前往 `chrome://extensions/`
@@ -37,6 +39,16 @@
 5. 點擊「**載入未封裝項目**」
 6. 選擇解壓縮後的資料夾
 7. 擴充功能圖示會出現在工具列
+
+**從原始碼建置：**
+
+1. Clone 此專案
+2. 執行 `npm install`
+3. 執行 `npm run build`
+4. 開啟 Chrome，前往 `chrome://extensions/`
+5. 開啟右上角的「**開發人員模式**」
+6. 點擊「**載入未封裝項目**」
+7. 選擇專案中的 `dist/` 資料夾
 
 </details>
 
@@ -82,6 +94,8 @@ A Chrome extension that automatically displays location info for Threads post au
 <details>
 <summary>Manual Installation (Developers)</summary>
 
+**From Release:**
+
 1. Download the latest ZIP from [Releases](https://github.com/meettomorrow/lee-su-threads/releases)
 2. Unzip the file
 3. Open Chrome and navigate to `chrome://extensions/`
@@ -89,6 +103,16 @@ A Chrome extension that automatically displays location info for Threads post au
 5. Click **Load unpacked**
 6. Select the unzipped folder
 7. The extension icon should appear in your toolbar
+
+**Build from Source:**
+
+1. Clone this repository
+2. Run `npm install`
+3. Run `npm run build`
+4. Open Chrome and navigate to `chrome://extensions/`
+5. Enable **Developer mode** (toggle in top-right corner)
+6. Click **Load unpacked**
+7. Select the `dist/` folder from the project
 
 </details>
 

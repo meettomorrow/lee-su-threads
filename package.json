@@ -5,7 +5,10 @@
   "main": "background.js",
   "scripts": {
     "test": "vitest run",
-    "test:watch": "vitest"
+    "test:watch": "vitest",
+    "build": "node esbuild.config.js",
+    "build:watch": "node esbuild.config.js --watch",
+    "clean": "rm -rf dist"
   },
   "repository": {
     "type": "git",
@@ -16,6 +19,7 @@
   "license": "ISC",
   "type": "module",
   "devDependencies": {
+    "esbuild": "^0.27.1",
     "vitest": "^4.0.15"
   }
 }

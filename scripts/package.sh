@@ -10,26 +10,17 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$PROJECT_ROOT"
 
-# Get version from manifest.json
-VERSION=$(grep '"version"' manifest.json | sed 's/.*"version": "\(.*\)".*/\1/')
+# Build the extension first
+echo "🔨 Building extension..."
+npm run build
+
+# Get version from manifest.json in dist/
+VERSION=$(grep '"version"' dist/manifest.json | sed 's/.*"version": "\(.*\)".*/\1/')
 
 echo "📦 Packaging Lee-Su-Threads v${VERSION}..."
 
-# Create dist directory if it doesn't exist
+# Create dist-zip directory if it doesn't exist
 mkdir -p dist-zip
-
-# Files to include in the extension
-FILES=(
-  "manifest.json"
-  "background.js"
-  "content.js"
-  "injected.js"
-  "popup.html"
-  "popup.js"
-  "styles.css"
-  "icons"
-  "_locales"
-)
 
 # Create a temporary directory for building
 TEMP_DIR=$(mktemp -d)
@@ -42,14 +33,24 @@ echo "🌐 Building Chrome extension..."
 CHROME_DIR="$TEMP_DIR/chrome"
 mkdir -p "$CHROME_DIR"
 
-# Copy files for Chrome
-for file in "${FILES[@]}"; do
-  cp -r "$file" "$CHROME_DIR/"
-done
+# Copy built files from dist/ (excluding Firefox manifest and source maps)
+cd dist
+cp -r \
+  manifest.json \
+  background.js \
+  content.js \
+  injected.js \
+  popup.html \
+  popup.js \
+  styles.css \
+  icons \
+  _locales \
+  "$CHROME_DIR/"
+cd "$PROJECT_ROOT"
 
 # Create Chrome zip
 cd "$CHROME_DIR"
-zip -r "$PROJECT_ROOT/dist-zip/lee-su-threads-chrome-v${VERSION}.zip" . -x "*.DS_Store"
+zip -r "$PROJECT_ROOT/dist-zip/lee-su-threads-chrome-v${VERSION}.zip" . -x "*.DS_Store" "*.map"
 cd "$PROJECT_ROOT"
 
 echo "✅ Created dist-zip/lee-su-threads-chrome-v${VERSION}.zip"
@@ -62,19 +63,26 @@ echo "🦊 Building Firefox extension..."
 FIREFOX_DIR="$TEMP_DIR/firefox"
 mkdir -p "$FIREFOX_DIR"
 
-# Copy files for Firefox (excluding Chrome manifest)
-for file in "${FILES[@]}"; do
-  if [ "$file" != "manifest.json" ]; then
-    cp -r "$file" "$FIREFOX_DIR/"
-  fi
-done
+# Copy built files from dist/ (excluding Chrome manifest and source maps)
+cd dist
+cp -r \
+  background.js \
+  content.js \
+  injected.js \
+  popup.html \
+  popup.js \
+  styles.css \
+  icons \
+  _locales \
+  "$FIREFOX_DIR/"
+cd "$PROJECT_ROOT"
 
-# Copy Firefox-specific manifest
-cp "manifest.firefox.json" "$FIREFOX_DIR/manifest.json"
+# Copy Firefox-specific manifest from dist/
+cp "dist/manifest.firefox.json" "$FIREFOX_DIR/manifest.json"
 
-# Create Firefox zip (Firefox uses .xpi extension, but .zip works too)
+# Create Firefox zip
 cd "$FIREFOX_DIR"
-zip -r "$PROJECT_ROOT/dist-zip/lee-su-threads-firefox-v${VERSION}.zip" . -x "*.DS_Store"
+zip -r "$PROJECT_ROOT/dist-zip/lee-su-threads-firefox-v${VERSION}.zip" . -x "*.DS_Store" "*.map"
 cd "$PROJECT_ROOT"
 
 echo "✅ Created dist-zip/lee-su-threads-firefox-v${VERSION}.zip"
