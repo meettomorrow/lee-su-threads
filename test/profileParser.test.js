@@ -56,6 +56,19 @@ describe('parseProfileResponse', () => {
     });
   });
 
+  describe('hidden location', () => {
+    it('should parse Chinese profile with hidden location (未分享)', () => {
+      const response = loadFixture('profile-hidden-location-zh.txt');
+      const result = parseProfileResponse(response);
+
+      expect(result.username).toBe('ggu__kim');
+      expect(result.displayName).toBe('金針菇🇰🇷ㅊㅓㄴㄱㅜ');
+      expect(result.joined).toBe('2023年7月');
+      expect(result.location).toBe('未分享');
+      expect(result.profileImage).toContain('cdninstagram.com');
+    });
+  });
+
   describe('edge cases', () => {
     it('should return null for invalid JSON', () => {
       const result = parseProfileResponse('not valid json');
