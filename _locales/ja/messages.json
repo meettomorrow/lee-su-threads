@@ -70,5 +70,14 @@
   },
   "clearTitle": {
     "message": "キャッシュをクリア"
+  },
+  "tabProfiles": {
+    "message": "プロフィール"
+  },
+  "tabLocations": {
+    "message": "地域統計"
+  },
+  "noLocationStats": {
+    "message": "まだ地域データがありません。\nThreads を閲覧して地域情報を取得してください。"
   }
 }

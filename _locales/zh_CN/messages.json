@@ -70,5 +70,14 @@
   },
   "clearTitle": {
     "message": "清除缓存"
+  },
+  "tabProfiles": {
+    "message": "个人资料"
+  },
+  "tabLocations": {
+    "message": "地点统计"
+  },
+  "noLocationStats": {
+    "message": "尚无地点数据。\n浏览 Threads 以提取地点信息。"
   }
 }

@@ -70,5 +70,14 @@
   },
   "clearTitle": {
     "message": "캐시 지우기"
+  },
+  "tabProfiles": {
+    "message": "프로필"
+  },
+  "tabLocations": {
+    "message": "위치 통계"
+  },
+  "noLocationStats": {
+    "message": "아직 위치 데이터가 없습니다.\nThreads를 탐색하여 위치 정보를 추출하세요."
   }
 }

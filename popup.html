@@ -268,6 +268,112 @@
       .footer a:hover {
         text-decoration: underline;
       }
+
+      .tabs {
+        display: flex;
+        gap: 0;
+        margin-bottom: 16px;
+        background: rgba(255, 255, 255, 0.05);
+        border-radius: 8px;
+        padding: 4px;
+      }
+
+      .tab-btn {
+        flex: 1;
+        padding: 8px 12px;
+        border: none;
+        background: transparent;
+        color: #888;
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        border-radius: 6px;
+        transition: all 0.2s;
+      }
+
+      .tab-btn:hover {
+        color: #e0e0e0;
+      }
+
+      .tab-btn.active {
+        background: rgba(255, 255, 255, 0.1);
+        color: #fff;
+      }
+
+      .tab-content {
+        display: none;
+      }
+
+      .tab-content.active {
+        display: block;
+      }
+
+      .location-stats-list {
+        margin-top: 8px;
+      }
+
+      .location-stat-item {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        padding: 10px 12px;
+        background: rgba(255, 255, 255, 0.03);
+        border-radius: 8px;
+        margin-bottom: 8px;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .location-stat-item:hover {
+        background: rgba(255, 255, 255, 0.08);
+      }
+
+      .location-info {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .location-content {
+        flex: 1;
+        overflow: hidden;
+      }
+
+      .location-name {
+        font-size: 13px;
+        color: #fff;
+        white-space: nowrap;
+        overflow: hidden;
+        text-overflow: ellipsis;
+      }
+
+      .location-count {
+        font-size: 13px;
+        font-weight: 600;
+        color: #667eea;
+        background: rgba(102, 126, 234, 0.15);
+        padding: 4px 10px;
+        border-radius: 12px;
+        min-width: 32px;
+        text-align: center;
+      }
+
+      .location-bar {
+        height: 4px;
+        background: rgba(255, 255, 255, 0.1);
+        border-radius: 2px;
+        margin-top: 6px;
+        overflow: hidden;
+      }
+
+      .location-bar-fill {
+        height: 100%;
+        background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        border-radius: 2px;
+        transition: width 0.3s ease;
+      }
     </style>
   </head>
   <body>
@@ -291,21 +397,48 @@
         </div>
       </div>
 
-      <div class="filter-row">
-        <input
-          type="text"
-          id="locationFilter"
-          class="filter-input"
-          placeholder="Filter by location..."
-        />
+      <div class="tabs">
+        <button
+          class="tab-btn active"
+          data-tab="profiles"
+          data-i18n="tabProfiles"
+        >
+          Profiles
+        </button>
+        <button class="tab-btn" data-tab="locations" data-i18n="tabLocations">
+          Location Stats
+        </button>
       </div>
 
-      <div class="profile-list" id="profileList">
-        <div class="empty-state">
-          <div class="empty-state-icon">🔍</div>
-          <div class="empty-state-text" data-i18n="emptyState">
-            No profiles extracted yet.<br />
-            Browse Threads to capture profile info.
+      <div id="profilesTab" class="tab-content active">
+        <div class="filter-row">
+          <input
+            type="text"
+            id="locationFilter"
+            class="filter-input"
+            placeholder="Filter by location..."
+          />
+        </div>
+
+        <div class="profile-list" id="profileList">
+          <div class="empty-state">
+            <div class="empty-state-icon">🔍</div>
+            <div class="empty-state-text" data-i18n="emptyState">
+              No profiles extracted yet.<br />
+              Browse Threads to capture profile info.
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="locationsTab" class="tab-content">
+        <div class="location-stats-list" id="locationStatsList">
+          <div class="empty-state">
+            <div class="empty-state-icon">📍</div>
+            <div class="empty-state-text" data-i18n="noLocationStats">
+              No location data yet.<br />
+              Browse Threads to capture profile locations.
+            </div>
           </div>
         </div>
       </div>

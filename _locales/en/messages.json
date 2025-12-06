@@ -70,5 +70,14 @@
   },
   "clearTitle": {
     "message": "Clear cache"
+  },
+  "tabProfiles": {
+    "message": "Profiles"
+  },
+  "tabLocations": {
+    "message": "Location Stats"
+  },
+  "noLocationStats": {
+    "message": "No location data yet.\nBrowse Threads to capture profile locations."
   }
 }

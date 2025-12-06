@@ -70,5 +70,14 @@
   },
   "clearTitle": {
     "message": "清除快取"
+  },
+  "tabProfiles": {
+    "message": "個人檔案"
+  },
+  "tabLocations": {
+    "message": "地點統計"
+  },
+  "noLocationStats": {
+    "message": "尚無地點資料。\n瀏覽 Threads 以擷取地點資訊。"
   }
 }
