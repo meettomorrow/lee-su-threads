@@ -564,6 +564,12 @@ function observeFeed() {
     childList: true,
     subtree: true
   });
+
+  // Cleanup on page unload
+  window.addEventListener('beforeunload', () => {
+    clearTimeout(observer._timeout);
+    observer.disconnect();
+  }, { once: true });
 }
 
 // Initialize

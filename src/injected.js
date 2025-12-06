@@ -487,8 +487,6 @@ async function fetchProfileInfo(targetUserId) {
 function scanPageForSessionTokens() {
   console.log('%c[Threads Extractor] 🔑 Scanning page for session tokens...', 'color: #ec4899; font-weight: bold;');
 
-  const html = document.documentElement.innerHTML;
-
   // Look for fb_dtsg in various places
   const patterns = {
     fb_dtsg: [
@@ -510,34 +508,35 @@ function scanPageForSessionTokens() {
 
   const foundTokens = {};
 
-  for (const [tokenName, regexList] of Object.entries(patterns)) {
-    for (const regex of regexList) {
-      const match = html.match(regex);
-      if (match) {
-        foundTokens[tokenName] = match[1];
-        console.log(`%c  Found ${tokenName}: ${match[1].substring(0, 30)}...`, 'color: #f472b6;');
-        break;
-      }
-    }
-  }
-
-  // Also check script tags for DTSGInitialData
+  // Scan inline script tags and input fields (much more efficient than scanning entire DOM)
   const scripts = document.querySelectorAll('script:not([src])');
+  const inputs = document.querySelectorAll('input[name="fb_dtsg"], input[name="lsd"], input[name="jazoest"]');
+
+  // Check input fields first (fastest)
+  inputs.forEach((input) => {
+    const name = input.getAttribute('name');
+    const value = input.getAttribute('value');
+    if (value && !foundTokens[name]) {
+      foundTokens[name] = value;
+      console.log(`%c  Found ${name} from input: ${value.substring(0, 30)}...`, 'color: #f472b6;');
+    }
+  });
+
+  // Check script tags
   scripts.forEach((script) => {
     const content = script.textContent || '';
 
-    // Look for DTSGInitialData pattern
-    const dtsgMatch = content.match(/\["DTSGInitData",\[\],\{"token":"([^"]+)"/);
-    if (dtsgMatch && !foundTokens.fb_dtsg) {
-      foundTokens.fb_dtsg = dtsgMatch[1];
-      console.log(`%c  Found fb_dtsg from DTSGInitData: ${dtsgMatch[1].substring(0, 30)}...`, 'color: #f472b6;');
-    }
+    for (const [tokenName, regexList] of Object.entries(patterns)) {
+      if (foundTokens[tokenName]) continue; // Skip if already found
 
-    // Look for LSD token
-    const lsdMatch = content.match(/\["LSD",\[\],\{"token":"([^"]+)"/);
-    if (lsdMatch && !foundTokens.lsd) {
-      foundTokens.lsd = lsdMatch[1];
-      console.log(`%c  Found lsd from LSD: ${lsdMatch[1]}`, 'color: #f472b6;');
+      for (const regex of regexList) {
+        const match = content.match(regex);
+        if (match) {
+          foundTokens[tokenName] = match[1];
+          console.log(`%c  Found ${tokenName}: ${match[1].substring(0, 30)}...`, 'color: #f472b6;');
+          break;
+        }
+      }
     }
   });
 
