@@ -152,12 +152,13 @@
 
     const joinedLabel = browserAPI.i18n.getMessage('joined') || 'Joined';
     if (profileInfo.location) {
-      badge.textContent = profileInfo.location;
-      badge.title = `Joined: ${profileInfo.joined || 'Unknown'}`;
+      badge.textContent = escapeHtml(profileInfo.location);
+      badge.title = `${joinedLabel}: ${profileInfo.joined || 'Unknown'}`;
     } else {
       // Location not available
-      badge.textContent = 'N/A';
-      badge.title = profileInfo.joined ? `Joined: ${profileInfo.joined}` : 'Location not available';
+      const noLocationText = browserAPI.i18n.getMessage('noLocation') || 'No location';
+      badge.textContent = noLocationText;
+      badge.title = profileInfo.joined ? `${joinedLabel}: ${profileInfo.joined}` : noLocationText;
     }
 
     return badge;
