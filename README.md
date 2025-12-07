@@ -1,6 +1,6 @@
 # Lee-Su-Threads 你是誰
 
-一個 Chrome 擴充功能，自動顯示 Threads 貼文作者的地點資訊，不需要點進每個人的個人檔案。
+一個瀏覽器擴充功能（支援 Chrome 與 Firefox），自動顯示 Threads 貼文作者的地點資訊，不需要點進每個人的個人檔案。
 
 > **[English](#english)** below
 
@@ -8,7 +8,8 @@
 
 - **自動擷取**：瀏覽動態時自動載入作者的地點資訊
 - **地點標籤**：在貼文時間旁顯示作者所在地點
-- **快取機制**：已擷取的資料會快取 72 小時
+- **新用戶標記**：自動標示加入 Threads 未滿 30 天的新用戶
+- **快取機制**：個人資料快取 72 小時，用戶 ID 快取 30 天
 - **匯出資料**：可將所有資料匯出為 JSON
 - **速率限制保護**：被 Threads 限制時會自動暫停並提醒
 
@@ -19,13 +20,20 @@
 
 ## 截圖
 
+### 動態中的地點標籤
 ![動態中的地點標籤](screenshots/feed-badge.png)
 
-![擴充功能彈出視窗](screenshots/popup.png)
+### 彈出視窗 - 個人資料列表
+![個人資料列表](screenshots/popup-profiles.png)
+
+### 彈出視窗 - 地點統計
+![地點統計](screenshots/popup-location-stats.png)
 
 ## 安裝方式
 
-**推薦：** 前往 [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol)，點擊「**加到 Chrome**」按鈕即可安裝，日後可自動獲得更新。
+**Chrome 使用者：** 前往 [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol)，點擊「**加到 Chrome**」按鈕即可安裝，日後可自動獲得更新。
+
+**Firefox 使用者：** 前往 [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/)，點擊「**加到 Firefox**」按鈕即可安裝。
 
 <details>
 <summary>手動安裝（開發者）</summary>
@@ -45,10 +53,8 @@
 1. Clone 此專案
 2. 執行 `npm install`
 3. 執行 `npm run build`
-4. 開啟 Chrome，前往 `chrome://extensions/`
-5. 開啟右上角的「**開發人員模式**」
-6. 點擊「**載入未封裝項目**」
-7. 選擇專案中的 `dist/` 資料夾
+4. **Chrome**: 開啟 Chrome，前往 `chrome://extensions/`，開啟「**開發人員模式**」，點擊「**載入未封裝項目**」，選擇專案中的 `dist/chrome/` 資料夾
+5. **Firefox**: 開啟 Firefox，前往 `about:debugging#/runtime/this-firefox`，點擊「**載入臨時附加元件**」，選擇 `dist/firefox/manifest.json` 檔案
 
 </details>
 
@@ -77,19 +83,38 @@
 
 ## English
 
-A Chrome extension that automatically displays location info for Threads post authors without visiting each profile.
+A browser extension (Chrome & Firefox) that automatically displays location info for Threads post authors without visiting each profile.
 
 ### Features
 
 - **Auto-fetch**: Automatically loads author location while browsing the feed
 - **Location badges**: Shows location next to post timestamp
-- **Caching**: Extracted data is cached for 72 hours
+- **New user flagging**: Automatically marks users who joined Threads within the last 30 days
+- **Caching**: Profile data cached for 72 hours, user IDs cached for 30 days
 - **Export**: Export all data as JSON
 - **Rate limit protection**: Auto-pauses and notifies when rate limited by Threads
 
+### What's Extracted
+
+- **Location**: User's set location (e.g., Taiwan)
+- **Join date**: When the user joined Threads
+
+### Screenshots
+
+#### Location badges in feed
+![Location badges in feed](screenshots/feed-badge.png)
+
+#### Popup - Profiles tab
+![Profiles list](screenshots/popup-profiles.png)
+
+#### Popup - Location Stats tab
+![Location statistics](screenshots/popup-location-stats.png)
+
 ### Installation
 
-**Recommended:** Go to [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol) and click "**Add to Chrome**" for easy installation and automatic updates.
+**Chrome Users:** Go to [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol) and click "**Add to Chrome**" for easy installation and automatic updates.
+
+**Firefox Users:** Go to [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/) and click "**Add to Firefox**" to install.
 
 <details>
 <summary>Manual Installation (Developers)</summary>
@@ -109,10 +134,8 @@ A Chrome extension that automatically displays location info for Threads post au
 1. Clone this repository
 2. Run `npm install`
 3. Run `npm run build`
-4. Open Chrome and navigate to `chrome://extensions/`
-5. Enable **Developer mode** (toggle in top-right corner)
-6. Click **Load unpacked**
-7. Select the `dist/` folder from the project
+4. **Chrome**: Open Chrome, navigate to `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, select the `dist/chrome/` folder
+5. **Firefox**: Open Firefox, navigate to `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on**, select the `dist/firefox/manifest.json` file
 
 </details>
 
@@ -125,9 +148,9 @@ A Chrome extension that automatically displays location info for Threads post au
 
 ### Privacy
 
-- All data is stored locally in Chrome's storage
+- All data is stored locally in your browser's storage
 - No data is sent to external servers
-- Cache is automatically cleared after 72 hours
+- Profile cache is automatically cleared after 72 hours
 
 ## License
 
