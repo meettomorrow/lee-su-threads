@@ -48,10 +48,7 @@
     "message": "모든 캐시된 프로필을 지우시겠습니까?"
   },
   "rateLimitWarning": {
-    "message": "⚠️ 위치 조회가 너무 많습니다. Threads에 의해 제한되었습니다. 30분간 자동 가져오기를 일시 중지합니다. 필요시 버튼을 클릭하여 수동으로 시도해 보세요"
-  },
-  "rateLimitResume": {
-    "message": "자동 가져오기 재개"
+    "message": "⚠️ 위치 조회가 너무 많습니다. Threads에 의해 제한되었습니다. 1시간 동안 자동 가져오기를 일시 중지합니다. 다른 기능에는 영향을 주지 않습니다"
   },
   "joined": {
     "message": "가입일"
@@ -82,5 +79,65 @@
   },
   "newUser": {
     "message": "신규"
+  },
+  "rateLimitPopupHint": {
+    "message": "속도 제한을 피하려면 확장 프로그램 설정에서 자동 조회를 끌 수 있습니다."
+  },
+  "rateLimitOpenSettings": {
+    "message": "사용 방법"
+  },
+  "onboardingTitle": {
+    "message": "Lee-Su-Threads에 오신 것을 환영합니다!"
+  },
+  "onboardingSubtitle": {
+    "message": "Threads 사용자의 위치 정보를 자동으로 표시"
+  },
+  "onboardingFeaturesTitle": {
+    "message": "이 확장 프로그램의 기능"
+  },
+  "onboardingFeature1": {
+    "message": "Threads 게시물 작성자의 위치 및 가입일 표시"
+  },
+  "onboardingFeature2": {
+    "message": "스크롤하는 동안 프로필 정보 자동 가져오기"
+  },
+  "onboardingFeature3": {
+    "message": "신규 사용자(30일 이내 가입)를 [신규] 배지로 강조 표시"
+  },
+  "onboardingFeature4": {
+    "message": "팝업 패널에서 위치 통계 보기"
+  },
+  "onboardingControlTitle": {
+    "message": "확장 프로그램 제어"
+  },
+  "onboardingControlDesc": {
+    "message": "브라우저 도구 모음에서 확장 프로그램 아이콘을 클릭하여 언제든지 자동 조회를 켜거나 끌 수 있습니다."
+  },
+  "onboardingStep1Title": {
+    "message": "확장 프로그램 아이콘 클릭"
+  },
+  "onboardingStep1Desc": {
+    "message": "브라우저 확장 프로그램 도구 모음(일반적으로 오른쪽 상단 모서리)에서 Lee-Su-Threads 아이콘을 찾으세요."
+  },
+  "onboardingStep2Title": {
+    "message": "자동 조회 전환"
+  },
+  "onboardingStep2Desc": {
+    "message": "팝업의 스위치를 사용하여 자동 프로필 가져오기를 활성화하거나 비활성화하세요."
+  },
+  "onboardingStep3Title": {
+    "message": "통계 보기"
+  },
+  "onboardingStep3Desc": {
+    "message": "\"위치 통계\" 탭을 확인하여 피드 작성자가 어디에서 왔는지 확인하세요!"
+  },
+  "onboardingCtaTitle": {
+    "message": "시작할 준비가 되셨나요?"
+  },
+  "onboardingCtaButton": {
+    "message": "Threads 열기"
+  },
+  "onboardingFooter": {
+    "message": "Threads 커뮤니티를 위해 ❤️로 제작"
   }
 }

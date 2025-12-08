@@ -10,6 +10,7 @@ const buildOptions = {
     'src/popup.js',
     'src/background.js',
     'src/injected.js',
+    'src/onboarding.js',
   ],
   bundle: true,
   outdir: 'dist/shared',
@@ -31,6 +32,7 @@ async function copyStaticFilesForBrowser(browser) {
   await copyFile('dist/shared/popup.js', `${distDir}/popup.js`);
   await copyFile('dist/shared/background.js', `${distDir}/background.js`);
   await copyFile('dist/shared/injected.js', `${distDir}/injected.js`);
+  await copyFile('dist/shared/onboarding.js', `${distDir}/onboarding.js`);
 
   if (!isWatch) {
     // Copy source maps in production builds
@@ -49,6 +51,7 @@ async function copyStaticFilesForBrowser(browser) {
 
   // Copy HTML and CSS
   await copyFile('src/popup.html', `${distDir}/popup.html`);
+  await copyFile('src/onboarding.html', `${distDir}/onboarding.html`);
   await copyFile('src/styles.css', `${distDir}/styles.css`);
 
   // Copy _locales directory recursively

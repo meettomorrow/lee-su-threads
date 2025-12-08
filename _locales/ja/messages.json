@@ -48,10 +48,7 @@
     "message": "すべてのキャッシュされたプロフィールをクリアしますか？"
   },
   "rateLimitWarning": {
-    "message": "⚠️ 地域クエリが多すぎます。Threadsに制限されました。30分間自動取得を休止します。必要に応じてボタンをクリックして手動でお試しください"
-  },
-  "rateLimitResume": {
-    "message": "自動取得を再開"
+    "message": "⚠️ 地域クエリが多すぎます。Threadsに制限されました。1時間自動取得を休止します。他の機能には影響しません"
   },
   "joined": {
     "message": "参加日"
@@ -82,5 +79,65 @@
   },
   "newUser": {
     "message": "新規"
+  },
+  "rateLimitPopupHint": {
+    "message": "レート制限を回避するには、拡張機能の設定で自動クエリをオフにできます。"
+  },
+  "rateLimitOpenSettings": {
+    "message": "使い方"
+  },
+  "onboardingTitle": {
+    "message": "Lee-Su-Threads へようこそ！"
+  },
+  "onboardingSubtitle": {
+    "message": "Threads ユーザーの地域情報を自動的に表示"
+  },
+  "onboardingFeaturesTitle": {
+    "message": "この拡張機能でできること"
+  },
+  "onboardingFeature1": {
+    "message": "Threads 投稿者の地域と参加日を表示"
+  },
+  "onboardingFeature2": {
+    "message": "スクロール中にプロフィール情報を自動取得"
+  },
+  "onboardingFeature3": {
+    "message": "新規ユーザー（30日以内に参加）を [新規] バッジで強調表示"
+  },
+  "onboardingFeature4": {
+    "message": "ポップアップパネルで地域統計を表示"
+  },
+  "onboardingControlTitle": {
+    "message": "拡張機能の制御"
+  },
+  "onboardingControlDesc": {
+    "message": "ブラウザのツールバーにある拡張機能アイコンをクリックすることで、いつでも自動クエリのオン/オフを切り替えることができます。"
+  },
+  "onboardingStep1Title": {
+    "message": "拡張機能アイコンをクリック"
+  },
+  "onboardingStep1Desc": {
+    "message": "ブラウザの拡張機能ツールバー（通常は右上隅）で Lee-Su-Threads アイコンを見つけます。"
+  },
+  "onboardingStep2Title": {
+    "message": "自動クエリを切り替え"
+  },
+  "onboardingStep2Desc": {
+    "message": "ポップアップ内のスイッチを使用して、自動プロフィール取得を有効または無効にします。"
+  },
+  "onboardingStep3Title": {
+    "message": "統計を表示"
+  },
+  "onboardingStep3Desc": {
+    "message": "「地域統計」タブをチェックして、フィードの作成者がどこから来ているかを確認しましょう！"
+  },
+  "onboardingCtaTitle": {
+    "message": "準備はできましたか？"
+  },
+  "onboardingCtaButton": {
+    "message": "Threads を開く"
+  },
+  "onboardingFooter": {
+    "message": "Threads コミュニティのために ❤️ で作成"
   }
 }

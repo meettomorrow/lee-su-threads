@@ -48,10 +48,7 @@
     "message": "Are you sure you want to clear all cached profiles?"
   },
   "rateLimitWarning": {
-    "message": "⚠️ Too many location queries. Rate limited by Threads. Auto-fetch paused for 30 minutes. Click the button to try manually if needed."
-  },
-  "rateLimitResume": {
-    "message": "Resume auto-fetch"
+    "message": "⚠️ Too many location queries. Rate limited by Threads. Auto-fetch paused for 1 hour. Other features unaffected"
   },
   "joined": {
     "message": "Joined"
@@ -82,5 +79,65 @@
   },
   "newUser": {
     "message": "NEW"
+  },
+  "rateLimitPopupHint": {
+    "message": "You can turn off auto-query in extension settings to avoid rate limiting."
+  },
+  "rateLimitOpenSettings": {
+    "message": "How to Use"
+  },
+  "onboardingTitle": {
+    "message": "Welcome to Lee-Su-Threads!"
+  },
+  "onboardingSubtitle": {
+    "message": "Automatically discover location info for Threads users"
+  },
+  "onboardingFeaturesTitle": {
+    "message": "What This Extension Does"
+  },
+  "onboardingFeature1": {
+    "message": "Displays location and join date for Threads post authors"
+  },
+  "onboardingFeature2": {
+    "message": "Automatically fetches profile info as you scroll"
+  },
+  "onboardingFeature3": {
+    "message": "Highlights new users (joined within 30 days) with a [NEW] badge"
+  },
+  "onboardingFeature4": {
+    "message": "View location statistics in the popup panel"
+  },
+  "onboardingControlTitle": {
+    "message": "Control Your Extension"
+  },
+  "onboardingControlDesc": {
+    "message": "You can toggle Auto-query on or off at any time by clicking the extension icon in your browser toolbar."
+  },
+  "onboardingStep1Title": {
+    "message": "Click the Extension Icon"
+  },
+  "onboardingStep1Desc": {
+    "message": "Find the Lee-Su-Threads icon in your browser's extension toolbar (usually in the top-right corner)."
+  },
+  "onboardingStep2Title": {
+    "message": "Toggle Auto-query"
+  },
+  "onboardingStep2Desc": {
+    "message": "Use the switch in the popup to enable or disable automatic profile fetching."
+  },
+  "onboardingStep3Title": {
+    "message": "View Statistics"
+  },
+  "onboardingStep3Desc": {
+    "message": "Check out the \"Location Stats\" tab to see where your feed authors are from!"
+  },
+  "onboardingCtaTitle": {
+    "message": "Ready to Get Started?"
+  },
+  "onboardingCtaButton": {
+    "message": "Open Threads"
+  },
+  "onboardingFooter": {
+    "message": "Made with ❤️ for the Threads community"
   }
 }

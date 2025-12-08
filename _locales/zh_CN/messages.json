@@ -48,10 +48,7 @@
     "message": "确定要清除所有缓存的个人资料吗？"
   },
   "rateLimitWarning": {
-    "message": "⚠️ 地点查询太多次，被 Threads 限制了，30 分钟内不会自动查，若有需要请手动点击按钮查看看"
-  },
-  "rateLimitResume": {
-    "message": "继续自动查询"
+    "message": "⚠️ 地点查询太多次，被 Threads 限制了，1 小时内不会自动查询。此不影响其他功能"
   },
   "joined": {
     "message": "加入时间"
@@ -82,5 +79,65 @@
   },
   "newUser": {
     "message": "新账号"
+  },
+  "rateLimitPopupHint": {
+    "message": "你可以在扩展程序设置中关闭自动查询以避免触发速率限制。"
+  },
+  "rateLimitOpenSettings": {
+    "message": "使用说明"
+  },
+  "onboardingTitle": {
+    "message": "欢迎使用 Lee-Su-Threads！"
+  },
+  "onboardingSubtitle": {
+    "message": "自动显示 Threads 用户的地点信息"
+  },
+  "onboardingFeaturesTitle": {
+    "message": "这个扩展的功能"
+  },
+  "onboardingFeature1": {
+    "message": "显示 Threads 帖文作者的地点和加入时间"
+  },
+  "onboardingFeature2": {
+    "message": "在你滚动时自动获取个人资料信息"
+  },
+  "onboardingFeature3": {
+    "message": "用 [新账号] 标签标示新用户（30 天内加入）"
+  },
+  "onboardingFeature4": {
+    "message": "在弹出窗口中查看地点统计"
+  },
+  "onboardingControlTitle": {
+    "message": "控制你的扩展"
+  },
+  "onboardingControlDesc": {
+    "message": "你可以随时点击浏览器工具栏中的扩展图标来开启或关闭自动查询。"
+  },
+  "onboardingStep1Title": {
+    "message": "点击扩展图标"
+  },
+  "onboardingStep1Desc": {
+    "message": "在你的浏览器扩展工具栏（通常在右上角）中找到 Lee-Su-Threads 图标。"
+  },
+  "onboardingStep2Title": {
+    "message": "切换自动查询"
+  },
+  "onboardingStep2Desc": {
+    "message": "使用弹出窗口中的开关来启用或停用自动获取个人资料。"
+  },
+  "onboardingStep3Title": {
+    "message": "查看统计数据"
+  },
+  "onboardingStep3Desc": {
+    "message": "查看「地点统计」标签，看看你的动态作者来自哪里！"
+  },
+  "onboardingCtaTitle": {
+    "message": "准备好开始了吗？"
+  },
+  "onboardingCtaButton": {
+    "message": "打开 Threads"
+  },
+  "onboardingFooter": {
+    "message": "用 ❤️ 为 Threads 社群打造"
   }
 }

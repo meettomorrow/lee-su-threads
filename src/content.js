@@ -17,7 +17,7 @@ let autoQueryEnabled = true; // User preference for auto-query
 let rateLimitedUntil = 0; // Timestamp when rate limit cooldown ends
 const FETCH_DELAY_MS = 800; // Delay between auto-fetches to avoid rate limiting
 const INITIAL_DELAY_MS = 2000; // Wait for bulk-route-definitions to load
-const RATE_LIMIT_COOLDOWN_MS = 30 * 60 * 1000; // 30 minutes cooldown
+const RATE_LIMIT_COOLDOWN_MS = 60 * 60 * 1000; // 60 minutes (1 hour) cooldown
 const MAX_QUEUE_SIZE = 5; // Maximum number of posts in queue
 const VISIBILITY_DELAY_MS = 500; // How long a post must be visible before queuing
 const pendingVisibility = new Map(); // Track posts waiting to be queued
@@ -75,30 +75,34 @@ function showRateLimitToast() {
   const toast = document.createElement('div');
   toast.id = 'threads-rate-limit-toast';
   const warningMsg = browserAPI.i18n.getMessage('rateLimitWarning') || '⚠️ Too many location queries. Rate limited by Threads.';
-  const resumeMsg = browserAPI.i18n.getMessage('rateLimitResume') || 'Resume auto-fetch';
+  const popupHintMsg = browserAPI.i18n.getMessage('rateLimitPopupHint') || 'You can turn off auto-query in the popup.';
+  const openSettingsMsg = browserAPI.i18n.getMessage('rateLimitOpenSettings') || 'How to Use';
 
   const warningSpan = document.createElement('span');
   warningSpan.textContent = warningMsg;
 
-  const resumeBtn = document.createElement('button');
-  resumeBtn.id = 'threads-resume-btn';
-  resumeBtn.textContent = resumeMsg;
+  const hintSpan = document.createElement('span');
+  hintSpan.className = 'threads-rate-limit-hint';
+  hintSpan.textContent = popupHintMsg;
+
+  const openSettingsBtn = document.createElement('button');
+  openSettingsBtn.id = 'threads-open-settings-btn';
+  openSettingsBtn.textContent = openSettingsMsg;
 
   const dismissBtn = document.createElement('button');
   dismissBtn.id = 'threads-dismiss-toast';
   dismissBtn.textContent = '✕';
 
   toast.appendChild(warningSpan);
-  toast.appendChild(resumeBtn);
+  toast.appendChild(hintSpan);
+  toast.appendChild(openSettingsBtn);
   toast.appendChild(dismissBtn);
   document.body.appendChild(toast);
 
-  // Resume button - clears the cooldown
-  document.getElementById('threads-resume-btn').addEventListener('click', () => {
-    rateLimitedUntil = 0;
-    toast.remove();
-    console.log('[Threads Extractor] User resumed auto-fetch manually.');
-    processFetchQueue();
+  // Open settings button - opens onboarding page with instructions
+  document.getElementById('threads-open-settings-btn').addEventListener('click', () => {
+    // Send message to background script to open the onboarding page
+    browserAPI.runtime.sendMessage({ type: 'OPEN_ONBOARDING' });
   });
 
   // Dismiss button

@@ -1,6 +1,6 @@
 {
   "extName": {
-    "message": "Lee-Su-Threads 你是誰"
+    "message": "Lee-Su-Threads 哩速隨 你是誰"
   },
   "extDescription": {
     "message": "自動顯示 Threads 貼文作者的地點資訊"
@@ -48,10 +48,7 @@
     "message": "確定要清除所有快取的個人檔案嗎？"
   },
   "rateLimitWarning": {
-    "message": "⚠️ 地點查詢太多次，被 Threads 限制了，30 分鐘內不會自動查，若有需要請手動點擊按鈕查看看"
-  },
-  "rateLimitResume": {
-    "message": "繼續自動查詢"
+    "message": "⚠️ 地點查詢太多次，被 Threads 限制了，1 小時內不會自動查詢。此不影響其他功能"
   },
   "joined": {
     "message": "加入時間"
@@ -82,5 +79,65 @@
   },
   "newUser": {
     "message": "新帳號"
+  },
+  "rateLimitPopupHint": {
+    "message": "你可以在擴充功能設定中關閉自動查詢以避免觸發速率限制。"
+  },
+  "rateLimitOpenSettings": {
+    "message": "使用說明"
+  },
+  "onboardingTitle": {
+    "message": "歡迎使用 Lee-Su-Threads (哩速隨)！"
+  },
+  "onboardingSubtitle": {
+    "message": "自動顯示 Threads 使用者的地點資訊"
+  },
+  "onboardingFeaturesTitle": {
+    "message": "這個擴充功能的功能"
+  },
+  "onboardingFeature1": {
+    "message": "顯示 Threads 貼文作者的地點和加入時間"
+  },
+  "onboardingFeature2": {
+    "message": "在你滾動時自動取得個人檔案資訊"
+  },
+  "onboardingFeature3": {
+    "message": "用 [新帳號] 標籤標示新使用者（30 天內加入）"
+  },
+  "onboardingFeature4": {
+    "message": "在彈出視窗中查看地點統計"
+  },
+  "onboardingControlTitle": {
+    "message": "控制你的擴充功能"
+  },
+  "onboardingControlDesc": {
+    "message": "你可以隨時點擊瀏覽器工具列中的擴充功能圖示來開啟或關閉自動查詢。"
+  },
+  "onboardingStep1Title": {
+    "message": "點擊擴充功能圖示"
+  },
+  "onboardingStep1Desc": {
+    "message": "在你的瀏覽器擴充功能工具列（通常在右上角）中找到哩速隨圖示。"
+  },
+  "onboardingStep2Title": {
+    "message": "切換自動查詢"
+  },
+  "onboardingStep2Desc": {
+    "message": "使用彈出視窗中的開關來啟用或停用自動取得個人檔案。"
+  },
+  "onboardingStep3Title": {
+    "message": "查看統計資料"
+  },
+  "onboardingStep3Desc": {
+    "message": "查看「地點統計」分頁，看看你的動態作者來自哪裡！"
+  },
+  "onboardingCtaTitle": {
+    "message": "準備好開始了嗎？"
+  },
+  "onboardingCtaButton": {
+    "message": "開啟 Threads"
+  },
+  "onboardingFooter": {
+    "message": "用 ❤️ 為 Threads 社群打造"
   }
 }
