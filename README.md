@@ -2,7 +2,7 @@
 
 一個 Safari 擴充功能（macOS），自動顯示 Threads 貼文作者的地點資訊，不需要點進每個人的個人檔案。
 
-> ⚠️ **這是 Safari/macOS 版本分支。** Chrome 與 Firefox 版本請前往 [main 分支](https://github.com/KoukeNeko/lee-su-threads/tree/main)。
+> ⚠️ **這是 Safari/macOS 版本分支。** Chrome 與 Firefox 版本請前往 [main 分支](https://github.com/meettomorrow/lee-su-threads/tree/main)。
 
 > **[English](#english)** below
 
@@ -42,7 +42,7 @@
 
 1. Clone 此專案並切換到 safari-version 分支：
    ```bash
-   git clone https://github.com/KoukeNeko/lee-su-threads.git
+   git clone https://github.com/meettomorrow/lee-su-threads.git
    cd lee-su-threads
    git checkout safari-version
    ```
@@ -94,7 +94,7 @@
 
 A Safari extension (macOS) that automatically displays location info for Threads post authors without visiting each profile.
 
-> ⚠️ **This is the Safari/macOS version branch.** For Chrome and Firefox, visit the [main branch](https://github.com/KoukeNeko/lee-su-threads/tree/main).
+> ⚠️ **This is the Safari/macOS version branch.** For Chrome and Firefox, visit the [main branch](https://github.com/meettomorrow/lee-su-threads/tree/main).
 
 ### Features
 
@@ -132,7 +132,7 @@ A Safari extension (macOS) that automatically displays location info for Threads
 
 1. Clone this repository and switch to the safari-version branch:
    ```bash
-   git clone https://github.com/KoukeNeko/lee-su-threads.git
+   git clone https://github.com/meettomorrow/lee-su-threads.git
    cd lee-su-threads
    git checkout safari-version
    ```
