@@ -33,12 +33,40 @@
 
 ## 安裝方式 (Safari/macOS)
 
-### 系統需求
-- macOS 10.14 或更新版本
-- Safari 14 或更新版本
-- Xcode（用於建置）
+### Homebrew（推薦）
+
+```bash
+brew install koukeneko/tap/lee-su-threads
+```
+
+這會自動：
+- 下載並安裝最新版本
+- 移除 quarantine 屬性（不需要手動執行 `xattr`）
+- 將 App 放入應用程式資料夾
+
+安裝後，需要在 Safari 中啟用擴充功能（見下方說明）。
+
+### 從 Release 下載
+
+1. 從 [Releases](https://github.com/KoukeNeko/lee-su-threads/releases) 下載最新的 ZIP 檔
+2. 解壓縮並將 `Lee-Su-Threads.app` 移動到應用程式資料夾
+3. 執行以下命令移除 quarantine 屬性：
+   ```bash
+   xattr -cr /Applications/Lee-Su-Threads.app
+   ```
 
 ### 從原始碼建置
+
+<details>
+<summary>開發者建置說明</summary>
+
+#### 系統需求
+- macOS 10.14 或更新版本
+- Safari 14 或更新版本
+- Xcode 14+
+- Node.js
+
+#### 建置步驟
 
 1. Clone 此專案並切換到 safari-version 分支：
    ```bash
@@ -47,25 +75,29 @@
    git checkout safari-version
    ```
 
-2. 安裝依賴並建置 JavaScript：
+2. 使用建置腳本：
+   ```bash
+   ./scripts/build-safari.sh
+   ```
+
+   或手動建置：
    ```bash
    npm install
    npm run build
-   ```
-
-3. 開啟 Xcode 專案：
-   ```bash
    open src/src.xcodeproj
    ```
 
-4. 在 Xcode 中選擇 **src (macOS)** scheme，然後按 **Cmd + R** 執行
+3. 在 Xcode 中選擇 **src (macOS)** scheme，然後按 **Cmd + R** 執行
 
-5. 開啟 Safari 設定 → 延伸功能 → 啟用 **Lee-Su-Threads 你是誰**
+</details>
 
-### 啟用未簽署的擴充功能（開發者）
+### 啟用擴充功能
+
+⚠️ **重要**：由於這是未簽署的擴充功能，每次重啟 Safari 後都需要重新啟用。
 
 1. 開啟 Safari 設定 → 進階 → 勾選「**在選單列中顯示「開發」選單**」
 2. 開啟 Safari 設定 → 開發者 → 勾選「**允許未簽署的延伸功能**」
+3. 開啟 Safari 設定 → 延伸功能 → 啟用 **Lee-Su-Threads 你是誰**
 
 ## 使用方式
 
@@ -123,12 +155,40 @@ A Safari extension (macOS) that automatically displays location info for Threads
 
 ### Installation (Safari/macOS)
 
-#### Requirements
-- macOS 10.14 or later
-- Safari 14 or later
-- Xcode (for building)
+#### Homebrew (Recommended)
+
+```bash
+brew install koukeneko/tap/lee-su-threads
+```
+
+This will automatically:
+- Download and install the latest version
+- Remove quarantine attributes (no manual `xattr` needed)
+- Set up the app in your Applications folder
+
+After installation, you need to enable the extension in Safari (see below).
+
+#### Download Release
+
+1. Download the latest ZIP from [Releases](https://github.com/KoukeNeko/lee-su-threads/releases)
+2. Extract and move `Lee-Su-Threads.app` to Applications folder
+3. Run this command to remove quarantine attribute:
+   ```bash
+   xattr -cr /Applications/Lee-Su-Threads.app
+   ```
 
 #### Build from Source
+
+<details>
+<summary>Developer build instructions</summary>
+
+##### Requirements
+- macOS 10.14 or later
+- Safari 14 or later
+- Xcode 14+
+- Node.js
+
+##### Build Steps
 
 1. Clone this repository and switch to the safari-version branch:
    ```bash
@@ -137,25 +197,29 @@ A Safari extension (macOS) that automatically displays location info for Threads
    git checkout safari-version
    ```
 
-2. Install dependencies and build JavaScript:
+2. Use the build script:
+   ```bash
+   ./scripts/build-safari.sh
+   ```
+
+   Or build manually:
    ```bash
    npm install
    npm run build
-   ```
-
-3. Open the Xcode project:
-   ```bash
    open src/src.xcodeproj
    ```
 
-4. Select the **src (macOS)** scheme in Xcode, then press **Cmd + R** to run
+3. Select the **src (macOS)** scheme in Xcode, then press **Cmd + R** to run
 
-5. Open Safari Settings → Extensions → Enable **Lee-Su-Threads 你是誰**
+</details>
 
-#### Enable Unsigned Extensions (Developers)
+#### Enable the Extension
+
+⚠️ **Important**: Since this is an unsigned extension, you need to re-enable it after each Safari restart.
 
 1. Open Safari Settings → Advanced → Check "**Show Develop menu in menu bar**"
 2. Open Safari Settings → Developer → Check "**Allow unsigned extensions**"
+3. Open Safari Settings → Extensions → Enable **Lee-Su-Threads 你是誰**
 
 ### Usage
 
