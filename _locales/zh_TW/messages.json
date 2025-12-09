@@ -111,10 +111,10 @@
     "message": "控制你的擴充功能"
   },
   "onboardingControlDesc": {
-    "message": "你可以隨時點擊瀏覽器工具列中的擴充功能圖示來開啟或關閉自動查詢。"
+    "message": "你可以隨時點選瀏覽器工具列中的擴充功能圖示來開啟或關閉自動查詢。"
   },
   "onboardingStep1Title": {
-    "message": "點擊擴充功能圖示"
+    "message": "點選擴充功能圖示"
   },
   "onboardingStep1Desc": {
     "message": "在你的瀏覽器擴充功能工具列（通常在右上角）中找到哩速隨圖示。"
