@@ -31,45 +31,52 @@
 ### 彈出視窗 - 地點統計
 ![地點統計](screenshots/popup-location-stats.png)
 
-## 安裝方式
+## 安裝方式 (Safari/macOS)
 
-**Chrome 使用者：** 前往 [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol)，點擊「**加到 Chrome**」按鈕即可安裝，日後可自動獲得更新。
+### 系統需求
+- macOS 10.14 或更新版本
+- Safari 14 或更新版本
+- Xcode（用於建置）
 
-**Firefox 使用者：** 前往 [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/)，點擊「**加到 Firefox**」按鈕即可安裝。
+### 從原始碼建置
 
-<details>
-<summary>手動安裝（開發者）</summary>
+1. Clone 此專案並切換到 safari-version 分支：
+   ```bash
+   git clone https://github.com/KoukeNeko/lee-su-threads.git
+   cd lee-su-threads
+   git checkout safari-version
+   ```
 
-**從 Release 安裝：**
+2. 安裝依賴並建置 JavaScript：
+   ```bash
+   npm install
+   npm run build
+   ```
 
-1. 前往 [Releases 頁面](https://github.com/meettomorrow/lee-su-threads/releases) 下載最新版本的 ZIP 檔
-2. 解壓縮 ZIP 檔
-3. 開啟 Chrome，前往 `chrome://extensions/`
-4. 開啟右上角的「**開發人員模式**」
-5. 點擊「**載入未封裝項目**」
-6. 選擇解壓縮後的資料夾
-7. 擴充功能圖示會出現在工具列
+3. 開啟 Xcode 專案：
+   ```bash
+   open src/src.xcodeproj
+   ```
 
-**從原始碼建置：**
+4. 在 Xcode 中選擇 **src (macOS)** scheme，然後按 **Cmd + R** 執行
 
-1. Clone 此專案
-2. 執行 `npm install`
-3. 執行 `npm run build`
-4. **Chrome**: 開啟 Chrome，前往 `chrome://extensions/`，開啟「**開發人員模式**」，點擊「**載入未封裝項目**」，選擇專案中的 `dist/chrome/` 資料夾
-5. **Firefox**: 開啟 Firefox，前往 `about:debugging#/runtime/this-firefox`，點擊「**載入臨時附加元件**」，選擇 `dist/firefox/manifest.json` 檔案
+5. 開啟 Safari 設定 → 延伸功能 → 啟用 **Lee-Su-Threads 你是誰**
 
-</details>
+### 啟用未簽署的擴充功能（開發者）
+
+1. 開啟 Safari 設定 → 進階 → 勾選「**在選單列中顯示「開發」選單**」
+2. 開啟 Safari 設定 → 開發者 → 勾選「**允許未簽署的延伸功能**」
 
 ## 使用方式
 
 1. 前往 [threads.com](https://www.threads.com)
 2. 正常瀏覽動態
 3. 擴充功能會自動在貼文旁顯示地點標籤
-4. 點擊擴充功能圖示可查看所有已擷取的資料
+4. 點擊工具列的擴充功能圖示可查看所有已擷取的資料
 
 ## 隱私說明
 
-- 所有資料僅儲存在本機 Chrome 儲存空間
+- 所有資料僅儲存在本機 Safari 儲存空間
 - 不會將任何資料傳送到外部伺服器
 - 快取會在 72 小時後自動清除
 
@@ -85,7 +92,9 @@
 
 ## English
 
-A browser extension (Chrome & Firefox) that automatically displays location info for Threads post authors without visiting each profile.
+A Safari extension (macOS) that automatically displays location info for Threads post authors without visiting each profile.
+
+> ⚠️ **This is the Safari/macOS version branch.** For Chrome and Firefox, visit the [main branch](https://github.com/KoukeNeko/lee-su-threads/tree/main).
 
 ### Features
 
@@ -112,45 +121,52 @@ A browser extension (Chrome & Firefox) that automatically displays location info
 #### Popup - Location Stats tab
 ![Location statistics](screenshots/popup-location-stats.png)
 
-### Installation
+### Installation (Safari/macOS)
 
-**Chrome Users:** Go to [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol) and click "**Add to Chrome**" for easy installation and automatic updates.
+#### Requirements
+- macOS 10.14 or later
+- Safari 14 or later
+- Xcode (for building)
 
-**Firefox Users:** Go to [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/) and click "**Add to Firefox**" to install.
+#### Build from Source
 
-<details>
-<summary>Manual Installation (Developers)</summary>
+1. Clone this repository and switch to the safari-version branch:
+   ```bash
+   git clone https://github.com/KoukeNeko/lee-su-threads.git
+   cd lee-su-threads
+   git checkout safari-version
+   ```
 
-**From Release:**
+2. Install dependencies and build JavaScript:
+   ```bash
+   npm install
+   npm run build
+   ```
 
-1. Download the latest ZIP from [Releases](https://github.com/meettomorrow/lee-su-threads/releases)
-2. Unzip the file
-3. Open Chrome and navigate to `chrome://extensions/`
-4. Enable **Developer mode** (toggle in top-right corner)
-5. Click **Load unpacked**
-6. Select the unzipped folder
-7. The extension icon should appear in your toolbar
+3. Open the Xcode project:
+   ```bash
+   open src/src.xcodeproj
+   ```
 
-**Build from Source:**
+4. Select the **src (macOS)** scheme in Xcode, then press **Cmd + R** to run
 
-1. Clone this repository
-2. Run `npm install`
-3. Run `npm run build`
-4. **Chrome**: Open Chrome, navigate to `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, select the `dist/chrome/` folder
-5. **Firefox**: Open Firefox, navigate to `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on**, select the `dist/firefox/manifest.json` file
+5. Open Safari Settings → Extensions → Enable **Lee-Su-Threads 你是誰**
 
-</details>
+#### Enable Unsigned Extensions (Developers)
+
+1. Open Safari Settings → Advanced → Check "**Show Develop menu in menu bar**"
+2. Open Safari Settings → Developer → Check "**Allow unsigned extensions**"
 
 ### Usage
 
 1. Navigate to [threads.com](https://www.threads.com)
 2. Browse your feed normally
 3. Location badges will automatically appear next to posts
-4. Click the extension icon to view all extracted profiles
+4. Click the extension icon in the toolbar to view all extracted profiles
 
 ### Privacy
 
-- All data is stored locally in your browser's storage
+- All data is stored locally in Safari's storage
 - No data is sent to external servers
 - Profile cache is automatically cleared after 72 hours
 
