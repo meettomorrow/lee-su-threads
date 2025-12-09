@@ -698,7 +698,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.;
-				PRODUCT_NAME = ProductName;
+				PRODUCT_NAME = "Lee-Su-Threads";
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -738,7 +738,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.;
-				PRODUCT_NAME = ProductName;
+				PRODUCT_NAME = "Lee-Su-Threads";
 				SDKROOT = iphoneos;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
 				SWIFT_APPROACHABLE_CONCURRENCY = YES;
@@ -850,7 +850,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.;
-				PRODUCT_NAME = ProductName;
+				PRODUCT_NAME = "Lee-Su-Threads";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;
@@ -891,7 +891,7 @@
 					WebKit,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.yourCompany.;
-				PRODUCT_NAME = ProductName;
+				PRODUCT_NAME = "Lee-Su-Threads";
 				REGISTER_APP_GROUPS = YES;
 				SDKROOT = macosx;
 				STRING_CATALOG_GENERATE_SYMBOLS = YES;

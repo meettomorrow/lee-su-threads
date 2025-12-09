@@ -1,6 +1,8 @@
-# Lee-Su-Threads 你是誰
+# Lee-Su-Threads 你是誰 (Safari/macOS 版)
 
-一個瀏覽器擴充功能（支援 Chrome 與 Firefox），自動顯示 Threads 貼文作者的地點資訊，不需要點進每個人的個人檔案。
+一個 Safari 擴充功能（macOS），自動顯示 Threads 貼文作者的地點資訊，不需要點進每個人的個人檔案。
+
+> ⚠️ **這是 Safari/macOS 版本分支。** Chrome 與 Firefox 版本請前往 [main 分支](https://github.com/KoukeNeko/lee-su-threads/tree/main)。
 
 > **[English](#english)** below
 
