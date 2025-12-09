@@ -1,0 +1,19 @@
+🚀 Starting Lee-Su-Threads Safari Extension build...
+📂 Working directory: /Users/doeshing/Documents/GitHub/lee-su-threads
+📌 Detected version: 0.3.6
+📦 Building JavaScript...
+
+up to date, audited 438 packages in 1s
+
+109 packages are looking for funding
+  run `npm fund` for details
+
+found 0 vulnerabilities
+
+> lee-su-thread@1.0.0 build
+> node esbuild.config.js
+
+✓ JavaScript bundles built
+✓ Static files copied to dist/chrome and dist/firefox
+✓ Build complete
+🧹 Cleaning extended attributes...
