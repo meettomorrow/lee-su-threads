@@ -1,5 +1,6 @@
 // Content script for Threads Profile Info Extractor
 import { parseJoinedDate, isNewUser } from './lib/dateParser.js';
+import { findUsernameContainer, findPostContainer, detectActiveTab } from './lib/domHelpers.js';
 
 'use strict';
 
@@ -83,21 +84,7 @@ window.addEventListener('threads-friendships-list-loaded', (event) => {
   // Try to determine if this is followers or following by checking the active tab
   setTimeout(() => {
     const tabs = document.querySelectorAll('[role="tab"]');
-    let isFollowers = false;
-    let isFollowing = false;
-
-    tabs.forEach((tab, index) => {
-      if (tab.getAttribute('aria-selected') === 'true') {
-        // Use tab position instead of string matching (language-agnostic)
-        // First tab (index 0) = Followers
-        // Second tab (index 1) = Following
-        if (index === 0) {
-          isFollowers = true;
-        } else if (index === 1) {
-          isFollowing = true;
-        }
-      }
-    });
+    const { isFollowers, isFollowing } = detectActiveTab(tabs);
 
     if (isFollowers) {
       // Append new users to existing list (for pagination)
@@ -252,50 +239,23 @@ function injectLocationButtonIntoUserRow(username, userId) {
         // Find the container to insert button
         const insertTarget = findUsernameContainer(userRow, username);
         if (insertTarget) {
-          // Find the follow button to insert before it
-          const followButton = insertTarget.querySelector('[role="button"]');
+          const btn = createFriendshipsLocationButton(username, userId);
+          // Find the follow button that is a direct child
+          const followButton = Array.from(insertTarget.children).find(child =>
+            child.getAttribute && child.getAttribute('role') === 'button'
+          );
           if (followButton) {
-            const btn = createFriendshipsLocationButton(username, userId);
             insertTarget.insertBefore(btn, followButton);
-            break;
+          } else {
+            // No follow button (e.g., own profile) - append to end
+            insertTarget.appendChild(btn);
           }
+          break;
         }
       }
       userRow = userRow.parentElement;
     }
   });
-}
-
-// Find the parent container that has both the name section and follow button
-function findUsernameContainer(container, username) {
-  // Find the profile link first
-  const profileLink = container.querySelector(`a[href="/@${username}"]`);
-  if (!profileLink) {
-    return null;
-  }
-
-  // Navigate up from the profile link to find the container that has a button with role="button"
-  // This container will have the username, profile pic, and follow/following button
-  let current = profileLink;
-
-  for (let i = 0; i < 15 && current; i++) {
-    const parent = current.parentElement;
-    if (parent) {
-      // Look for any button child (could be "Follow", "Following", "Follow Back", etc.)
-      const hasButton = Array.from(parent.children).some(child =>
-        child.getAttribute &&
-        child.getAttribute('role') === 'button' &&
-        child.tagName.toLowerCase() !== 'a' // Exclude link buttons
-      );
-
-      if (hasButton) {
-        return parent;
-      }
-    }
-    current = current.parentElement;
-  }
-
-  return null;
 }
 
 // Create a fetch location button for friendships list
@@ -383,13 +343,18 @@ function injectLocationBadgeIntoUserRow(username, profileInfo) {
         // Find where to insert the badge
         const insertTarget = findUsernameContainer(userRow, username);
         if (insertTarget) {
-          // Find the follow button to insert before it
-          const followButton = insertTarget.querySelector('[role="button"]');
+          const badge = createLocationBadge(profileInfo);
+          // Find the follow button that is a direct child
+          const followButton = Array.from(insertTarget.children).find(child =>
+            child.getAttribute && child.getAttribute('role') === 'button'
+          );
           if (followButton) {
-            const badge = createLocationBadge(profileInfo);
             insertTarget.insertBefore(badge, followButton);
-            break;
+          } else {
+            // No follow button (e.g., own profile) - append to end
+            insertTarget.appendChild(badge);
           }
+          break;
         }
       }
       userRow = userRow.parentElement;
@@ -417,13 +382,18 @@ function injectEmptyLocationIntoUserRow(username) {
         // Find where to insert the indicator
         const insertTarget = findUsernameContainer(userRow, username);
         if (insertTarget) {
-          // Find the follow button to insert before it
-          const followButton = insertTarget.querySelector('[role="button"]');
+          const emptyIndicator = createEmptyLocationIndicator(username);
+          // Find the follow button that is a direct child
+          const followButton = Array.from(insertTarget.children).find(child =>
+            child.getAttribute && child.getAttribute('role') === 'button'
+          );
           if (followButton) {
-            const emptyIndicator = createEmptyLocationIndicator(username);
             insertTarget.insertBefore(emptyIndicator, followButton);
-            break;
+          } else {
+            // No follow button (e.g., own profile) - append to end
+            insertTarget.appendChild(emptyIndicator);
           }
+          break;
         }
       }
       userRow = userRow.parentElement;
@@ -482,27 +452,6 @@ function displayProfileInfo(profileInfo) {
 }
 
 // Find the post container element
-function findPostContainer(element) {
-  let current = element;
-  let depth = 0;
-  const maxDepth = 15;
-
-  while (current && depth < maxDepth) {
-    // Look for common post container patterns
-    if (current.getAttribute &&
-        (current.getAttribute('data-pressable-container') === 'true' ||
-         current.classList?.contains('x1lliihq') ||
-         current.tagName === 'ARTICLE')) {
-      return current;
-    }
-    current = current.parentElement;
-    depth++;
-  }
-
-  return null;
-}
-
-
 // Create the profile info badge element - simple location only
 function createProfileBadge(profileInfo) {
   const badge = document.createElement('span');
@@ -929,26 +878,14 @@ function observeFeed() {
         // Determine which list to use by checking active tab
         const tabs = dialogOpen.querySelectorAll('[role="tab"]');
 
+        const { isFollowers: isFollowersTab, isFollowing: isFollowingTab } = detectActiveTab(tabs);
+
         let activeList = null;
-        let isFollowersTab = false;
-        let isFollowingTab = false;
-
-        tabs.forEach((tab, index) => {
-          const isSelected = tab.getAttribute('aria-selected') === 'true';
-
-          if (isSelected) {
-            // Use tab position instead of string matching (language-agnostic)
-            // First tab (index 0) = Followers
-            // Second tab (index 1) = Following
-            if (index === 0) {
-              activeList = lastFollowersList;
-              isFollowersTab = true;
-            } else if (index === 1) {
-              activeList = lastFollowingList;
-              isFollowingTab = true;
-            }
-          }
-        });
+        if (isFollowersTab) {
+          activeList = lastFollowersList;
+        } else if (isFollowingTab) {
+          activeList = lastFollowingList;
+        }
 
         // Fallback to the most recent list if we can't determine
         if (!activeList || activeList.length === 0) {

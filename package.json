@@ -22,6 +22,8 @@
   "type": "module",
   "devDependencies": {
     "esbuild": "^0.27.1",
+    "happy-dom": "^20.0.11",
+    "jsdom": "^27.3.0",
     "vitest": "^4.0.15",
     "web-ext": "^9.2.0"
   }
