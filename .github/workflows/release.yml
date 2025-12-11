@@ -35,10 +35,19 @@ jobs:
       - name: Package extensions
         run: bash scripts/package.sh
 
+      - name: Sign Firefox extension
+        run: |
+          npx web-ext sign \
+            --source-dir=dist/firefox \
+            --artifacts-dir=dist-zip \
+            --api-key=${{ secrets.FIREFOX_API_KEY }} \
+            --api-secret=${{ secrets.FIREFOX_API_SECRET }}
+        continue-on-error: true
+
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v1
         with:
-          files: dist-zip/*.zip
+          files: dist-zip/*
           draft: false
           prerelease: false
           generate_release_notes: true
