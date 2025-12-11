@@ -1,0 +1,343 @@
+/* Threads Profile Info Extractor Styles */
+
+/* Fetch info button - matches Threads timestamp styling */
+.threads-fetch-btn {
+  display: inline;
+  margin-left: 4px;
+  padding: 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 15px;
+  line-height: 21px;
+  color: rgb(119, 119, 119);
+  font-family: system-ui, -apple-system, "system-ui", Roboto, Helvetica, Arial,
+    sans-serif;
+  vertical-align: baseline;
+}
+
+.threads-fetch-btn:hover:not(:disabled) {
+  color: rgb(168, 168, 168);
+}
+
+.threads-fetch-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.threads-fetch-btn:active:not(:disabled) {
+  opacity: 0.8;
+}
+
+/* Rate limit toast notification */
+#threads-rate-limit-toast {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+  padding: 16px 20px 16px 20px;
+  background: #fffbeb;
+  border: 1px solid #fbbf24;
+  color: #78350f;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 999999999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  font-weight: 400;
+  animation: slideInRight 0.3s ease-out;
+  max-width: 380px;
+}
+
+.threads-rate-limit-hint {
+  font-size: 13px;
+  opacity: 0.85;
+  margin-top: 6px;
+  margin-bottom: 4px;
+  color: #92400e;
+}
+
+@keyframes slideInRight {
+  from {
+    opacity: 0;
+    transform: translateX(100px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+#threads-open-settings-btn {
+  padding: 8px 16px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 13px;
+  font-weight: 600;
+  transition: all 0.2s;
+  width: 100%;
+  margin-top: 8px;
+  background: #1877F2;
+  color: white;
+}
+
+#threads-open-settings-btn:hover {
+  background: #166fe5;
+}
+
+#threads-dismiss-toast {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  background: transparent;
+  color: #92400e;
+  font-size: 18px;
+  padding: 2px;
+  border: none;
+  cursor: pointer;
+  opacity: 0.5;
+  width: auto;
+  margin: 0;
+  line-height: 1;
+  transition: opacity 0.2s;
+}
+
+#threads-dismiss-toast:hover {
+  opacity: 1;
+}
+
+/* Extension icon indicator */
+.threads-extension-indicator {
+  position: fixed;
+  top: 60px;
+  right: 20px;
+  max-width: 320px;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border-radius: 12px;
+  box-shadow: 0 8px 24px rgba(102, 126, 234, 0.4);
+  z-index: 9999999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  font-size: 14px;
+  line-height: 1.5;
+  animation: slideInRight 0.4s ease-out;
+  text-align: center;
+  font-weight: 500;
+}
+
+/* Profile info badge - matches Threads native style */
+.threads-profile-info-badge {
+  display: inline;
+  margin-left: 4px;
+  padding: 0;
+  background: none;
+  font-size: 15px;
+  line-height: 21px;
+  color: rgb(119, 119, 119);
+  vertical-align: baseline;
+  cursor: default;
+  font-family: system-ui, -apple-system, "system-ui", Roboto, Helvetica, Arial,
+    sans-serif;
+}
+
+/* Separator dot before badge */
+.threads-profile-info-badge::before {
+  content: " · ";
+  color: rgb(119, 119, 119);
+}
+
+/* New user tag */
+.threads-new-user-tag {
+  margin-left: 4px;
+  color: rgb(239, 68, 68);
+  font-weight: 600;
+}
+
+/* Floating panel */
+#threads-extractor-panel {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 320px;
+  max-height: 400px;
+  background: linear-gradient(135deg, #1a1a2e 0%, #0f0f23 100%);
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+  z-index: 999999;
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+  overflow: hidden;
+}
+
+.threads-panel-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.05);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font-weight: 600;
+  font-size: 14px;
+}
+
+.threads-panel-toggle {
+  background: none;
+  border: none;
+  color: #888;
+  cursor: pointer;
+  font-size: 18px;
+  width: 28px;
+  height: 28px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.threads-panel-toggle:hover {
+  background: rgba(255, 255, 255, 0.1);
+  color: #fff;
+}
+
+.threads-panel-content {
+  max-height: 320px;
+  overflow-y: auto;
+}
+
+.threads-panel-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.threads-panel-content::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.threads-panel-content::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.threads-panel-content::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+.threads-panel-list {
+  padding: 8px;
+}
+
+.threads-panel-empty {
+  padding: 20px;
+  text-align: center;
+  color: #666;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.threads-panel-item {
+  padding: 12px;
+  border-radius: 8px;
+  margin-bottom: 8px;
+  background: rgba(255, 255, 255, 0.05);
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+
+.threads-panel-item:hover {
+  background: rgba(255, 255, 255, 0.1);
+  border-color: rgba(255, 255, 255, 0.1);
+}
+
+.threads-panel-item:last-child {
+  margin-bottom: 0;
+}
+
+.threads-panel-item-header {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.threads-panel-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid rgba(255, 255, 255, 0.1);
+}
+
+.threads-panel-item-name {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  overflow: hidden;
+}
+
+.threads-panel-item-name strong {
+  color: #fff;
+  font-size: 14px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.threads-panel-username {
+  color: #888;
+  font-size: 12px;
+}
+
+.threads-panel-item-details {
+  font-size: 12px;
+  color: #aaa;
+  line-height: 1.6;
+  padding-left: 46px;
+}
+
+.threads-panel-item-details div {
+  margin: 2px 0;
+}
+
+/* Dark mode adjustments (Threads is dark by default) */
+@media (prefers-color-scheme: light) {
+  .threads-fetch-btn,
+  .threads-profile-info-badge,
+  .threads-profile-info-badge::before {
+    color: rgb(119, 119, 119);
+  }
+
+  .threads-fetch-btn:hover:not(:disabled) {
+    color: rgb(80, 80, 80);
+  }
+
+  #threads-extractor-panel {
+    background: linear-gradient(135deg, #ffffff 0%, #f5f5f5 100%);
+    border-color: rgba(0, 0, 0, 0.15);
+  }
+
+  .threads-panel-header {
+    background: rgba(0, 0, 0, 0.03);
+    border-bottom-color: rgba(0, 0, 0, 0.1);
+    color: #333;
+  }
+
+  .threads-panel-item {
+    background: rgba(0, 0, 0, 0.03);
+  }
+
+  .threads-panel-item:hover {
+    background: rgba(0, 0, 0, 0.06);
+  }
+
+  .threads-panel-item-name strong {
+    color: #333;
+  }
+}

@@ -1,6 +1,8 @@
-# Lee-Su-Threads 你是誰
+# Lee-Su-Threads 你是誰 (Safari/macOS 版)
 
-一個瀏覽器擴充功能（支援 Chrome 與 Firefox），自動顯示 Threads 貼文作者的地點資訊，不需要點進每個人的個人檔案。
+一個 Safari 擴充功能（macOS），自動顯示 Threads 貼文作者的地點資訊，不需要點進每個人的個人檔案。
+
+> ⚠️ **這是 Safari/macOS 版本分支。** Chrome 與 Firefox 版本請前往 [main 分支](https://github.com/meettomorrow/lee-su-threads/tree/main)。
 
 > **[English](#english)** below
 
@@ -29,45 +31,85 @@
 ### 彈出視窗 - 地點統計
 ![地點統計](screenshots/popup-location-stats.png)
 
-## 安裝方式
+## 安裝方式 (Safari/macOS)
 
-**Chrome 使用者：** 前往 [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol)，點擊「**加到 Chrome**」按鈕即可安裝，日後可自動獲得更新。
+### Homebrew（推薦）
 
-**Firefox 使用者：** 前往 [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/)，點擊「**加到 Firefox**」按鈕即可安裝。
+```bash
+brew tap koukeneko/tap
+brew install --cask lee-su-threads
+```
+
+這會自動：
+- 下載並安裝最新版本
+- 移除 quarantine 屬性（不需要手動執行 `xattr`）
+- 將 App 放入應用程式資料夾
+
+安裝後，需要在 Safari 中啟用擴充功能（見下方說明）。
+
+### 從 Release 下載
+
+1. 從 [Releases](https://github.com/KoukeNeko/lee-su-threads/releases) 下載最新的 ZIP 檔
+2. 解壓縮並將 `Lee-Su-Threads.app` 移動到應用程式資料夾
+3. 執行以下命令移除 quarantine 屬性：
+   ```bash
+   xattr -cr /Applications/Lee-Su-Threads.app
+   ```
+
+### 從原始碼建置
 
 <details>
-<summary>手動安裝（開發者）</summary>
+<summary>開發者建置說明</summary>
 
-**從 Release 安裝：**
+#### 系統需求
+- macOS 10.14 或更新版本
+- Safari 14 或更新版本
+- Xcode 14+
+- Node.js
 
-1. 前往 [Releases 頁面](https://github.com/meettomorrow/lee-su-threads/releases) 下載最新版本的 ZIP 檔
-2. 解壓縮 ZIP 檔
-3. 開啟 Chrome，前往 `chrome://extensions/`
-4. 開啟右上角的「**開發人員模式**」
-5. 點擊「**載入未封裝項目**」
-6. 選擇解壓縮後的資料夾
-7. 擴充功能圖示會出現在工具列
+#### 建置步驟
 
-**從原始碼建置：**
+1. Clone 此專案並切換到 safari-version 分支：
+   ```bash
+   git clone https://github.com/meettomorrow/lee-su-threads.git
+   cd lee-su-threads
+   git checkout safari-version
+   ```
 
-1. Clone 此專案
-2. 執行 `npm install`
-3. 執行 `npm run build`
-4. **Chrome**: 開啟 Chrome，前往 `chrome://extensions/`，開啟「**開發人員模式**」，點擊「**載入未封裝項目**」，選擇專案中的 `dist/chrome/` 資料夾
-5. **Firefox**: 開啟 Firefox，前往 `about:debugging#/runtime/this-firefox`，點擊「**載入臨時附加元件**」，選擇 `dist/firefox/manifest.json` 檔案
+2. 使用建置腳本：
+   ```bash
+   ./scripts/build-safari.sh
+   ```
+
+   或手動建置：
+   ```bash
+   npm install
+   npm run build
+   open src/src.xcodeproj
+   ```
+
+3. 在 Xcode 中選擇 **src (macOS)** scheme，然後按 **Cmd + R** 執行
 
 </details>
+
+### 啟用擴充功能
+
+⚠️ **重要**：由於這是未簽署的擴充功能，每次重啟 Safari 後都需要重新啟用。
+
+1. 開啟 Safari 設定 → 進階 → 勾選「**在選單列中顯示「開發」選單**」
+2. 開啟 Safari 設定 → 開發者 → 勾選「**允許未簽署的延伸功能**」
+3. 開啟 Safari 設定 → 延伸功能 → 啟用 **Lee-Su-Threads 你是誰**
 
 ## 使用方式
 
 1. 前往 [threads.com](https://www.threads.com)
 2. 正常瀏覽動態
 3. 擴充功能會自動在貼文旁顯示地點標籤
-4. 點擊擴充功能圖示可查看所有已擷取的資料
+4. 點選工具列的擴充功能圖示可查看所有已擷取的資料
 
 ## 隱私說明
 
-- 所有資料僅儲存在本機 Chrome 儲存空間
+- 所有資料僅儲存在本機 Safari 儲存空間
 - 不會將任何資料傳送到外部伺服器
 - 快取會在 72 小時後自動清除
 
@@ -83,7 +125,9 @@
 
 ## English
 
-A browser extension (Chrome & Firefox) that automatically displays location info for Threads post authors without visiting each profile.
+A Safari extension (macOS) that automatically displays location info for Threads post authors without visiting each profile.
+
+> ⚠️ **This is the Safari/macOS version branch.** For Chrome and Firefox, visit the [main branch](https://github.com/meettomorrow/lee-su-threads/tree/main).
 
 ### Features
 
@@ -110,45 +154,84 @@ A browser extension (Chrome & Firefox) that automatically displays location info
 #### Popup - Location Stats tab
 ![Location statistics](screenshots/popup-location-stats.png)
 
-### Installation
+### Installation (Safari/macOS)
 
-**Chrome Users:** Go to [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol) and click "**Add to Chrome**" for easy installation and automatic updates.
+#### Homebrew (Recommended)
 
-**Firefox Users:** Go to [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/) and click "**Add to Firefox**" to install.
+```bash
+brew install koukeneko/tap/lee-su-threads
+```
+
+This will automatically:
+- Download and install the latest version
+- Remove quarantine attributes (no manual `xattr` needed)
+- Set up the app in your Applications folder
+
+After installation, you need to enable the extension in Safari (see below).
+
+#### Download Release
+
+1. Download the latest ZIP from [Releases](https://github.com/KoukeNeko/lee-su-threads/releases)
+2. Extract and move `Lee-Su-Threads.app` to Applications folder
+3. Run this command to remove quarantine attribute:
+   ```bash
+   xattr -cr /Applications/Lee-Su-Threads.app
+   ```
+
+#### Build from Source
 
 <details>
-<summary>Manual Installation (Developers)</summary>
+<summary>Developer build instructions</summary>
 
-**From Release:**
+##### Requirements
+- macOS 10.14 or later
+- Safari 14 or later
+- Xcode 14+
+- Node.js
 
-1. Download the latest ZIP from [Releases](https://github.com/meettomorrow/lee-su-threads/releases)
-2. Unzip the file
-3. Open Chrome and navigate to `chrome://extensions/`
-4. Enable **Developer mode** (toggle in top-right corner)
-5. Click **Load unpacked**
-6. Select the unzipped folder
-7. The extension icon should appear in your toolbar
+##### Build Steps
 
-**Build from Source:**
+1. Clone this repository and switch to the safari-version branch:
+   ```bash
+   git clone https://github.com/meettomorrow/lee-su-threads.git
+   cd lee-su-threads
+   git checkout safari-version
+   ```
 
-1. Clone this repository
-2. Run `npm install`
-3. Run `npm run build`
-4. **Chrome**: Open Chrome, navigate to `chrome://extensions/`, enable **Developer mode**, click **Load unpacked**, select the `dist/chrome/` folder
-5. **Firefox**: Open Firefox, navigate to `about:debugging#/runtime/this-firefox`, click **Load Temporary Add-on**, select the `dist/firefox/manifest.json` file
+2. Use the build script:
+   ```bash
+   ./scripts/build-safari.sh
+   ```
+
+   Or build manually:
+   ```bash
+   npm install
+   npm run build
+   open src/src.xcodeproj
+   ```
+
+3. Select the **src (macOS)** scheme in Xcode, then press **Cmd + R** to run
 
 </details>
+
+#### Enable the Extension
+
+⚠️ **Important**: Since this is an unsigned extension, you need to re-enable it after each Safari restart.
+
+1. Open Safari Settings → Advanced → Check "**Show Develop menu in menu bar**"
+2. Open Safari Settings → Developer → Check "**Allow unsigned extensions**"
+3. Open Safari Settings → Extensions → Enable **Lee-Su-Threads 你是誰**
 
 ### Usage
 
 1. Navigate to [threads.com](https://www.threads.com)
 2. Browse your feed normally
 3. Location badges will automatically appear next to posts
-4. Click the extension icon to view all extracted profiles
+4. Click the extension icon in the toolbar to view all extracted profiles
 
 ### Privacy
 
-- All data is stored locally in your browser's storage
+- All data is stored locally in Safari's storage
 - No data is sent to external servers
 - Profile cache is automatically cleared after 72 hours
 
