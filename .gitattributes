@@ -1,0 +1,4 @@
+# Automatically use 'ours' strategy when merging Claude workflow files
+# This prevents merge conflicts with upstream when they have their own workflows
+.github/workflows/claude.yml merge=ours
+.github/workflows/claude-code-review.yml merge=ours
