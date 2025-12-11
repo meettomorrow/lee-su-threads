@@ -37,6 +37,7 @@ jobs:
         run: |
           jq ".version = \"$VERSION\"" src/manifest.json > temp.json && mv temp.json src/manifest.json
           jq ".version = \"$VERSION\"" src/manifest.firefox.json > temp.json && mv temp.json src/manifest.firefox.json
+          jq ".version = \"$VERSION\"" src/manifest.firefox-direct.json > temp.json && mv temp.json src/manifest.firefox-direct.json
 
       - name: Build Chrome and Firefox AMO version
         run: |
@@ -46,7 +47,7 @@ jobs:
       - name: Build Firefox self-hosted version (with update_url)
         if: env.ENABLE_FIREFOX_SIGNING == 'true'
         run: |
-          echo "🔨 Building Firefox self-hosted version (with update_url, version ${VERSION}.0)..."
+          echo "🔨 Building Firefox self-hosted version (different add-on ID, version ${VERSION})..."
           npm run build:firefox-self-hosted
 
       - name: Package extensions
@@ -66,10 +67,10 @@ jobs:
 
       - name: Sign Firefox extension (self-distributed)
         if: env.ENABLE_FIREFOX_SIGNING == 'true'
-        timeout-minutes: 5
+        timeout-minutes: 8
         run: |
           npx web-ext sign \
-            --source-dir=dist/firefox \
+            --source-dir=dist/firefox-direct \
             --artifacts-dir=dist-zip \
             --api-key=${{ secrets.FIREFOX_API_KEY }} \
             --api-secret=${{ secrets.FIREFOX_API_SECRET }} \
@@ -79,14 +80,14 @@ jobs:
       - name: Rename signed Firefox extension
         if: env.ENABLE_FIREFOX_SIGNING == 'true'
         run: |
-          if [ -f dist-zip/lee_su_threads-*.xpi ]; then
-            mv dist-zip/lee_su_threads-*.xpi dist-zip/lee-su-threads-firefox-v${VERSION}.0-direct-install.xpi
+          if [ -f dist-zip/lee_su_threads_direct-*.xpi ]; then
+            mv dist-zip/lee_su_threads_direct-*.xpi dist-zip/lee-su-threads-firefox-v${VERSION}-direct-install.xpi
           fi
 
       - name: Validate signed extension exists
         if: env.ENABLE_FIREFOX_SIGNING == 'true'
         run: |
-          if [ ! -f "dist-zip/lee-su-threads-firefox-v${VERSION}.0-direct-install.xpi" ]; then
+          if [ ! -f "dist-zip/lee-su-threads-firefox-v${VERSION}-direct-install.xpi" ]; then
             echo "Error: Signed extension not found"
             exit 1
           fi
@@ -94,7 +95,7 @@ jobs:
       - name: Generate update manifest
         if: env.ENABLE_FIREFOX_SIGNING == 'true'
         run: |
-          sed "s/VERSION_PLACEHOLDER/${VERSION}.0/g" updates.json.template > dist-zip/updates.json
+          sed "s/VERSION_PLACEHOLDER/${VERSION}/g" updates.json.template > dist-zip/updates.json
 
       - name: Create GitHub Release (with signed Firefox)
         if: env.ENABLE_FIREFOX_SIGNING == 'true'

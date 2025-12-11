@@ -9,9 +9,9 @@
     "build": "node esbuild.config.js",
     "build:watch": "node esbuild.config.js --watch",
     "build:firefox-amo": "FIREFOX_BUILD_TYPE=amo node esbuild.config.js",
-    "build:firefox-self-hosted": "FIREFOX_BUILD_TYPE=self-hosted FIREFOX_VERSION_SUFFIX=.0 node esbuild.config.js",
+    "build:firefox-self-hosted": "FIREFOX_BUILD_TYPE=self-hosted node esbuild.config.js",
     "clean": "rm -rf dist",
-    "start:firefox": "web-ext run --source-dir=dist/firefox --start-url=https://www.threads.com",
+    "start:firefox": "web-ext run --source-dir=dist/firefox-direct --start-url=https://www.threads.com",
     "start:firefox:android": "bash scripts/run-firefox-android.sh"
   },
   "repository": {

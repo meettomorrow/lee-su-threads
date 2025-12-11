@@ -88,7 +88,7 @@ Use `browserAPI.storage`, `browserAPI.runtime`, `browserAPI.i18n`, etc.
 
 ### Version Management
 
-**IMPORTANT:** Do NOT manually update version numbers in `src/manifest.json` or `src/manifest.firefox.json` during development.
+**IMPORTANT:** Do NOT manually update version numbers in `src/manifest.json`, `src/manifest.firefox.json`, or `src/manifest.firefox-direct.json` during development.
 
 - **Development builds** (`npm run build:watch`): Automatically uses git tag version + 1 (e.g., if latest tag is `v0.3.7`, dev build shows `0.3.8`)
 - **Production builds** (`npm run build`): Uses the version from source manifests
@@ -104,18 +104,19 @@ npm run clean         # Remove dist/ directory
 
 The build creates separate directories:
 - `dist/chrome/` - Chrome extension (load unpacked from here)
-- `dist/firefox/` - Firefox extension (load temporary add-on from here)
+- `dist/firefox-amo/` - Firefox AMO version (without update_url)
+- `dist/firefox-direct/` - Firefox direct install version (with update_url, load temporary add-on from here)
 - `dist/shared/` - Bundled JS files (intermediate build output)
 
 ### Testing with web-ext (Firefox)
 
 ```bash
-# Lint Firefox extension
-npx web-ext lint --source-dir=dist/firefox
+# Lint Firefox extension (direct install version)
+npx web-ext lint --source-dir=dist/firefox-direct
 
-# Run in Firefox desktop
+# Run in Firefox desktop (direct install version)
 npm run start:firefox
-# or: npx web-ext run --source-dir=dist/firefox
+# or: npx web-ext run --source-dir=dist/firefox-direct
 
 # Run in Firefox for Android (device must be connected via ADB)
 npm run start:firefox:android

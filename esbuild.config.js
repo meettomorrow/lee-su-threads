@@ -7,7 +7,6 @@ const isDev = isWatch || process.env.NODE_ENV === 'development';
 
 // Build configuration for Firefox variants
 const FIREFOX_BUILD_TYPE = process.env.FIREFOX_BUILD_TYPE; // 'amo' or 'self-hosted'
-const FIREFOX_VERSION_SUFFIX = process.env.FIREFOX_VERSION_SUFFIX || ''; // e.g., '.0'
 
 // Get version from git tags (supports both annotated and lightweight tags)
 function getGitVersion() {
@@ -64,18 +63,14 @@ const buildOptions = {
 async function copyStaticFilesForBrowser(browser) {
   // Determine Firefox-specific build configuration
   let distDir = `dist/${browser}`;
-  let removeUpdateUrl = false;
-  let versionSuffix = '';
 
   if (browser === 'firefox' && FIREFOX_BUILD_TYPE) {
     if (FIREFOX_BUILD_TYPE === 'amo') {
       distDir = 'dist/firefox-amo';
-      removeUpdateUrl = true;
-      console.log('🦊 Building Firefox AMO variant (no update_url)');
+      console.log('🦊 Building Firefox AMO variant → dist/firefox-amo');
     } else if (FIREFOX_BUILD_TYPE === 'self-hosted') {
-      distDir = 'dist/firefox';
-      versionSuffix = FIREFOX_VERSION_SUFFIX;
-      console.log(`🦊 Building Firefox self-hosted variant (with update_url, version suffix: ${versionSuffix})`);
+      distDir = 'dist/firefox-direct';
+      console.log('🦊 Building Firefox Direct Install variant → dist/firefox-direct');
     }
   }
 
@@ -98,7 +93,15 @@ async function copyStaticFilesForBrowser(browser) {
   }
 
   // Copy appropriate manifest (rename to manifest.json for both)
-  const sourceManifest = browser === 'chrome' ? 'src/manifest.json' : 'src/manifest.firefox.json';
+  let sourceManifest;
+  if (browser === 'chrome') {
+    sourceManifest = 'src/manifest.json';
+  } else if (browser === 'firefox' && FIREFOX_BUILD_TYPE === 'self-hosted') {
+    sourceManifest = 'src/manifest.firefox-direct.json';
+  } else {
+    sourceManifest = 'src/manifest.firefox.json';
+  }
+
   const manifestContent = await readFile(sourceManifest, 'utf-8');
   const manifest = JSON.parse(manifestContent);
 
@@ -115,19 +118,6 @@ async function copyStaticFilesForBrowser(browser) {
       console.log(`📦 ${browser}: Dev build using manifest version ${oldVersion} → ${newVersion}`);
       manifest.version = newVersion;
     }
-  }
-
-  // Apply version suffix if provided (e.g., ".0" for self-hosted builds)
-  if (versionSuffix) {
-    if (!versionSuffix.startsWith('.')) {
-      throw new Error(`Invalid FIREFOX_VERSION_SUFFIX "${versionSuffix}". Must start with a dot (e.g., ".0")`);
-    }
-    manifest.version = manifest.version + versionSuffix;
-  }
-
-  // Remove update_url for AMO builds
-  if (removeUpdateUrl && manifest.browser_specific_settings?.gecko?.update_url) {
-    delete manifest.browser_specific_settings.gecko.update_url;
   }
 
   await writeFile(`${distDir}/manifest.json`, JSON.stringify(manifest, null, 2));
@@ -149,7 +139,7 @@ async function copyStaticFiles() {
   await copyStaticFilesForBrowser('chrome');
   await copyStaticFilesForBrowser('firefox');
 
-  console.log('✓ Static files copied to dist/chrome and dist/firefox');
+  console.log('✓ Static files copied to dist/chrome and dist/firefox-*');
 }
 
 async function build() {

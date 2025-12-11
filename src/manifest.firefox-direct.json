@@ -54,8 +54,9 @@
   ],
   "browser_specific_settings": {
     "gecko": {
-      "id": "lee-su-threads@meetandy.ai",
+      "id": "lee-su-threads-direct@meetandy.ai",
       "strict_min_version": "109.0",
+      "update_url": "https://github.com/meettomorrow/lee-su-threads/releases/latest/download/updates.json",
       "data_collection_permissions": {
         "required": [
           "none"

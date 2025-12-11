@@ -39,23 +39,19 @@ echo ""
 echo "🦊 Building Firefox extension..."
 
 # Check if firefox-amo directory exists (AMO unlisted build)
-if [ -d "dist/firefox-amo" ]; then
-  echo "📦 Building AMO version (for unlisted review)..."
-  cd dist/firefox-amo
-  zip -r "$PROJECT_ROOT/dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip" . -x "*.DS_Store" "*.map"
-  cd "$PROJECT_ROOT"
-
-  echo "✅ Created dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip (AMO unlisted)"
-  echo "📊 Size: $(du -h dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip | cut -f1)"
-else
-  # Fallback: use regular firefox build (treat as AMO version)
-  cd dist/firefox
-  zip -r "$PROJECT_ROOT/dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip" . -x "*.DS_Store" "*.map"
-  cd "$PROJECT_ROOT"
-
-  echo "✅ Created dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip (fallback)"
-  echo "📊 Size: $(du -h dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip | cut -f1)"
+if [ ! -d "dist/firefox-amo" ]; then
+  echo "❌ Error: dist/firefox-amo/ not found"
+  echo "   Run 'npm run build:firefox-amo' first"
+  exit 1
 fi
+
+echo "📦 Building AMO version (for unlisted review)..."
+cd dist/firefox-amo
+zip -r "$PROJECT_ROOT/dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip" . -x "*.DS_Store" "*.map"
+cd "$PROJECT_ROOT"
+
+echo "✅ Created dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip (AMO unlisted)"
+echo "📊 Size: $(du -h dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip | cut -f1)"
 
 echo ""
 echo "🎉 All builds complete!"
@@ -63,6 +59,6 @@ echo ""
 echo "Chrome:  dist-zip/lee-su-threads-chrome-v${VERSION}.zip"
 
 echo "Firefox (AMO): dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip"
-if [ -d "dist/firefox" ] && [ -d "dist/firefox-amo" ]; then
-  echo "Firefox (Self-hosted): Will be signed and created as .xpi in CI"
+if [ -d "dist/firefox-direct" ]; then
+  echo "Firefox (Direct Install): Will be signed and created as .xpi in CI"
 fi
