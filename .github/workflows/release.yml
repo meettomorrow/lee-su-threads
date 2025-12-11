@@ -69,6 +69,8 @@ jobs:
         if: env.ENABLE_FIREFOX_SIGNING == 'true'
         timeout-minutes: 8
         run: |
+          # Clean up any existing XPI files to avoid selecting wrong file
+          rm -f dist-zip/*.xpi
           npx web-ext sign \
             --source-dir=dist/firefox-direct \
             --artifacts-dir=dist-zip \
