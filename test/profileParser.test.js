@@ -157,4 +157,30 @@ describe('parseProfileResponse', () => {
       expect(result).toEqual({});
     });
   });
+
+  describe('dynamic binding', () => {
+    it('should parse location from on_bind conditional (English labels)', () => {
+      const response = loadFixture('profile-dynamic-bind.txt');
+      const result = parseProfileResponse(response);
+
+      expect(result.username).toBe('testuser123');
+      expect(result.displayName).toBe('Test User');
+      expect(result.joined).toBe('July 2023');
+      // Test Unicode decoding from on_bind (\\u53f0\\u7063 = 台灣)
+      expect(result.location).toBe('台灣');
+      // Profile image is anonymized in test fixture
+      expect(result.profileImage).toBeUndefined();
+    });
+
+    it('should parse location from on_bind with Chinese labels', () => {
+      const response = loadFixture('profile-chinese-labels.txt');
+      const result = parseProfileResponse(response);
+
+      expect(result.username).toBe('testuser');
+      expect(result.displayName).toBe('測試用戶');
+      expect(result.joined).toBe('2024年1月');
+      // Test Unicode decoding with Chinese labels (\\u53f0\\u7063 = 台灣, \\u672a\\u5206\\u4eab = 未分享)
+      expect(result.location).toBe('台灣');
+    });
+  });
 });

@@ -8,6 +8,9 @@
   "noLocation": {
     "message": "No location"
   },
+  "noLocationData": {
+    "message": "No location data"
+  },
   "popupTitle": {
     "message": "Threads Location Viewer"
   },

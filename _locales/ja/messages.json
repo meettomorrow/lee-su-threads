@@ -8,6 +8,9 @@
   "noLocation": {
     "message": "地域なし"
   },
+  "noLocationData": {
+    "message": "地域データなし"
+  },
   "popupTitle": {
     "message": "Threads 地域情報"
   },

@@ -8,6 +8,9 @@
   "noLocation": {
     "message": "无地点"
   },
+  "noLocationData": {
+    "message": "无地点资料"
+  },
   "popupTitle": {
     "message": "Threads 地点信息"
   },

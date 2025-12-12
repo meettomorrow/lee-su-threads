@@ -7,6 +7,8 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 import { compareVersions, shouldShowOnboarding } from './lib/versionUtils.js';
 
 const USER_ID_CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days for user ID mapping
+const PROFILE_WITH_LOCATION_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days for profiles with location
+const PROFILE_NO_LOCATION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours (1 day) for profiles without location
 
 // Handle async message responses for both Chrome and Firefox
 function handleAsyncMessage(message, sender, sendResponse) {
@@ -30,7 +32,19 @@ function handleAsyncMessage(message, sender, sendResponse) {
 
   if (message.type === 'GET_CACHED_PROFILES') {
     browserAPI.storage.local.get(['profileCache']).then((result) => {
-      sendResponse(result.profileCache || {});
+      const cache = result.profileCache || {};
+      const now = Date.now();
+      const validCache = {};
+
+      // Filter out expired entries based on different TTLs
+      for (const [username, data] of Object.entries(cache)) {
+        const maxAge = data.location ? PROFILE_WITH_LOCATION_MAX_AGE : PROFILE_NO_LOCATION_MAX_AGE;
+        if (now - data.timestamp < maxAge) {
+          validCache[username] = data;
+        }
+      }
+
+      sendResponse(validCache);
     });
     return true; // Keep channel open for async response
   }
@@ -109,14 +123,15 @@ browserAPI.runtime.onInstalled.addListener((details) => {
 // Clean up old cache entries on startup
 browserAPI.runtime.onStartup.addListener(() => {
   const now = Date.now();
-  const profileMaxAge = 72 * 60 * 60 * 1000; // 72 hours for profiles
 
-  // Clean profile cache
+  // Clean profile cache with different TTLs based on location data
   browserAPI.storage.local.get(['profileCache']).then((result) => {
     const cache = result.profileCache || {};
     const cleanedCache = {};
     for (const [username, data] of Object.entries(cache)) {
-      if (now - data.timestamp < profileMaxAge) {
+      // Use different max age depending on whether location exists
+      const maxAge = data.location ? PROFILE_WITH_LOCATION_MAX_AGE : PROFILE_NO_LOCATION_MAX_AGE;
+      if (now - data.timestamp < maxAge) {
         cleanedCache[username] = data;
       }
     }

@@ -14,8 +14,27 @@ function extractProfileInfo(obj, result = {}) {
 
   if (obj['bk.components.Text']) {
     const textComp = obj['bk.components.Text'];
-    const text = textComp.text;
+    let text = textComp.text;
     const style = textComp.text_style;
+    const onBind = textComp.on_bind;
+
+    // Handle dynamic text binding (e.g., location privacy)
+    // Format: (bk.action.core.If, condition, "Value1", "Value2")
+    if (!text && onBind && typeof onBind === 'string') {
+      // Extract the first value from the conditional (the "shown" value)
+      const match = onBind.match(/"([^"]+)"\s*,\s*"([^"]+)"/);
+      if (match) {
+        // Use the first value (shown when condition is true)
+        // The second value is typically "Not shared"
+        text = match[1];
+
+        // Decode Unicode escape sequences (e.g., "\u53f0\u7063" -> "台灣")
+        // The on_bind string contains literal \uXXXX sequences that need decoding
+        text = text.replace(/\\u([0-9a-fA-F]{4})/g, (_, hex) => {
+          return String.fromCharCode(parseInt(hex, 16));
+        });
+      }
+    }
 
     if (style === 'semibold' && text) {
       // This is a label - store it

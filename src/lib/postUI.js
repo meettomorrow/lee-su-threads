@@ -45,10 +45,10 @@ export function createProfileBadge(profileInfo) {
     badge.textContent = profileInfo.location;
     badge.title = `${joinedLabel}: ${profileInfo.joined || 'Unknown'}`;
   } else {
-    // Location not available
-    const noLocationText = browserAPI.i18n.getMessage('noLocation') || 'No location';
-    badge.textContent = noLocationText;
-    badge.title = profileInfo.joined ? `${joinedLabel}: ${profileInfo.joined}` : noLocationText;
+    // Location not available - show "無地點資料" with same hover behavior as regular location
+    const noLocationData = browserAPI.i18n.getMessage('noLocationData') || 'No location data';
+    badge.textContent = noLocationData;
+    badge.title = `${joinedLabel}: ${profileInfo.joined || 'Unknown'}`;
   }
 
   // Add [NEW] label for new users (skip if verified)
