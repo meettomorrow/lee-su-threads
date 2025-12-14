@@ -8,7 +8,9 @@
     "storage"
   ],
   "host_permissions": [
-    "https://www.threads.com/*"
+    "https://www.threads.com/*",
+    "https://threads.net/*",
+    "https://www.threads.net/*"
   ],
   "background": {
     "scripts": [
@@ -18,7 +20,9 @@
   "content_scripts": [
     {
       "matches": [
-        "https://www.threads.com/*"
+        "https://www.threads.com/*",
+        "https://threads.net/*",
+        "https://www.threads.net/*"
       ],
       "js": [
         "content.js"
@@ -48,7 +52,9 @@
         "injected.js"
       ],
       "matches": [
-        "https://www.threads.com/*"
+        "https://www.threads.com/*",
+        "https://threads.net/*",
+        "https://www.threads.net/*"
       ]
     }
   ],

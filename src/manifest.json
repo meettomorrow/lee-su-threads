@@ -50,7 +50,9 @@
         "injected.js"
       ],
       "matches": [
-        "https://www.threads.com/*"
+        "https://www.threads.com/*",
+        "https://threads.net/*",
+        "https://www.threads.net/*"
       ]
     }
   ]

@@ -559,25 +559,13 @@ function observeFeed() {
 }
 
 // Detect Threads theme and store it for popup
+let themeObserver = null;
+
 function detectThreadsTheme() {
-  console.log('[Threads Extractor] detectThreadsTheme() called');
-
   function updateTheme() {
-    console.log('[Threads Extractor] updateTheme() called');
-
     // Check multiple possible attributes/classes that Threads might use
     const html = document.documentElement;
     const body = document.body;
-
-    // Log all attributes for debugging
-    console.log('[Threads Extractor] HTML attributes:', {
-      colorMode: html.getAttribute('data-color-mode'),
-      colorScheme: html.getAttribute('data-color-scheme'),
-      theme: html.getAttribute('data-theme'),
-      style: html.getAttribute('style'),
-      classList: Array.from(html.classList),
-      bodyClassList: Array.from(body?.classList || [])
-    });
 
     // Try different detection methods
     let theme = null;
@@ -586,7 +574,6 @@ function detectThreadsTheme() {
     const colorMode = html.getAttribute('data-color-mode');
     if (colorMode) {
       theme = colorMode === 'dark' ? 'dark' : 'light';
-      console.log('[Threads Extractor] Theme detected via data-color-mode:', theme);
     }
 
     // Method 2: Check computed background color
@@ -597,7 +584,6 @@ function detectThreadsTheme() {
       if (rgb && rgb.length >= 3) {
         const brightness = (parseInt(rgb[0]) + parseInt(rgb[1]) + parseInt(rgb[2])) / 3;
         theme = brightness < 128 ? 'dark' : 'light';
-        console.log('[Threads Extractor] Theme detected via background color:', theme, bgColor);
       }
     }
 
@@ -611,23 +597,33 @@ function detectThreadsTheme() {
   // Initial detection
   setTimeout(updateTheme, 1000); // Wait for page to fully load
 
-  // Watch for any attribute changes on html and body
-  const observer = new MutationObserver(() => {
-    updateTheme();
+  // Watch for any attribute changes on html and body with debouncing
+  let updateTimeout = null;
+  themeObserver = new MutationObserver(() => {
+    clearTimeout(updateTimeout);
+    updateTimeout = setTimeout(updateTheme, 100); // Debounce for 100ms
   });
 
-  observer.observe(document.documentElement, {
+  themeObserver.observe(document.documentElement, {
     attributes: true,
     attributeFilter: ['data-color-mode', 'data-color-scheme', 'data-theme', 'class', 'style']
   });
 
   if (document.body) {
-    observer.observe(document.body, {
+    themeObserver.observe(document.body, {
       attributes: true,
       attributeFilter: ['class', 'style']
     });
   }
 }
+
+// Cleanup theme observer on page unload
+window.addEventListener('beforeunload', () => {
+  if (themeObserver) {
+    themeObserver.disconnect();
+    themeObserver = null;
+  }
+}, { once: true });
 
 // Initialize
 function init() {

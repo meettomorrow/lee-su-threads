@@ -64,12 +64,13 @@ document.addEventListener('DOMContentLoaded', () => {
   const tabsEl = document.querySelector('.tabs');
   const statsEl = document.querySelector('.stats');
   const scrollToTopBtn = document.getElementById('scrollToTop');
-  let scrollTimeout;
+  let scrollRAF = null;
 
   if (contentEl) {
     contentEl.addEventListener('scroll', () => {
-      clearTimeout(scrollTimeout);
-      scrollTimeout = setTimeout(() => {
+      if (scrollRAF) return;
+
+      scrollRAF = requestAnimationFrame(() => {
         const scrollTop = contentEl.scrollTop;
 
         // Hide stats in mobile view when scrolled
@@ -97,7 +98,9 @@ document.addEventListener('DOMContentLoaded', () => {
             scrollToTopBtn.classList.remove('visible');
           }
         }
-      }, 10);
+
+        scrollRAF = null;
+      });
     });
   }
 
