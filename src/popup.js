@@ -7,7 +7,8 @@ import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
 // Initialize country flag emoji polyfill for Windows compatibility (popup context)
-polyfillCountryFlagEmojis();
+// Use local font to avoid CSP issues with CDN
+polyfillCountryFlagEmojis("Twemoji Country Flags", browserAPI.runtime.getURL('fonts/TwemojiCountryFlags.woff2'));
 
 // Theme detection and application
 function detectAndApplyTheme() {

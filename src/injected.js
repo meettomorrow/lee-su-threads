@@ -1,11 +1,10 @@
 // Injected script to intercept fetch/XHR responses for profile data
 import { parseProfileResponse } from './lib/profileParser.js';
-import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
 
 'use strict';
 
-// Initialize country flag emoji polyfill for Windows compatibility
-polyfillCountryFlagEmojis();
+// Note: Font polyfill is loaded by content.js (same document, different context)
+// No need to load it again here
 
 // ========== LOGGING HELPERS ==========
 function logRequest(type, url, options = {}) {

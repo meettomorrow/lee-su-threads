@@ -8,11 +8,12 @@ import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
 
 console.log('[Threads Extractor] 🚀 content.js is loading...');
 
-// Initialize country flag emoji polyfill for Windows compatibility (content script context)
-polyfillCountryFlagEmojis();
-
 // Cross-browser compatibility: use browser.* API if available (Firefox), fallback to chrome.*
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
+
+// Initialize country flag emoji polyfill for Windows compatibility (content script context)
+// Use local font to avoid CSP issues with CDN
+polyfillCountryFlagEmojis("Twemoji Country Flags", browserAPI.runtime.getURL('fonts/TwemojiCountryFlags.woff2'));
 
 // Store extracted profiles
 const profileCache = new Map();

@@ -132,6 +132,9 @@ async function copyStaticFilesForBrowser(browser) {
 
   // Copy icons directory
   await cp('icons', `${distDir}/icons`, { recursive: true });
+
+  // Copy fonts directory
+  await cp('fonts', `${distDir}/fonts`, { recursive: true });
 }
 
 async function copyStaticFiles() {

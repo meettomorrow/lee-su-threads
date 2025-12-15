@@ -43,7 +43,8 @@
   "web_accessible_resources": [
     {
       "resources": [
-        "injected.js"
+        "injected.js",
+        "fonts/TwemojiCountryFlags.woff2"
       ],
       "matches": [
         "https://www.threads.com/*"
