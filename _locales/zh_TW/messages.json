@@ -101,6 +101,18 @@
   "rateLimitOpenSettings": {
     "message": "使用說明"
   },
+  "loginRequiredWarning": {
+    "message": "🔒 請登入 Threads 以使用此擴充功能"
+  },
+  "loginRequiredHint": {
+    "message": "只有在你登入時才能取得地點資訊。"
+  },
+  "loginRequired": {
+    "message": "需要登入。點擊以了解更多。"
+  },
+  "dismiss": {
+    "message": "關閉"
+  },
   "onboardingTitle": {
     "message": "歡迎使用 Lee-Su-Threads (哩速隨)！"
   },

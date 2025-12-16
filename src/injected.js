@@ -74,6 +74,23 @@ function logResponse(type, url, responseText) {
 
 // ========== SESSION TOKENS ==========
 let sessionTokens = null;
+let lastLoginState = null; // Track login state to detect changes
+
+function isLoggedIn() {
+  if (!sessionTokens) return false;
+  if (!sessionTokens.fb_dtsg) return false;
+  if (!sessionTokens.__user || sessionTokens.__user === '0') return false;
+  return true;
+}
+
+function broadcastLoginState() {
+  const currentState = isLoggedIn();
+  if (currentState !== lastLoginState) {
+    lastLoginState = currentState;
+    window.postMessage({ type: 'threads-login-state', isLoggedIn: currentState }, '*');
+    console.log(`%c[Threads Extractor] Login state: ${currentState ? 'LOGGED IN' : 'LOGGED OUT'}`, 'color: #3b82f6; font-weight: bold;');
+  }
+}
 
 function captureSessionTokens(bodyParsed) {
   if (bodyParsed && bodyParsed.fb_dtsg) {
@@ -106,6 +123,7 @@ function captureSessionTokens(bodyParsed) {
     console.log('%c[Threads Extractor] Session tokens captured!', 'color: #10b981; font-weight: bold;');
 
     window.__threadsExtractorTokens = sessionTokens;
+    broadcastLoginState();
   }
 }
 
@@ -507,9 +525,9 @@ XMLHttpRequest.prototype.send = function(...args) {
 
 // ========== FETCH PROFILE INFO ==========
 async function fetchProfileInfo(targetUserId) {
-  if (!sessionTokens) {
-    console.error('[Threads Extractor] No session tokens available. Browse the feed first.');
-    return null;
+  if (!isLoggedIn()) {
+    console.warn('[Threads Extractor] User is not logged in. Cannot fetch profile info.');
+    return { _loginRequired: true };
   }
 
   const url = '/async/wbloks/fetch/?appid=com.bloks.www.text_post_app.about_this_profile_async_action&type=app&__bkv=22713cafbb647b89c4e9c1acdea97d89c8c2046e2f4b18729760e9b1ae0724f7';
@@ -686,8 +704,10 @@ function scanPageForSessionTokens() {
     };
     window.__threadsExtractorTokens = sessionTokens;
     console.log('%c  ✅ Session tokens updated from page!', 'color: #22c55e; font-weight: bold;');
+    broadcastLoginState();
   } else {
     console.log('%c  ❌ Could not find fb_dtsg on page', 'color: #ef4444;');
+    broadcastLoginState(); // Still broadcast - might be logged out
   }
 
   return foundTokens;
@@ -799,12 +819,13 @@ window.addEventListener('message', async (event) => {
 window.__threadsFetchProfileInfo = fetchProfileInfo;
 window.__threadsGetUserIdMap = () => Object.fromEntries(userIdMap);
 window.__threadsGetSessionTokens = () => sessionTokens;
+window.__threadsIsLoggedIn = isLoggedIn;
 window.__threadsScanPage = scanPageForUserIds;
 window.__threadsScanTokens = scanPageForSessionTokens;
 window.__threadsScanAll = () => {
   scanPageForSessionTokens();
   scanPageForUserIds();
-  return { tokens: sessionTokens, users: Object.fromEntries(userIdMap) };
+  return { tokens: sessionTokens, users: Object.fromEntries(userIdMap), isLoggedIn: isLoggedIn() };
 };
 
 console.log('[Threads Extractor] Network interceptor injected');
@@ -812,6 +833,7 @@ console.log('[Threads Extractor] Available functions:');
 console.log('  - window.__threadsFetchProfileInfo(userId) - Fetch profile info by user ID');
 console.log('  - window.__threadsGetUserIdMap() - Get all discovered username -> userId mappings');
 console.log('  - window.__threadsGetSessionTokens() - Get captured session tokens');
+console.log('  - window.__threadsIsLoggedIn() - Check if user is logged in');
 console.log('  - window.__threadsScanPage() - Scan page for embedded user data');
 console.log('  - window.__threadsScanTokens() - Scan page for session tokens');
 console.log('  - window.__threadsScanAll() - Scan for both tokens and users');

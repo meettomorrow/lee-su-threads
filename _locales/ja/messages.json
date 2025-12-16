@@ -98,6 +98,18 @@
   "rateLimitOpenSettings": {
     "message": "使い方"
   },
+  "loginRequiredWarning": {
+    "message": "🔒 この拡張機能を使用するには Threads にログインしてください"
+  },
+  "loginRequiredHint": {
+    "message": "ログインしている場合のみ地域情報を取得できます。"
+  },
+  "loginRequired": {
+    "message": "ログインが必要です。クリックして詳細を確認。"
+  },
+  "dismiss": {
+    "message": "閉じる"
+  },
   "onboardingTitle": {
     "message": "Lee-Su-Threads へようこそ！"
   },

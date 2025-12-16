@@ -98,6 +98,18 @@
   "rateLimitOpenSettings": {
     "message": "사용 방법"
   },
+  "loginRequiredWarning": {
+    "message": "🔒 이 확장 프로그램을 사용하려면 Threads에 로그인하세요"
+  },
+  "loginRequiredHint": {
+    "message": "로그인한 경우에만 위치 정보를 가져올 수 있습니다."
+  },
+  "loginRequired": {
+    "message": "로그인이 필요합니다. 클릭하여 자세히 알아보기."
+  },
+  "dismiss": {
+    "message": "닫기"
+  },
   "onboardingTitle": {
     "message": "Lee-Su-Threads에 오신 것을 환영합니다!"
   },

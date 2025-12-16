@@ -98,6 +98,18 @@
   "rateLimitOpenSettings": {
     "message": "使用说明"
   },
+  "loginRequiredWarning": {
+    "message": "🔒 请登录 Threads 以使用此扩展程序"
+  },
+  "loginRequiredHint": {
+    "message": "只有在你登录时才能获取地点信息。"
+  },
+  "loginRequired": {
+    "message": "需要登录。点击以了解更多。"
+  },
+  "dismiss": {
+    "message": "关闭"
+  },
   "onboardingTitle": {
     "message": "欢迎使用 Lee-Su-Threads！"
   },

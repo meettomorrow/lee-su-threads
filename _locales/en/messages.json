@@ -101,6 +101,18 @@
   "rateLimitOpenSettings": {
     "message": "Settings"
   },
+  "loginRequiredWarning": {
+    "message": "🔒 Please log in to Threads to use this extension"
+  },
+  "loginRequiredHint": {
+    "message": "Location info can only be fetched when you're logged in."
+  },
+  "loginRequired": {
+    "message": "Login required. Click to learn more."
+  },
+  "dismiss": {
+    "message": "Dismiss"
+  },
   "onboardingTitle": {
     "message": "Welcome to Lee-Su-Threads!"
   },

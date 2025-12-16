@@ -137,6 +137,13 @@ export async function autoFetchProfile(username, btn, profileCache) {
       btn.textContent = '🔄';
       btn.title = 'Rate limited. Click to retry later.';
       btn.disabled = false;
+    } else if (result._loginRequired) {
+      // Login required - show lock icon (banner will be shown on manual click)
+      btn.textContent = '🔒';
+      btn.title = browserAPI.i18n.getMessage('loginRequired') || 'Login required. Click to learn more.';
+      btn.disabled = false;
+      // Mark button as login-required so click handler knows to show banner
+      btn.setAttribute('data-login-required', 'true');
     } else {
       btn.style.display = 'none';
     }

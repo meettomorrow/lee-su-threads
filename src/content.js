@@ -66,6 +66,12 @@ window.addEventListener('threads-rate-limited', () => {
   showRateLimitToast();
 });
 
+// Listen for login required events
+window.addEventListener('threads-show-login-banner', () => {
+  console.warn('[Threads Extractor] Login required - showing banner');
+  showLoginRequiredBanner();
+});
+
 // Keyboard shortcut: Ctrl+Shift+, to open settings
 document.addEventListener('keydown', (event) => {
   // Check for Ctrl+Shift+, on all platforms (standard settings shortcut)
@@ -78,8 +84,25 @@ document.addEventListener('keydown', (event) => {
   }
 });
 
-// Listen for new user ID discoveries from injected script and persist them
+// Track login state
+let isUserLoggedIn = null; // null = unknown, true = logged in, false = logged out
+
+// Listen for login state changes from injected script
 window.addEventListener('message', (event) => {
+  if (event.data?.type === 'threads-login-state') {
+    const wasLoggedIn = isUserLoggedIn;
+    isUserLoggedIn = event.data.isLoggedIn;
+
+    console.log(`[Threads Extractor] Login state changed: ${isUserLoggedIn ? 'LOGGED IN' : 'LOGGED OUT'}`);
+
+    // If user just logged out, clear any pending fetches
+    if (wasLoggedIn === true && isUserLoggedIn === false) {
+      fetchQueue.length = 0;
+      isFetching = false;
+    }
+  }
+
+  // Listen for new user ID discoveries from injected script and persist them
   if (event.data?.type === 'threads-new-user-ids') {
     const newUserIds = event.data.data;
     if (newUserIds && Object.keys(newUserIds).length > 0) {
@@ -215,6 +238,49 @@ function showRateLimitToast() {
   }, RATE_LIMIT_COOLDOWN_MS);
 }
 
+// Show login required banner notification
+function showLoginRequiredBanner() {
+  console.log('[Threads Extractor] showLoginRequiredBanner called');
+  // Remove existing banner if any
+  const existing = document.getElementById('threads-login-required-banner');
+  if (existing) {
+    console.log('[Threads Extractor] Removing existing banner');
+    existing.remove();
+  }
+
+  const banner = document.createElement('div');
+  banner.id = 'threads-login-required-banner';
+  console.log('[Threads Extractor] Creating new banner element');
+  const warningMsg = browserAPI.i18n.getMessage('loginRequiredWarning') || '🔒 Please log in to Threads to use this extension';
+  const hintMsg = browserAPI.i18n.getMessage('loginRequiredHint') || 'Location info can only be fetched when you\'re logged in.';
+  const dismissMsg = browserAPI.i18n.getMessage('dismiss') || 'Dismiss';
+
+  const warningSpan = document.createElement('span');
+  warningSpan.className = 'threads-login-required-main';
+  warningSpan.textContent = warningMsg;
+
+  const hintSpan = document.createElement('span');
+  hintSpan.className = 'threads-login-required-hint';
+  hintSpan.textContent = hintMsg;
+
+  const dismissBtn = document.createElement('button');
+  dismissBtn.id = 'threads-dismiss-login-banner';
+  dismissBtn.textContent = dismissMsg;
+
+  banner.appendChild(warningSpan);
+  banner.appendChild(hintSpan);
+  banner.appendChild(dismissBtn);
+  document.body.appendChild(banner);
+  console.log('[Threads Extractor] Banner appended to body');
+
+  // Dismiss button
+  dismissBtn.addEventListener('click', () => {
+    console.log('[Threads Extractor] Banner dismissed');
+    banner.remove();
+    // Don't persist dismissal - allow showing again on next click
+  });
+}
+
 // Inject location badges into followers/following list
 function injectLocationBadgesIntoFriendshipsList(users) {
   for (const user of users) {
@@ -242,6 +308,13 @@ async function processFetchQueue() {
   isFetching = true;
 
   while (fetchQueue.length > 0) {
+    // Stop processing if user is logged out
+    if (isUserLoggedIn === false) {
+      console.log('[Threads Extractor] User logged out. Stopping queue processing.');
+      fetchQueue.length = 0; // Clear the queue
+      break;
+    }
+
     // Check rate limit before each fetch
     if (Date.now() < rateLimitedUntil) {
       console.log('[Threads Extractor] Rate limit triggered. Stopping queue processing.');
@@ -311,6 +384,16 @@ const visibilityObserver = new IntersectionObserver((entries) => {
     if (!username) return;
 
     if (entry.isIntersecting) {
+      // Skip auto-fetch if user is logged out
+      if (isUserLoggedIn === false) {
+        // Mark button as login-required without fetching
+        btn.textContent = '🔒';
+        btn.title = browserAPI.i18n.getMessage('loginRequired') || 'Login required. Click to learn more.';
+        btn.setAttribute('data-login-required', 'true');
+        visibilityObserver.unobserve(btn);
+        return;
+      }
+
       // Post entered viewport - start delay timer
       if (!pendingVisibility.has(username) && !profileCache.has(username)) {
         const timeoutId = setTimeout(() => {
@@ -428,6 +511,13 @@ function addFetchButtons() {
       e.preventDefault();
       e.stopPropagation();
 
+      // Check if button is marked as login-required
+      if (btn.getAttribute('data-login-required') === 'true') {
+        console.log('[Threads Extractor] Login required button clicked - showing banner');
+        showLoginRequiredBanner();
+        return; // Don't attempt to fetch
+      }
+
       btn.disabled = true;
       btn.textContent = '⏳';
 
@@ -483,7 +573,17 @@ function addFetchButtons() {
         });
 
         if (result) {
-          btn.style.display = 'none';
+          if (result._loginRequired) {
+            // Login required - show lock icon and banner
+            btn.textContent = '🔒';
+            btn.title = browserAPI.i18n.getMessage('loginRequired') || 'Login required. Click to learn more.';
+            btn.disabled = false;
+            btn.setAttribute('data-login-required', 'true');
+            // Show banner when user manually clicks button
+            showLoginRequiredBanner();
+          } else {
+            btn.style.display = 'none';
+          }
         } else {
           btn.textContent = '🔄';
           btn.title = 'Failed to load. Click to retry.';
