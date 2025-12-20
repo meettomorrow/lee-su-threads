@@ -472,42 +472,35 @@ function addFetchButtons() {
 
     // First, try to find a profile link that's an ancestor of the time element
     // (i.e., the time element is inside a link to the post, which contains the username)
-    let current = timeEl;
-    for (let i = 0; i < 10 && current; i++) {
-      const parentLink = current.closest('a[href^="/@"]');
-      if (parentLink) {
-        const href = parentLink.getAttribute('href');
-        const match = href.match(/^\/@([\w.]+)/);
-        if (match) {
-          username = match[1];
-          profileLink = parentLink;
-          break;
-        }
+    const parentLink = timeEl.closest('a[href^="/@"]');
+    if (parentLink) {
+      const href = parentLink.getAttribute('href');
+      // Match username links (with optional query params/hash), but not post links
+      const match = href.match(/^\/@([\w.]+)(?:[?#]|$)/);
+      if (match) {
+        username = match[1];
+        profileLink = parentLink;
       }
-      current = current.parentElement;
     }
 
-    // If not found, look for a profile link in the same subtree as the time element
-    // (search upward to find a common parent, then search for the closest username link)
+    // If not found, traverse up to find a nearby username link in the DOM tree
+    // This handles reposts where the original poster's link is near the time element
     if (!username) {
-      let searchRoot = timeEl;
-      for (let i = 0; i < 5 && searchRoot; i++) {
-        searchRoot = searchRoot.parentElement;
-        if (!searchRoot) break;
+      let current = timeEl;
+      for (let i = 0; i < 8 && current; i++) {
+        current = current.parentElement;
+        if (!current) break;
 
-        // Find all profile links within this subtree
-        const links = searchRoot.querySelectorAll('a[href^="/@"]');
-        for (const link of links) {
+        // Look for a username-only link within this level
+        const usernameLinks = current.querySelectorAll('a[href^="/@"]');
+        for (const link of usernameLinks) {
           const href = link.getAttribute('href');
-          // Match pure username links only (not post links)
-          const match = href.match(/^\/@([\w.]+)$/);
+          // Match username links (with optional query params/hash), but not post links
+          const match = href.match(/^\/@([\w.]+)(?:[?#]|$)/);
           if (match) {
-            // Check if this link is close to the time element
-            if (searchRoot.contains(link) && searchRoot.contains(timeEl)) {
-              username = match[1];
-              profileLink = link;
-              break;
-            }
+            username = match[1];
+            profileLink = link;
+            break;
           }
         }
         if (username) break;
@@ -520,7 +513,8 @@ function addFetchButtons() {
       if (!profileLink) return;
 
       const href = profileLink.getAttribute('href');
-      const match = href.match(/^\/@([\w.]+)/);
+      // Match username links (with optional query params/hash), but not post links
+      const match = href.match(/^\/@([\w.]+)(?:[?#]|$)/);
       if (!match) return;
 
       username = match[1];
