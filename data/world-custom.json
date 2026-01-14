@@ -27,11 +27,17 @@
   "additions": {},
   "aliases": {
     "TW": [],
-    "HK": [
-      "hongkong"
-    ],
-    "MO": [
-      "macao"
-    ]
+    "HK": {
+      "en": ["hongkong"]
+    },
+    "MO": {
+      "en": ["macao"]
+    },
+    "VN": {
+      "en": ["vietnam"]
+    },
+    "KR": {
+      "en": ["south korea"]
+    }
   }
 }

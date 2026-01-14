@@ -6,8 +6,8 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 // Import version utilities
 import { compareVersions, shouldShowOnboarding } from './lib/versionUtils.js';
 
-const USER_ID_CACHE_MAX_AGE = 30 * 24 * 60 * 60 * 1000; // 30 days for user ID mapping
-const PROFILE_WITH_LOCATION_MAX_AGE = 7 * 24 * 60 * 60 * 1000; // 7 days for profiles with location
+const USER_ID_CACHE_MAX_AGE = 60 * 24 * 60 * 60 * 1000; // 60 days for user ID mapping
+const PROFILE_WITH_LOCATION_MAX_AGE = 21 * 24 * 60 * 60 * 1000; // 21 days for profiles with location
 const PROFILE_NO_LOCATION_MAX_AGE = 24 * 60 * 60 * 1000; // 24 hours (1 day) for profiles without location
 
 // Handle async message responses for both Chrome and Firefox
