@@ -574,6 +574,13 @@ document.addEventListener('DOMContentLoaded', () => {
       return sharedPicker;
     };
 
+    // Close picker on window resize (important for mobile/desktop transitions)
+    window.addEventListener('resize', () => {
+      if (sharedPicker && !sharedPicker.classList.contains('hidden')) {
+        sharedPicker.classList.add('hidden');
+      }
+    });
+
     sortedLocations.forEach(([location, count]) => {
       const percentage = (count / maxCount) * 100;
       const customEmoji = customLocationEmojis[location] || '';

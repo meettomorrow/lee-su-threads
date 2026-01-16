@@ -536,7 +536,7 @@
 
       .location-name {
         font-size: 13px;
-        color: var(--text-white);
+        color: var(--text-primary);
         white-space: nowrap;
         overflow: hidden;
         text-overflow: ellipsis;
@@ -639,13 +639,13 @@
         justify-content: center;
         width: 24px;
         height: 24px;
-        border: none;
+        border: 1px solid var(--bg-overlay-15);
         border-radius: 4px;
         font-size: 14px;
         cursor: pointer;
         transition: all 0.2s;
         background: var(--bg-overlay-10);
-        opacity: 0.6;
+        opacity: 0.7;
       }
 
       .btn-reset-emoji.hidden {
@@ -667,6 +667,8 @@
         z-index: 1000;
         box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
         border-radius: 8px;
+        max-width: calc(100vw - 40px);
+        width: 320px;
         --background: var(--bg-gradient-start);
         --border-color: var(--border-color);
         --indicator-color: #667eea;
@@ -676,15 +678,32 @@
         --outline-color: #667eea;
         --category-font-color: var(--text-secondary);
         --button-hover-background: var(--bg-overlay-10);
+        --num-columns: 8;
       }
 
       emoji-picker.hidden {
         display: none;
       }
 
+      /* Mobile adjustments for emoji picker */
+      @media (max-width: 400px) {
+        emoji-picker {
+          position: fixed;
+          left: 50%;
+          right: auto;
+          transform: translateX(-50%);
+          top: auto;
+          bottom: 60px;
+          margin-top: 0;
+          width: calc(100vw - 32px);
+          max-width: 340px;
+          --num-columns: 6;
+        }
+      }
+
       .location-bar {
         height: 4px;
-        background: var(--bg-overlay-10);
+        background: var(--bg-overlay-15);
         border-radius: 2px;
         margin-top: 6px;
         overflow: hidden;
