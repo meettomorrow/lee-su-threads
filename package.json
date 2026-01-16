@@ -33,6 +33,7 @@
     "web-ext": "^9.2.0"
   },
   "dependencies": {
-    "country-flag-emoji-polyfill": "^0.1.8"
+    "country-flag-emoji-polyfill": "^0.1.8",
+    "emoji-picker-element": "^1.28.1"
   }
 }

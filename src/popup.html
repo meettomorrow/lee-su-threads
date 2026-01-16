@@ -610,6 +610,29 @@
         background: var(--bg-overlay-10);
       }
 
+      .emoji-picker-btn {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 28px;
+        height: 28px;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        cursor: pointer;
+        transition: all 0.2s;
+        background: var(--bg-overlay-10);
+      }
+
+      .emoji-picker-btn.hidden {
+        display: none;
+      }
+
+      .emoji-picker-btn:hover {
+        background: var(--bg-overlay-20);
+        transform: scale(1.05);
+      }
+
       .btn-reset-emoji {
         display: flex;
         align-items: center;
@@ -633,6 +656,30 @@
         background: var(--bg-overlay-20);
         opacity: 1;
         transform: scale(1.05);
+      }
+
+      /* Emoji picker popup */
+      emoji-picker {
+        position: absolute;
+        right: 0;
+        top: 100%;
+        margin-top: 8px;
+        z-index: 1000;
+        box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+        border-radius: 8px;
+        --background: var(--bg-gradient-start);
+        --border-color: var(--border-color);
+        --indicator-color: #667eea;
+        --input-border-color: var(--bg-overlay-15);
+        --input-font-color: var(--text-primary);
+        --input-placeholder-color: var(--input-placeholder);
+        --outline-color: #667eea;
+        --category-font-color: var(--text-secondary);
+        --button-hover-background: var(--bg-overlay-10);
+      }
+
+      emoji-picker.hidden {
+        display: none;
       }
 
       .location-bar {
