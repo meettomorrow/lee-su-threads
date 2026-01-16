@@ -48,12 +48,15 @@ export async function createProfileBadge(profileInfo) {
   const isNew = isNewUser(profileInfo.joined);
   const newLabel = browserAPI.i18n.getMessage('newUser') || 'NEW';
 
-  // Get showFlags setting
-  const { showFlags = true } = await browserAPI.storage.local.get(['showFlags']);
+  // Get showFlags setting and custom emojis
+  const { showFlags = true, customLocationEmojis = {} } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis']);
 
   if (profileInfo.location) {
-    // Display location with optional flag emoji
-    badge.textContent = formatLocation(profileInfo.location, false, showFlags);
+    // Get custom emoji for this location (if set)
+    const customEmoji = customLocationEmojis[profileInfo.location] || null;
+
+    // Display location with optional flag emoji or custom emoji
+    badge.textContent = formatLocation(profileInfo.location, false, showFlags, customEmoji);
     badge.title = `${profileInfo.location} • ${joinedLabel}: ${profileInfo.joined || 'Unknown'}`;
   } else {
     // Location not available - show "無地點資料" with same hover behavior as regular location

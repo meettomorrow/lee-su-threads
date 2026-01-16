@@ -232,8 +232,8 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Render the profile list
   async function renderProfileList() {
-    // Get showFlags setting
-    const { showFlags = true } = await browserAPI.storage.local.get(['showFlags']);
+    // Get showFlags setting and custom emojis
+    const { showFlags = true, customLocationEmojis = {} } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis']);
 
     let entries = Object.entries(profiles);
 
@@ -325,8 +325,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
       if (data.location) {
         profileMeta.appendChild(document.createTextNode(' • '));
-        // Display location with flag emoji (location text + flag)
-        const displayText = formatLocation(data.location, false, showFlags);
+        // Get custom emoji for this location (if set)
+        const customEmoji = customLocationEmojis[data.location] || null;
+        // Display location with flag emoji or custom emoji
+        const displayText = formatLocation(data.location, false, showFlags, customEmoji);
         profileMeta.appendChild(document.createTextNode(displayText));
       }
 
@@ -445,10 +447,38 @@ document.addEventListener('DOMContentLoaded', () => {
     }, 2500);
   }
 
+  // Save custom emoji for a location
+  async function saveCustomEmoji(location, emoji) {
+    const { customLocationEmojis = {} } = await browserAPI.storage.local.get(['customLocationEmojis']);
+
+    if (emoji && emoji.trim()) {
+      customLocationEmojis[location] = emoji.trim();
+    } else {
+      delete customLocationEmojis[location];
+    }
+
+    await browserAPI.storage.local.set({ customLocationEmojis });
+
+    // Notify content script to refresh UI
+    browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0]?.id) {
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'CUSTOM_EMOJIS_CHANGED' });
+      }
+    });
+
+    // Refresh popup display
+    renderProfileList();
+  }
+
+  // Reset custom emoji for a location
+  async function resetCustomEmoji(location) {
+    await saveCustomEmoji(location, '');
+  }
+
   // Render location stats
   async function renderLocationStats() {
-    // Get showFlags setting
-    const { showFlags = true } = await browserAPI.storage.local.get(['showFlags']);
+    // Get custom emojis
+    const { customLocationEmojis = {} } = await browserAPI.storage.local.get(['customLocationEmojis']);
 
     const entries = Object.entries(profiles);
 
@@ -499,21 +529,22 @@ document.addEventListener('DOMContentLoaded', () => {
 
     sortedLocations.forEach(([location, count]) => {
       const percentage = (count / maxCount) * 100;
+      const customEmoji = customLocationEmojis[location] || '';
 
       const item = document.createElement('div');
       item.className = 'location-stat-item';
       item.setAttribute('data-location', location);
 
       const locationInfo = document.createElement('div');
-      locationInfo.className = 'location-info';
+      locationInfo.className = 'location-info location-stat-item-clickable';
 
       const locationContent = document.createElement('div');
       locationContent.className = 'location-content';
 
       const locationName = document.createElement('div');
       locationName.className = 'location-name';
-      // Display location with flag emoji (flag + text)
-      locationName.textContent = formatLocation(location, false, showFlags);
+      // Display location text only (no emoji) - the emoji is shown in the edit button
+      locationName.textContent = location;
 
       const locationBar = document.createElement('div');
       locationBar.className = 'location-bar';
@@ -527,24 +558,125 @@ document.addEventListener('DOMContentLoaded', () => {
       locationContent.appendChild(locationBar);
       locationInfo.appendChild(locationContent);
 
-      const countSpan = document.createElement('span');
-      countSpan.className = 'location-count';
-      countSpan.textContent = count;
-
-      item.appendChild(locationInfo);
-      item.appendChild(countSpan);
-
-      // Add click handler
-      item.addEventListener('click', () => {
+      // Add click handler to locationInfo only (not the whole item)
+      locationInfo.addEventListener('click', () => {
         filterNoLocation = false;
         filterText = location;
         locationFilter.value = location;
-        activeTab = 'profiles';
         tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'profiles'));
         profilesTab.classList.add('active');
         locationsTab.classList.remove('active');
         renderProfileList();
       });
+
+      // Emoji customizer
+      const emojiCustomizer = document.createElement('div');
+      emojiCustomizer.className = 'emoji-customizer';
+
+      // Pencil/emoji button (shows pencil or custom emoji)
+      const editBtn = document.createElement('button');
+      editBtn.className = 'emoji-edit-btn' + (customEmoji ? ' hidden' : '');
+      editBtn.textContent = '✏️';
+      editBtn.setAttribute('aria-label', `Edit emoji for ${location}`);
+      editBtn.title = browserAPI.i18n.getMessage('customEmojiHint') || 'Click to set a custom emoji for this location';
+
+      // Custom emoji display button (only shown when custom emoji is set)
+      const emojiDisplayBtn = document.createElement('button');
+      emojiDisplayBtn.className = 'emoji-edit-btn' + (customEmoji ? '' : ' hidden');
+      emojiDisplayBtn.textContent = customEmoji;
+      emojiDisplayBtn.setAttribute('aria-label', `Custom emoji: ${customEmoji}`);
+      emojiDisplayBtn.title = customEmoji;
+
+      // Input field (hidden initially)
+      const emojiInput = document.createElement('input');
+      emojiInput.type = 'text';
+      emojiInput.className = 'emoji-input hidden';
+      emojiInput.value = customEmoji;
+      emojiInput.maxLength = 10;
+      emojiInput.setAttribute('aria-label', `Custom emoji for ${location}`);
+      emojiInput.title = browserAPI.i18n.getMessage('customEmojiHint') || 'Click to set a custom emoji for this location';
+
+      // Reset button (only show when there's a custom emoji)
+      const resetBtn = document.createElement('button');
+      resetBtn.className = 'btn-reset-emoji' + (customEmoji ? '' : ' hidden');
+      resetBtn.textContent = '×';
+      resetBtn.setAttribute('aria-label', `Reset emoji for ${location}`);
+      resetBtn.title = browserAPI.i18n.getMessage('resetEmoji') || 'Reset to default flag';
+
+      // Pencil button click - show input field
+      editBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        editBtn.classList.add('hidden');
+        emojiDisplayBtn.classList.add('hidden');
+        emojiInput.classList.remove('hidden');
+        emojiInput.focus();
+      });
+
+      // Custom emoji display button click - enter edit mode
+      emojiDisplayBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        emojiDisplayBtn.classList.add('hidden');
+        emojiInput.classList.remove('hidden');
+        emojiInput.focus();
+      });
+
+      // Debounce save on input
+      let saveTimeout;
+      emojiInput.addEventListener('input', (e) => {
+        e.stopPropagation();
+        clearTimeout(saveTimeout);
+        saveTimeout = setTimeout(() => {
+          const newEmoji = emojiInput.value.trim();
+          saveCustomEmoji(location, newEmoji);
+          // Update display
+          if (newEmoji) {
+            emojiDisplayBtn.textContent = newEmoji;
+            emojiDisplayBtn.title = newEmoji;
+            emojiDisplayBtn.classList.remove('hidden');
+            resetBtn.classList.remove('hidden');
+            editBtn.classList.add('hidden');
+          } else {
+            emojiDisplayBtn.classList.add('hidden');
+            resetBtn.classList.add('hidden');
+            editBtn.classList.remove('hidden');
+          }
+        }, 500);
+      });
+
+      // When input loses focus, hide it
+      emojiInput.addEventListener('blur', () => {
+        setTimeout(() => {
+          emojiInput.classList.add('hidden');
+        }, 200);
+      });
+
+      // Prevent click propagation
+      emojiInput.addEventListener('click', (e) => {
+        e.stopPropagation();
+      });
+
+      // Reset button click
+      resetBtn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        emojiInput.value = '';
+        saveCustomEmoji(location, '');
+        emojiDisplayBtn.classList.add('hidden');
+        resetBtn.classList.add('hidden');
+        editBtn.classList.remove('hidden');
+      });
+
+      emojiCustomizer.appendChild(editBtn);
+      emojiCustomizer.appendChild(emojiDisplayBtn);
+      emojiCustomizer.appendChild(emojiInput);
+      emojiCustomizer.appendChild(resetBtn);
+
+      const countSpan = document.createElement('span');
+      countSpan.className = 'location-count';
+      countSpan.textContent = count;
+
+      item.appendChild(locationInfo);
+      item.appendChild(emojiCustomizer);
+      item.appendChild(countSpan);
 
       locationStatsListEl.appendChild(item);
     });

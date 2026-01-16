@@ -116,9 +116,10 @@ export function getLocationFlag(location) {
  * @param {string} location - Location string from profile
  * @param {boolean} flagOnly - If true, return only flag; otherwise return "flag location"
  * @param {boolean} showFlags - If false, skip flag display (from user setting)
+ * @param {string|null} customEmoji - Custom emoji override (from user customization)
  * @returns {string} - Formatted location string
  */
-export function formatLocation(location, flagOnly = false, showFlags = true) {
+export function formatLocation(location, flagOnly = false, showFlags = true, customEmoji = null) {
   if (!location) return '';
 
   // If flags are disabled, return location text only
@@ -126,10 +127,11 @@ export function formatLocation(location, flagOnly = false, showFlags = true) {
     return location;
   }
 
-  const flag = getLocationFlag(location);
+  // Use custom emoji if provided, otherwise get default flag
+  const emoji = customEmoji || getLocationFlag(location);
 
-  if (flag) {
-    return flagOnly ? flag : `${flag} ${location}`;
+  if (emoji) {
+    return flagOnly ? emoji : `${emoji} ${location}`;
   }
 
   // No flag found - return original location

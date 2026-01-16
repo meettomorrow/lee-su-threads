@@ -172,5 +172,11 @@
   },
   "onboardingFooter": {
     "message": "Threads 커뮤니티를 위해 ❤️로 제작"
+  },
+  "resetEmoji": {
+    "message": "기본 국기로 재설정"
+  },
+  "customEmojiHint": {
+    "message": "클릭하여 이 위치의 사용자 정의 이모티콘 설정"
   }
 }

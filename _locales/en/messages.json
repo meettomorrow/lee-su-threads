@@ -175,5 +175,11 @@
   },
   "onboardingFooter": {
     "message": "Made with ❤️ for the Threads community"
+  },
+  "resetEmoji": {
+    "message": "Reset to default flag"
+  },
+  "customEmojiHint": {
+    "message": "Click to set a custom emoji for this location"
   }
 }

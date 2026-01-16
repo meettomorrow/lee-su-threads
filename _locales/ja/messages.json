@@ -172,5 +172,11 @@
   },
   "onboardingFooter": {
     "message": "Threads コミュニティのために ❤️ で作成"
+  },
+  "resetEmoji": {
+    "message": "デフォルトの旗にリセット"
+  },
+  "customEmojiHint": {
+    "message": "クリックしてこの場所のカスタム絵文字を設定"
   }
 }

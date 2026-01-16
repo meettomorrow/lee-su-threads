@@ -175,5 +175,11 @@
   },
   "onboardingFooter": {
     "message": "用 ❤️ 為 Threads 社群打造"
+  },
+  "resetEmoji": {
+    "message": "重設為預設旗幟"
+  },
+  "customEmojiHint": {
+    "message": "點擊以設定此地點的自訂表情符號"
   }
 }

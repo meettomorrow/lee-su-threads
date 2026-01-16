@@ -257,15 +257,18 @@ export async function createLocationBadge(profileInfo) {
   const badge = document.createElement('span');
   badge.className = 'threads-friendships-location-badge';
 
-  // Get showFlags setting
-  const { showFlags = true } = await browserAPI.storage.local.get(['showFlags']);
+  // Get showFlags setting and custom emojis
+  const { showFlags = true, customLocationEmojis = {} } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis']);
   const joinedLabel = browserAPI.i18n.getMessage('joined') || 'Joined';
 
   const locationText = document.createElement('span');
 
   if (profileInfo.location) {
-    // Display location with optional flag emoji
-    locationText.textContent = formatLocation(profileInfo.location, false, showFlags);
+    // Get custom emoji for this location (if set)
+    const customEmoji = customLocationEmojis[profileInfo.location] || null;
+
+    // Display location with optional flag emoji or custom emoji
+    locationText.textContent = formatLocation(profileInfo.location, false, showFlags, customEmoji);
     badge.appendChild(locationText);
 
     if (profileInfo.joined) {
