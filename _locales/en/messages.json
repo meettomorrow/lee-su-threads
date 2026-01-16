@@ -181,5 +181,8 @@
   },
   "customEmojiHint": {
     "message": "Click to set a custom emoji for this location"
+  },
+  "clickToCustomize": {
+    "message": "Click to customize emoji"
   }
 }

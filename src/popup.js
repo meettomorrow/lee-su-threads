@@ -69,6 +69,10 @@ document.addEventListener('DOMContentLoaded', () => {
   let filterNoLocation = false; // Special flag for filtering profiles without location
   let activeTab = 'profiles';
 
+  // Check URL parameters for location pre-selection
+  const urlParams = new URLSearchParams(window.location.search);
+  const preSelectLocation = urlParams.get('location');
+
   // Scroll detection for hiding stats in mobile view and sticky tabs shadow
   const tabsEl = document.querySelector('.tabs');
   const statsEl = document.querySelector('.stats');
@@ -679,6 +683,20 @@ document.addEventListener('DOMContentLoaded', () => {
       item.appendChild(countSpan);
 
       locationStatsListEl.appendChild(item);
+
+      // Auto-trigger edit mode if this location was pre-selected via URL
+      if (preSelectLocation && location === preSelectLocation) {
+        // Switch to locations tab
+        setTimeout(() => {
+          editBtn.classList.add('hidden');
+          emojiDisplayBtn.classList.add('hidden');
+          emojiInput.classList.remove('hidden');
+          resetBtn.classList.remove('hidden');
+          emojiInput.focus();
+          // Scroll to this item
+          item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }, 100);
+      }
     });
 
     // Add "No location" entry if there are profiles without location
@@ -728,6 +746,16 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Initial load
   loadProfiles();
+
+  // If a location is pre-selected, switch to locations tab
+  if (preSelectLocation) {
+    // Switch to locations tab
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'locations'));
+    profilesTab.classList.remove('active');
+    locationsTab.classList.add('active');
+    // Render location stats to trigger the auto-focus
+    renderLocationStats();
+  }
 
   // Listen for updates from content script
   browserAPI.runtime.onMessage.addListener((message) => {

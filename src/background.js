@@ -89,6 +89,30 @@ function handleAsyncMessage(message, sender, sendResponse) {
     return false;
   }
 
+  // Open popup in a new tab with URL (for location pre-selection)
+  // Reuse existing popup tab if one exists
+  if (message.type === 'OPEN_POPUP_IN_TAB') {
+    const popupUrl = browserAPI.runtime.getURL('popup.html');
+
+    // Find existing popup tab
+    browserAPI.tabs.query({ url: popupUrl + '*' }).then((tabs) => {
+      if (tabs.length > 0) {
+        // Reuse existing tab - update URL and focus it
+        browserAPI.tabs.update(tabs[0].id, {
+          url: message.url,
+          active: true
+        });
+        browserAPI.windows.update(tabs[0].windowId, { focused: true });
+      } else {
+        // Create new tab
+        browserAPI.tabs.create({
+          url: message.url
+        });
+      }
+    });
+    return false;
+  }
+
   return false;
 }
 

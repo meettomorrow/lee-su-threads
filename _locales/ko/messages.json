@@ -178,5 +178,8 @@
   },
   "customEmojiHint": {
     "message": "클릭하여 이 위치의 사용자 정의 이모티콘 설정"
+  },
+  "clickToCustomize": {
+    "message": "클릭하여 이모티콘 사용자 정의"
   }
 }

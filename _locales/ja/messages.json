@@ -178,5 +178,8 @@
   },
   "customEmojiHint": {
     "message": "クリックしてこの場所のカスタム絵文字を設定"
+  },
+  "clickToCustomize": {
+    "message": "クリックして絵文字をカスタマイズ"
   }
 }

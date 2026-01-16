@@ -55,9 +55,23 @@ export async function createProfileBadge(profileInfo) {
     // Get custom emoji for this location (if set)
     const customEmoji = customLocationEmojis[profileInfo.location] || null;
 
+    const clickHint = browserAPI.i18n.getMessage('clickToCustomize') || 'Click to customize emoji';
+
     // Display location with optional flag emoji or custom emoji
     badge.textContent = formatLocation(profileInfo.location, false, showFlags, customEmoji);
-    badge.title = `${profileInfo.location} • ${joinedLabel}: ${profileInfo.joined || 'Unknown'}`;
+    badge.title = `${profileInfo.location} • ${joinedLabel}: ${profileInfo.joined || 'Unknown'}\n(${clickHint})`;
+    badge.style.cursor = 'pointer';
+
+    // Click to customize emoji - opens settings with this location
+    badge.addEventListener('click', (e) => {
+      e.stopPropagation();
+      e.preventDefault();
+      const settingsUrl = browserAPI.runtime.getURL('popup.html') + `?location=${encodeURIComponent(profileInfo.location)}`;
+      browserAPI.runtime.sendMessage({
+        type: 'OPEN_POPUP_IN_TAB',
+        url: settingsUrl
+      });
+    });
   } else {
     // Location not available - show "無地點資料" with same hover behavior as regular location
     const noLocationData = browserAPI.i18n.getMessage('noLocationData') || 'No location data';

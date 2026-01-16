@@ -267,6 +267,16 @@
   cursor: default;
   font-family: "Twemoji Country Flags", system-ui, -apple-system, "system-ui", Roboto, Helvetica, Arial,
     sans-serif;
+  transition: opacity 0.2s ease;
+}
+
+/* Clickable badges get pointer cursor and hover effect */
+.threads-profile-info-badge[style*="pointer"] {
+  cursor: pointer !important;
+}
+
+.threads-profile-info-badge[style*="pointer"]:hover {
+  opacity: 0.7;
 }
 
 /* Separator dot before badge */
@@ -300,6 +310,17 @@
   cursor: default;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
   flex-shrink: 0;
+  transition: all 0.2s ease;
+}
+
+/* Clickable friendships badges get hover effect */
+.threads-friendships-location-badge[style*="pointer"] {
+  cursor: pointer !important;
+}
+
+.threads-friendships-location-badge[style*="pointer"]:hover {
+  background: rgba(0, 0, 0, 0.1);
+  transform: scale(1.05);
 }
 
 .threads-friendships-location-badge span {

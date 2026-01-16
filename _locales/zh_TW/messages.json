@@ -181,5 +181,8 @@
   },
   "customEmojiHint": {
     "message": "點擊以設定此地點的自訂表情符號"
+  },
+  "clickToCustomize": {
+    "message": "點擊以自訂表情符號"
   }
 }
