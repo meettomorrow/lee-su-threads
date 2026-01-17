@@ -184,5 +184,8 @@
   },
   "clickToCustomize": {
     "message": "點擊以自訂表情符號"
+  },
+  "pickEmojiFor": {
+    "message": "為以下地點選擇表情符號："
   }
 }

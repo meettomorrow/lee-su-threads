@@ -181,5 +181,8 @@
   },
   "clickToCustomize": {
     "message": "クリックして絵文字をカスタマイズ"
+  },
+  "pickEmojiFor": {
+    "message": "次の場所の絵文字を選択："
   }
 }

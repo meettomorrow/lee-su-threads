@@ -184,5 +184,8 @@
   },
   "clickToCustomize": {
     "message": "Click to customize emoji"
+  },
+  "pickEmojiFor": {
+    "message": "Pick emoji for"
   }
 }
