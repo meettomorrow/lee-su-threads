@@ -15,7 +15,9 @@
     "build:firefox-self-hosted": "FIREFOX_BUILD_TYPE=self-hosted node esbuild.config.js",
     "clean": "rm -rf dist",
     "start:firefox": "web-ext run --source-dir=dist/firefox-direct --start-url=https://www.threads.com",
-    "start:firefox:android": "bash scripts/run-firefox-android.sh"
+    "start:firefox:android": "bash scripts/run-firefox-android.sh",
+    "setup:safari": "bash scripts/setup-safari-project.sh",
+    "open:safari": "open dist-safari/safari-project/Lee-Su-Threads/Lee-Su-Threads.xcodeproj"
   },
   "repository": {
     "type": "git",

@@ -1,6 +1,6 @@
 # Privacy Policy / 隱私權政策
 
-**Last updated / 最後更新：2025-12-05**
+**Last updated / 最後更新：2025-01-17**
 
 ---
 
@@ -18,7 +18,7 @@ The extension only:
 
 ### Data Storage
 
-- All data is stored locally on your device using Chrome's built-in storage API
+- All data is stored locally on your device using your browser's built-in storage API
 - Cached data automatically expires after 24 hours
 - You can clear all stored data at any time through the extension popup
 
@@ -51,7 +51,7 @@ If you have any questions about this privacy policy, please open an issue on our
 
 ### 資料儲存
 
-- 所有資料都使用 Chrome 內建的儲存 API 儲存在您的裝置上
+- 所有資料都使用瀏覽器內建的儲存 API 儲存在您的裝置上
 - 快取資料會在 24 小時後自動過期
 - 您可以隨時透過擴充功能彈出視窗清除所有儲存的資料
 
