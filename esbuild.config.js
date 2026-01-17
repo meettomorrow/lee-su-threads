@@ -137,12 +137,71 @@ async function copyStaticFilesForBrowser(browser) {
   await cp('fonts', `${distDir}/fonts`, { recursive: true });
 }
 
+// Copy static files for Safari (similar to Chrome/Firefox but uses safari manifest)
+async function copyStaticFilesForSafari() {
+  const distDir = 'dist/safari';
+
+  // Ensure Safari dist directory exists
+  await mkdir(distDir, { recursive: true });
+
+  // Copy bundled JS files from shared directory
+  await copyFile('dist/shared/content.js', `${distDir}/content.js`);
+  await copyFile('dist/shared/popup.js', `${distDir}/popup.js`);
+  await copyFile('dist/shared/background.js', `${distDir}/background.js`);
+  await copyFile('dist/shared/injected.js', `${distDir}/injected.js`);
+  await copyFile('dist/shared/onboarding.js', `${distDir}/onboarding.js`);
+
+  if (!isWatch) {
+    // Copy source maps in production builds
+    await copyFile('dist/shared/content.js.map', `${distDir}/content.js.map`).catch(() => {});
+    await copyFile('dist/shared/popup.js.map', `${distDir}/popup.js.map`).catch(() => {});
+    await copyFile('dist/shared/background.js.map', `${distDir}/background.js.map`).catch(() => {});
+    await copyFile('dist/shared/injected.js.map', `${distDir}/injected.js.map`).catch(() => {});
+  }
+
+  // Copy Safari manifest
+  const manifestContent = await readFile('src/manifest.safari.json', 'utf-8');
+  const manifest = JSON.parse(manifestContent);
+
+  // In development, use git tag version + 1
+  if (isDev) {
+    const gitVersion = getGitVersion();
+    if (gitVersion) {
+      const newVersion = incrementVersion(gitVersion);
+      console.log(`📦 safari: Dev build using git tag ${gitVersion} → ${newVersion}`);
+      manifest.version = newVersion;
+    } else {
+      const oldVersion = manifest.version;
+      const newVersion = incrementVersion(oldVersion);
+      console.log(`📦 safari: Dev build using manifest version ${oldVersion} → ${newVersion}`);
+      manifest.version = newVersion;
+    }
+  }
+
+  await writeFile(`${distDir}/manifest.json`, JSON.stringify(manifest, null, 2));
+
+  // Copy HTML and CSS
+  await copyFile('src/popup.html', `${distDir}/popup.html`);
+  await copyFile('src/onboarding.html', `${distDir}/onboarding.html`);
+  await copyFile('src/styles.css', `${distDir}/styles.css`);
+
+  // Copy _locales directory recursively
+  await cp('_locales', `${distDir}/_locales`, { recursive: true });
+
+  // Copy icons directory
+  await cp('icons', `${distDir}/icons`, { recursive: true });
+
+  // Copy fonts directory
+  await cp('fonts', `${distDir}/fonts`, { recursive: true });
+}
+
 async function copyStaticFiles() {
-  // Build for both Chrome and Firefox
+  // Build for Chrome, Firefox, and Safari
   await copyStaticFilesForBrowser('chrome');
   await copyStaticFilesForBrowser('firefox');
+  await copyStaticFilesForSafari();
 
-  console.log('✓ Static files copied to dist/chrome and dist/firefox-*');
+  console.log('✓ Static files copied to dist/chrome, dist/firefox-*, and dist/safari');
 }
 
 async function build() {

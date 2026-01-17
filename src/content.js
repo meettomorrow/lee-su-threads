@@ -975,6 +975,10 @@ browserAPI.runtime.onMessage.addListener((message) => {
     console.log('[Threads Extractor] Show flags', message.enabled ? 'enabled' : 'disabled');
     // Update all existing badges on the page
     updateBadgesForFlagsChange();
+  } else if (message.type === 'CUSTOM_EMOJIS_CHANGED') {
+    console.log('[Threads Extractor] Custom emojis changed, refreshing badges');
+    // Update all existing badges to show new custom emojis
+    updateBadgesForFlagsChange();
   }
 });
 

@@ -464,11 +464,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
     await browserAPI.storage.local.set({ customLocationEmojis });
 
-    // Notify content script to refresh UI
-    browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
-      if (tabs[0]?.id) {
-        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'CUSTOM_EMOJIS_CHANGED' });
-      }
+    // Notify content script to refresh UI in all Threads tabs
+    browserAPI.tabs.query({ url: 'https://www.threads.com/*' }).then((tabs) => {
+      tabs.forEach((tab) => {
+        browserAPI.tabs.sendMessage(tab.id, { type: 'CUSTOM_EMOJIS_CHANGED' }).catch(() => {
+          // Ignore errors if tab doesn't have content script loaded
+        });
+      });
     });
 
     // Refresh popup display
@@ -705,12 +707,20 @@ document.addEventListener('DOMContentLoaded', () => {
 
       // Auto-trigger picker if this location was pre-selected via URL
       if (preSelectLocation && location === preSelectLocation) {
-        // Switch to locations tab and show picker
+        // Switch to locations tab and scroll to item
         setTimeout(() => {
-          // Trigger the button click to show picker
-          emojiPickerBtn.click();
           // Scroll to this item
           item.scrollIntoView({ behavior: 'smooth', block: 'center' });
+
+          // Only auto-open picker on desktop (not mobile)
+          // On mobile devices, the picker is too large and blocks the view
+          // Note: Use navigator.userAgent instead of window.innerWidth because
+          // popup window is small (~360px) even on desktop
+          const isMobileDevice = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+          if (!isMobileDevice) {
+            // Trigger the button click to show picker on desktop
+            emojiPickerBtn.click();
+          }
         }, 100);
       }
     });

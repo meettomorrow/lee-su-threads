@@ -35,6 +35,8 @@
 
 **Firefox 使用者（推薦）：** 前往 [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/)，點擊「**加到 Firefox**」按鈕即可安裝，日後可自動獲得更新。
 
+**Safari 使用者（macOS / iOS）：** Safari 版本開發中。開發者可參考 [Safari 開發工作流程](docs/SAFARI_WORKFLOW.md)。
+
 **Android 使用者：** 先從 Play 商店安裝 [Firefox for Android](https://play.google.com/store/apps/details?id=org.mozilla.firefox)，然後在 Firefox 中前往 [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/) 安裝擴充功能。
 
 <details>
@@ -119,6 +121,8 @@ A browser extension (Chrome & Firefox) that automatically displays location info
 **Chrome / Edge / Opera Users:** Go to [Chrome Web Store](https://chromewebstore.google.com/detail/lee-su-threads/cciaoflecmmomchcjndagcnfpdaanhol) and click "**Add to Chrome**" for easy installation and automatic updates.
 
 **Firefox Users (Recommended):** Go to [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/) and click "**Add to Firefox**" for easy installation and automatic updates.
+
+**Safari Users (macOS / iOS):** Safari version in development. Developers see [Safari Development Workflow](docs/SAFARI_WORKFLOW.md).
 
 **Android Users:** Install [Firefox for Android](https://play.google.com/store/apps/details?id=org.mozilla.firefox) from the Play Store, then visit [Firefox Add-ons](https://addons.mozilla.org/en-US/firefox/addon/lee-su-threads-%E4%BD%A0%E6%98%AF%E8%AA%B0/) in Firefox to install the extension.
 
