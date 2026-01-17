@@ -733,6 +733,8 @@
         overflow: hidden;
         text-overflow: ellipsis;
         white-space: nowrap;
+        margin: 0;
+        padding: 0;
       }
 
       .emoji-picker-sheet-close {
@@ -947,9 +949,9 @@
     <button class="scroll-to-top" id="scrollToTop" aria-label="Scroll to top">↑</button>
 
     <!-- Emoji picker sheet modal (for popup mode) -->
-    <div class="emoji-picker-sheet" id="emojiPickerSheet">
+    <div class="emoji-picker-sheet" id="emojiPickerSheet" role="dialog" aria-modal="true" aria-labelledby="emojiPickerSheetTitle">
       <div class="emoji-picker-sheet-header">
-        <div class="emoji-picker-sheet-title" id="emojiPickerSheetTitle">Pick emoji</div>
+        <h2 class="emoji-picker-sheet-title" id="emojiPickerSheetTitle">Pick emoji</h2>
         <button class="emoji-picker-sheet-close" id="emojiPickerSheetClose" aria-label="Close emoji picker">×</button>
       </div>
       <div class="emoji-picker-sheet-content" id="emojiPickerSheetContent">
