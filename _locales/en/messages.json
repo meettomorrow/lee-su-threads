@@ -62,6 +62,18 @@
   "autoQuery": {
     "message": "Auto-query"
   },
+  "autoQueryFeed": {
+    "message": "Auto-query Feed"
+  },
+  "autoQueryFollower": {
+    "message": "Auto-query Follower"
+  },
+  "feedLabel": {
+    "message": "Feed"
+  },
+  "followerLabel": {
+    "message": "Follower"
+  },
   "autoQueryTooltip": {
     "message": "Automatically fetch profile information while browsing Threads"
   },

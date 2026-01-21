@@ -59,8 +59,26 @@
   "autoQuery": {
     "message": "自動取得"
   },
+  "autoQueryFeed": {
+    "message": "フィード自動取得"
+  },
+  "autoQueryFollower": {
+    "message": "フォロワー自動取得"
+  },
+  "feedLabel": {
+    "message": "フィード"
+  },
+  "followerLabel": {
+    "message": "フォロワー"
+  },
   "autoQueryTooltip": {
     "message": "Threads 閲覧中にプロフィール情報を自動的に取得します"
+  },
+  "autoQueryFollowers": {
+    "message": "フォロワー自動取得"
+  },
+  "autoQueryFollowersTooltip": {
+    "message": "フォロワー/フォロー中リストの位置情報を自動取得します"
   },
   "showFlags": {
     "message": "国旗を表示"

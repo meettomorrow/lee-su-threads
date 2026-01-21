@@ -21,9 +21,12 @@ const profileCache = new Map();
 
 // Auto-fetch queue and throttling
 const fetchQueue = [];
+const followersFetchQueue = [];
 let isFetching = false;
+let isFetchingFollowers = false;
 let autoFetchReady = false; // Wait for initial data to load
 let autoQueryEnabled = true; // User preference for auto-query
+let autoQueryFollowersEnabled = false; // User preference for auto-query followers (default off)
 let rateLimitedUntil = 0; // Timestamp when rate limit cooldown ends
 const FETCH_DELAY_MS = 800; // Delay between auto-fetches to avoid rate limiting
 const INITIAL_DELAY_MS = 2000; // Wait for bulk-route-definitions to load
@@ -31,6 +34,7 @@ const RATE_LIMIT_COOLDOWN_MS = 60 * 60 * 1000; // 60 minutes (1 hour) cooldown
 const MAX_QUEUE_SIZE = 5; // Maximum number of posts in queue
 const VISIBILITY_DELAY_MS = 500; // How long a post must be visible before queuing
 const pendingVisibility = new Map(); // Track posts waiting to be queued
+const pendingFollowersVisibility = new Map(); // Track followers waiting to be queued
 
 // Inject the network interceptor script
 function injectScript() {
@@ -285,7 +289,7 @@ function showLoginRequiredBanner() {
 function injectLocationBadgesIntoFriendshipsList(users) {
   for (const user of users) {
     const { pk, username } = user;
-    injectLocationUIForUser(username, pk, profileCache);
+    injectLocationUIForUser(username, pk, profileCache, followersVisibilityObserver);
   }
 }
 
@@ -415,6 +419,192 @@ const visibilityObserver = new IntersectionObserver((entries) => {
     }
   });
 }, { threshold: 0.1 });
+
+// Intersection Observer for auto-fetching visible followers/following
+const followersVisibilityObserver = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    const btn = entry.target;
+    const username = btn.getAttribute('data-username');
+    const userId = btn.getAttribute('data-userid');
+    if (!username || !userId) return;
+
+    if (entry.isIntersecting) {
+      // Skip auto-fetch if main auto-query or followers auto-query is disabled
+      if (!autoQueryEnabled || !autoQueryFollowersEnabled) {
+        return;
+      }
+
+      // Skip auto-fetch if user is logged out
+      if (isUserLoggedIn === false) {
+        btn.textContent = '🔒';
+        btn.title = browserAPI.i18n.getMessage('loginRequired') || 'Login required. Click to learn more.';
+        btn.setAttribute('data-login-required', 'true');
+        followersVisibilityObserver.unobserve(btn);
+        return;
+      }
+
+      // User row entered viewport - start delay timer
+      if (!pendingFollowersVisibility.has(username) && !profileCache.has(username)) {
+        const timeoutId = setTimeout(() => {
+          // Still visible after delay? Queue the fetch
+          if (pendingFollowersVisibility.has(username)) {
+            pendingFollowersVisibility.delete(username);
+            // Add to followers fetch queue
+            queueFollowersFetch(username, btn);
+            followersVisibilityObserver.unobserve(btn);
+          }
+        }, VISIBILITY_DELAY_MS);
+        pendingFollowersVisibility.set(username, timeoutId);
+      }
+    } else {
+      // User row left viewport - cancel pending timer
+      if (pendingFollowersVisibility.has(username)) {
+        clearTimeout(pendingFollowersVisibility.get(username));
+        pendingFollowersVisibility.delete(username);
+      }
+    }
+  });
+}, { threshold: 0.1 });
+
+// Queue a follower for auto-fetch
+function queueFollowersFetch(username, btn) {
+  // Don't queue if already cached
+  if (profileCache.has(username)) return;
+
+  // Check if already in queue
+  const existingIndex = followersFetchQueue.findIndex(item => item.username === username);
+  if (existingIndex !== -1) {
+    return; // Already in queue
+  }
+
+  // Add to queue
+  followersFetchQueue.push({ username, btn });
+
+  // Trim queue if it exceeds max size
+  while (followersFetchQueue.length > MAX_QUEUE_SIZE) {
+    followersFetchQueue.shift(); // Remove oldest
+  }
+
+  // Start processing
+  processFollowersFetchQueue();
+}
+
+// Process the followers fetch queue with throttling
+async function processFollowersFetchQueue() {
+  if (isFetchingFollowers || followersFetchQueue.length === 0) return;
+
+  // Check if auto-query followers is disabled
+  if (!autoQueryEnabled || !autoQueryFollowersEnabled) {
+    return;
+  }
+
+  // Check if rate limited
+  if (Date.now() < rateLimitedUntil) {
+    return;
+  }
+
+  isFetchingFollowers = true;
+
+  while (followersFetchQueue.length > 0) {
+    // Stop processing if user is logged out
+    if (isUserLoggedIn === false) {
+      console.log('[Threads Extractor] User logged out. Stopping followers queue processing.');
+      followersFetchQueue.length = 0;
+      break;
+    }
+
+    // Check rate limit before each fetch
+    if (Date.now() < rateLimitedUntil) {
+      console.log('[Threads Extractor] Rate limit triggered. Stopping followers queue processing.');
+      break;
+    }
+
+    const { username, btn } = followersFetchQueue.shift();
+    console.log(`[Threads Extractor] Processing follower @${username}, queue length: ${followersFetchQueue.length}`);
+
+    // Skip if already fetched while in queue
+    if (profileCache.has(username)) {
+      const cached = profileCache.get(username);
+      // For followers, replace button with badge
+      if (cached.location) {
+        const badge = await createLocationBadge(cached);
+        btn.parentElement.replaceChild(badge, btn);
+      } else {
+        btn.textContent = '➖';
+        btn.title = 'No location available';
+        btn.disabled = true;
+        btn.style.cursor = 'default';
+        btn.style.opacity = '0.4';
+      }
+      continue;
+    }
+
+    btn.textContent = '⏳';
+
+    // Get the user ID from the button
+    const userId = btn.getAttribute('data-userid');
+    if (!userId) {
+      btn.textContent = '❓';
+      btn.title = 'User ID not found';
+      continue;
+    }
+
+    // Fetch profile info using the same mechanism as button click
+    const fetchRequestId = Math.random().toString(36).substring(7);
+    const profileInfo = await new Promise((resolve) => {
+      const handler = (event) => {
+        if (event.data?.type === 'threads-fetch-response' && event.data?.requestId === fetchRequestId) {
+          window.removeEventListener('message', handler);
+          resolve(event.data.result);
+        }
+      };
+      window.addEventListener('message', handler);
+
+      window.postMessage({
+        type: 'threads-fetch-request',
+        requestId: fetchRequestId,
+        userId: userId
+      }, '*');
+
+      setTimeout(() => {
+        window.removeEventListener('message', handler);
+        resolve(null);
+      }, 10000);
+    });
+
+    if (profileInfo && !profileInfo._rateLimited) {
+      profileCache.set(username, profileInfo);
+
+      // Replace button with badge
+      if (profileInfo.location) {
+        const badge = await createLocationBadge(profileInfo);
+        btn.parentElement.replaceChild(badge, btn);
+      } else {
+        // No location data
+        btn.textContent = '➖';
+        btn.title = 'No location available';
+        btn.disabled = true;
+        btn.style.cursor = 'default';
+        btn.style.opacity = '0.4';
+      }
+    } else if (profileInfo?._rateLimited) {
+      btn.textContent = '⏸';
+      btn.title = 'Rate limited. Try again later.';
+      btn.disabled = false;
+    } else {
+      btn.textContent = '🔄';
+      btn.title = 'Failed. Click to retry.';
+      btn.disabled = false;
+    }
+
+    // Throttle: wait before next fetch
+    if (followersFetchQueue.length > 0) {
+      await new Promise(r => setTimeout(r, FETCH_DELAY_MS));
+    }
+  }
+
+  isFetchingFollowers = false;
+}
 
 // Detect if we're on an activity page (replies, follows, etc.)
 function isActivityPage() {
@@ -681,7 +871,7 @@ function addFetchButtons() {
 
 // Observe DOM for new posts AND for friendships dialog reopening/scrolling
 function observeFeed() {
-  const observer = new MutationObserver((mutations) => {
+  const observer = new MutationObserver((_mutations) => {
     // Debounce
     clearTimeout(observer._timeout);
     observer._timeout = setTimeout(() => {
@@ -732,7 +922,7 @@ function observeFeed() {
 
                     if (userData) {
                       // We have the user data with pk from GraphQL
-                      injectLocationUIForUser(username, userData.pk, profileCache);
+                      injectLocationUIForUser(username, userData.pk, profileCache, followersVisibilityObserver);
                     } else {
                       // User not in our GraphQL list - try to get user ID from injected script
                       // Request user ID lookup via postMessage
@@ -758,7 +948,7 @@ function observeFeed() {
 
                       getUserIdPromise.then(userId => {
                         if (userId) {
-                          injectLocationUIForUser(username, userId, profileCache);
+                          injectLocationUIForUser(username, userId, profileCache, followersVisibilityObserver);
                         }
                       });
                     }
@@ -903,9 +1093,10 @@ function init() {
   }, INITIAL_DELAY_MS);
 }
 
-// Load auto-query setting from storage
-browserAPI.storage.local.get(['autoQueryEnabled']).then((result) => {
+// Load auto-query settings from storage
+browserAPI.storage.local.get(['autoQueryEnabled', 'autoQueryFollowersEnabled']).then((result) => {
   autoQueryEnabled = result.autoQueryEnabled !== false;
+  autoQueryFollowersEnabled = result.autoQueryFollowersEnabled === true; // Default off
 });
 
 /**
@@ -971,6 +1162,9 @@ browserAPI.runtime.onMessage.addListener((message) => {
     if (autoQueryEnabled) {
       processFetchQueue();
     }
+  } else if (message.type === 'AUTO_QUERY_FOLLOWERS_CHANGED') {
+    autoQueryFollowersEnabled = message.enabled;
+    console.log('[Threads Extractor] Auto-query followers', autoQueryFollowersEnabled ? 'enabled' : 'disabled');
   } else if (message.type === 'SHOW_FLAGS_CHANGED') {
     console.log('[Threads Extractor] Show flags', message.enabled ? 'enabled' : 'disabled');
     // Update all existing badges on the page

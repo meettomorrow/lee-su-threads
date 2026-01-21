@@ -15,8 +15,9 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
  * @param {string} username - Username (without @)
  * @param {string} userId - User ID
  * @param {Map} profileCache - Cache of profile data
+ * @param {IntersectionObserver} observer - Optional IntersectionObserver for auto-fetch
  */
-export function injectLocationUIForUser(username, userId, profileCache) {
+export function injectLocationUIForUser(username, userId, profileCache, observer = null) {
   const profileInfo = profileCache.get(username);
 
   if (profileInfo) {
@@ -29,7 +30,7 @@ export function injectLocationUIForUser(username, userId, profileCache) {
     }
   } else if (userId) {
     // No cached data - add a button to fetch on demand
-    injectLocationButtonIntoUserRow(username, userId, profileCache);
+    injectLocationButtonIntoUserRow(username, userId, profileCache, observer);
   }
 }
 
@@ -38,8 +39,9 @@ export function injectLocationUIForUser(username, userId, profileCache) {
  * @param {string} username - Username (without @)
  * @param {string} userId - User ID
  * @param {Map} profileCache - Cache of profile data
+ * @param {IntersectionObserver} observer - Optional IntersectionObserver for auto-fetch
  */
-function injectLocationButtonIntoUserRow(username, userId, profileCache) {
+function injectLocationButtonIntoUserRow(username, userId, profileCache, observer = null) {
   // Find all links to this user's profile
   const profileLinks = document.querySelectorAll(`a[href="/@${username}"]`);
 
@@ -68,6 +70,12 @@ function injectLocationButtonIntoUserRow(username, userId, profileCache) {
             // No follow button (e.g., own profile) - append to end
             insertTarget.appendChild(btn);
           }
+
+          // Attach observer if provided
+          if (observer) {
+            observer.observe(btn);
+          }
+
           break;
         }
       }
