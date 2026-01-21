@@ -33,7 +33,7 @@ const pendingFollowersVisibility = new Map(); // Track followers waiting to be q
 const FETCH_DELAY_MS = 800; // Delay between auto-fetches to avoid rate limiting
 const INITIAL_DELAY_MS = 2000; // Wait for bulk-route-definitions to load
 const RATE_LIMIT_COOLDOWN_MS = 60 * 60 * 1000; // 60 minutes (1 hour) cooldown
-const MAX_QUEUE_SIZE = 5; // Maximum number of posts in queue
+const MAX_QUEUE_SIZE = 10; // Maximum number of posts in queue
 const VISIBILITY_DELAY_MS = 500; // How long a post must be visible before queuing
 
 // Shared state object for queue manager and observers
