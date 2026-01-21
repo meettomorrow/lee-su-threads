@@ -59,8 +59,26 @@
   "autoQuery": {
     "message": "自动查询"
   },
+  "autoQueryFeed": {
+    "message": "自动查询动态"
+  },
+  "autoQueryFollower": {
+    "message": "自动查询关注者"
+  },
+  "feedLabel": {
+    "message": "动态"
+  },
+  "followerLabel": {
+    "message": "关注者"
+  },
   "autoQueryTooltip": {
     "message": "在浏览 Threads 时自动获取个人资料信息"
+  },
+  "autoQueryFollowers": {
+    "message": "自动查询关注者"
+  },
+  "autoQueryFollowersTooltip": {
+    "message": "自动获取关注者/关注中列表的位置信息"
   },
   "showFlags": {
     "message": "显示国旗"

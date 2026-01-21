@@ -6,6 +6,7 @@
 import { findUsernameContainer } from './domHelpers.js';
 import { isNewUser } from './dateParser.js';
 import { formatLocation } from './locationMapper.js';
+import { fetchProfileByUserId, updateButtonWithFetchResult } from './profileFetcher.js';
 
 // Cross-browser compatibility
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -15,8 +16,9 @@ const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
  * @param {string} username - Username (without @)
  * @param {string} userId - User ID
  * @param {Map} profileCache - Cache of profile data
+ * @param {IntersectionObserver} observer - Optional IntersectionObserver for auto-fetch
  */
-export function injectLocationUIForUser(username, userId, profileCache) {
+export function injectLocationUIForUser(username, userId, profileCache, observer = null) {
   const profileInfo = profileCache.get(username);
 
   if (profileInfo) {
@@ -29,7 +31,7 @@ export function injectLocationUIForUser(username, userId, profileCache) {
     }
   } else if (userId) {
     // No cached data - add a button to fetch on demand
-    injectLocationButtonIntoUserRow(username, userId, profileCache);
+    injectLocationButtonIntoUserRow(username, userId, profileCache, observer);
   }
 }
 
@@ -38,8 +40,9 @@ export function injectLocationUIForUser(username, userId, profileCache) {
  * @param {string} username - Username (without @)
  * @param {string} userId - User ID
  * @param {Map} profileCache - Cache of profile data
+ * @param {IntersectionObserver} observer - Optional IntersectionObserver for auto-fetch
  */
-function injectLocationButtonIntoUserRow(username, userId, profileCache) {
+function injectLocationButtonIntoUserRow(username, userId, profileCache, observer = null) {
   // Find all links to this user's profile
   const profileLinks = document.querySelectorAll(`a[href="/@${username}"]`);
 
@@ -68,6 +71,12 @@ function injectLocationButtonIntoUserRow(username, userId, profileCache) {
             // No follow button (e.g., own profile) - append to end
             insertTarget.appendChild(btn);
           }
+
+          // Attach observer if provided
+          if (observer) {
+            observer.observe(btn);
+          }
+
           break;
         }
       }
@@ -98,51 +107,11 @@ function createFriendshipsLocationButton(username, userId, profileCache) {
     btn.disabled = true;
     btn.textContent = '⏳';
 
-    // Fetch profile info
-    const fetchRequestId = Math.random().toString(36).substring(7);
-    const profileInfo = await new Promise((resolve) => {
-      const handler = (event) => {
-        if (event.data?.type === 'threads-fetch-response' && event.data?.requestId === fetchRequestId) {
-          window.removeEventListener('message', handler);
-          resolve(event.data.result);
-        }
-      };
-      window.addEventListener('message', handler);
+    // Fetch profile info using shared utility
+    const profileInfo = await fetchProfileByUserId(userId);
 
-      window.postMessage({
-        type: 'threads-fetch-request',
-        requestId: fetchRequestId,
-        userId: userId
-      }, '*');
-
-      setTimeout(() => {
-        window.removeEventListener('message', handler);
-        resolve(null);
-      }, 10000);
-    });
-
-    if (profileInfo && !profileInfo._rateLimited) {
-      profileCache.set(username, profileInfo);
-
-      // Replace button with badge
-      if (profileInfo.location) {
-        const badge = await createLocationBadge(profileInfo);
-        btn.parentElement.replaceChild(badge, btn);
-      } else {
-        // No location data
-        btn.textContent = '—';
-        btn.title = 'No location available';
-        btn.disabled = true;
-      }
-    } else if (profileInfo?._rateLimited) {
-      btn.textContent = '⏸';
-      btn.title = 'Rate limited. Try again later.';
-      btn.disabled = false;
-    } else {
-      btn.textContent = '🔄';
-      btn.title = 'Failed. Click to retry.';
-      btn.disabled = false;
-    }
+    // Update button with result using shared utility
+    await updateButtonWithFetchResult(btn, username, profileInfo, profileCache, createLocationBadge);
   });
 
   return btn;

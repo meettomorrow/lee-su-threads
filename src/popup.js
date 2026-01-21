@@ -49,6 +49,7 @@ if (versionNumberEl) {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
+  // Get DOM elements
   const profileCountEl = document.getElementById('profileCount');
   const headerProfileCountEl = document.getElementById('headerProfileCount');
   const profileListEl = document.getElementById('profileList');
@@ -57,6 +58,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const copyBtn = document.getElementById('copyBtn');
   const clearBtn = document.getElementById('clearBtn');
   const autoQueryToggle = document.getElementById('autoQueryToggle');
+  const autoQueryFollowersToggle = document.getElementById('autoQueryFollowersToggle');
   const showFlagsToggle = document.getElementById('showFlagsToggle');
   const locationFilter = document.getElementById('locationFilter');
   const onboardingLink = document.getElementById('onboardingLink');
@@ -65,10 +67,75 @@ document.addEventListener('DOMContentLoaded', () => {
   const locationsTab = document.getElementById('locationsTab');
   const contentEl = document.querySelector('.content');
 
+  // Variables used throughout
   let profiles = {};
   let filterText = '';
   let filterNoLocation = false; // Special flag for filtering profiles without location
   let activeTab = 'profiles';
+  let rateLimitCountdownInterval = null;
+
+  // Rate limit handling functions
+  function showRateLimitBanner(rateLimitedUntil) {
+    const banner = document.getElementById('rateLimitBanner');
+    const countdown = document.getElementById('rateLimitCountdown');
+
+    if (!banner || !countdown) return;
+
+    banner.classList.add('visible');
+
+    // Clear any existing interval
+    if (rateLimitCountdownInterval) {
+      clearInterval(rateLimitCountdownInterval);
+    }
+
+    // Update countdown every second
+    const updateCountdown = () => {
+      const now = Date.now();
+      const remaining = rateLimitedUntil - now;
+
+      if (remaining <= 0) {
+        hideRateLimitBanner();
+        enableAllToggles();
+        return;
+      }
+
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+
+      if (minutes > 0) {
+        countdown.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+      } else {
+        countdown.textContent = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+      }
+    };
+
+    updateCountdown();
+    rateLimitCountdownInterval = setInterval(updateCountdown, 1000);
+  }
+
+  function hideRateLimitBanner() {
+    const banner = document.getElementById('rateLimitBanner');
+    if (banner) {
+      banner.classList.remove('visible');
+    }
+
+    if (rateLimitCountdownInterval) {
+      clearInterval(rateLimitCountdownInterval);
+      rateLimitCountdownInterval = null;
+    }
+  }
+
+  function disableAllToggles() {
+    autoQueryToggle.disabled = true;
+    autoQueryFollowersToggle.disabled = true;
+    showFlagsToggle.disabled = true;
+  }
+
+  function enableAllToggles() {
+    autoQueryToggle.disabled = false;
+    autoQueryFollowersToggle.disabled = false;
+    showFlagsToggle.disabled = false;
+  }
 
   // Detect if we should use sheet modal for emoji picker
   // Use sheet modal for:
@@ -198,32 +265,75 @@ document.addEventListener('DOMContentLoaded', () => {
     // Notify content script
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
-        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'AUTO_QUERY_CHANGED', enabled });
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'AUTO_QUERY_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
       }
     });
   });
 
-  // Load and handle show flags setting
-  browserAPI.storage.local.get(['showFlags']).then((result) => {
-    // Default to true if not set
-    const enabled = result.showFlags !== false;
-    showFlagsToggle.checked = enabled;
+  // Load initial settings
+  browserAPI.storage.local.get([
+    'autoQueryEnabled',
+    'autoQueryFollowersEnabled',
+    'showFlags',
+    'rateLimitedUntil'
+  ]).then((result) => {
+    // Check if currently rate limited
+    const rateLimitedUntil = result.rateLimitedUntil || 0;
+    if (Date.now() < rateLimitedUntil) {
+      disableAllToggles();
+      showRateLimitBanner(rateLimitedUntil);
+      return;
+    }
+
+    // Set toggles based on stored settings
+    autoQueryToggle.checked = result.autoQueryEnabled !== false;
+    autoQueryFollowersToggle.checked = result.autoQueryFollowersEnabled === true;
+    showFlagsToggle.checked = result.showFlags !== false;
+  });
+
+  // Additional toggle change event listeners
+  autoQueryFollowersToggle.addEventListener('change', () => {
+    const enabled = autoQueryFollowersToggle.checked;
+    browserAPI.storage.local.set({ autoQueryFollowersEnabled: enabled });
+    browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0]?.id) {
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'AUTO_QUERY_FOLLOWERS_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
+      }
+    });
   });
 
   showFlagsToggle.addEventListener('change', () => {
     const enabled = showFlagsToggle.checked;
     browserAPI.storage.local.set({ showFlags: enabled });
-
-    // Refresh popup display immediately
-    renderProfileList();
-    renderLocationStats();
-
-    // Notify content script to refresh UI
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
-        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'SHOW_FLAGS_CHANGED', enabled });
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'SHOW_FLAGS_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
       }
     });
+  });
+
+
+  // Listen for rate limit events from content script
+  browserAPI.runtime.onMessage.addListener((message) => {
+    if (message.type === 'RATE_LIMITED') {
+      disableAllToggles();
+      // Get the rate limit end time from storage
+      browserAPI.storage.local.get(['rateLimitedUntil']).then((result) => {
+        const rateLimitedUntil = result.rateLimitedUntil || 0;
+        if (Date.now() < rateLimitedUntil) {
+          showRateLimitBanner(rateLimitedUntil);
+        }
+      });
+    } else if (message.type === 'RATE_LIMIT_CLEARED') {
+      enableAllToggles();
+      hideRateLimitBanner();
+    }
   });
 
   // Localize UI elements

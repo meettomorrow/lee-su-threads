@@ -59,8 +59,26 @@
   "autoQuery": {
     "message": "자동 조회"
   },
+  "autoQueryFeed": {
+    "message": "피드 자동 조회"
+  },
+  "autoQueryFollower": {
+    "message": "팔로워 자동 조회"
+  },
+  "feedLabel": {
+    "message": "피드"
+  },
+  "followerLabel": {
+    "message": "팔로워"
+  },
   "autoQueryTooltip": {
     "message": "Threads를 탐색하는 동안 프로필 정보를 자동으로 가져옵니다"
+  },
+  "autoQueryFollowers": {
+    "message": "팔로워 자동 조회"
+  },
+  "autoQueryFollowersTooltip": {
+    "message": "팔로워/팔로잉 목록의 위치 정보를 자동으로 가져옵니다"
   },
   "showFlags": {
     "message": "국기 표시"

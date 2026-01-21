@@ -62,8 +62,26 @@
   "autoQuery": {
     "message": "自動查詢"
   },
+  "autoQueryFeed": {
+    "message": "自動查詢動態"
+  },
+  "autoQueryFollower": {
+    "message": "自動查詢追蹤者"
+  },
+  "feedLabel": {
+    "message": "動態"
+  },
+  "followerLabel": {
+    "message": "追蹤者"
+  },
   "autoQueryTooltip": {
     "message": "在瀏覽 Threads 時自動取得個人檔案資訊"
+  },
+  "autoQueryFollowers": {
+    "message": "自動查詢追蹤者"
+  },
+  "autoQueryFollowersTooltip": {
+    "message": "自動取得追蹤者/追蹤中列表的地點資訊"
   },
   "showFlags": {
     "message": "顯示國旗"
