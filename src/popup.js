@@ -72,8 +72,59 @@ document.addEventListener('DOMContentLoaded', () => {
   let filterText = '';
   let filterNoLocation = false; // Special flag for filtering profiles without location
   let activeTab = 'profiles';
+  let rateLimitCountdownInterval = null;
 
   // Rate limit handling functions
+  function showRateLimitBanner(rateLimitedUntil) {
+    const banner = document.getElementById('rateLimitBanner');
+    const countdown = document.getElementById('rateLimitCountdown');
+
+    if (!banner || !countdown) return;
+
+    banner.classList.add('visible');
+
+    // Clear any existing interval
+    if (rateLimitCountdownInterval) {
+      clearInterval(rateLimitCountdownInterval);
+    }
+
+    // Update countdown every second
+    const updateCountdown = () => {
+      const now = Date.now();
+      const remaining = rateLimitedUntil - now;
+
+      if (remaining <= 0) {
+        hideRateLimitBanner();
+        enableAllToggles();
+        return;
+      }
+
+      const minutes = Math.floor(remaining / 60000);
+      const seconds = Math.floor((remaining % 60000) / 1000);
+
+      if (minutes > 0) {
+        countdown.textContent = `${minutes} minute${minutes !== 1 ? 's' : ''}`;
+      } else {
+        countdown.textContent = `${seconds} second${seconds !== 1 ? 's' : ''}`;
+      }
+    };
+
+    updateCountdown();
+    rateLimitCountdownInterval = setInterval(updateCountdown, 1000);
+  }
+
+  function hideRateLimitBanner() {
+    const banner = document.getElementById('rateLimitBanner');
+    if (banner) {
+      banner.classList.remove('visible');
+    }
+
+    if (rateLimitCountdownInterval) {
+      clearInterval(rateLimitCountdownInterval);
+      rateLimitCountdownInterval = null;
+    }
+  }
+
   function disableAllToggles() {
     autoQueryToggle.disabled = true;
     autoQueryFollowersToggle.disabled = true;
@@ -214,7 +265,9 @@ document.addEventListener('DOMContentLoaded', () => {
     // Notify content script
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
-        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'AUTO_QUERY_CHANGED', enabled });
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'AUTO_QUERY_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
       }
     });
   });
@@ -230,6 +283,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const rateLimitedUntil = result.rateLimitedUntil || 0;
     if (Date.now() < rateLimitedUntil) {
       disableAllToggles();
+      showRateLimitBanner(rateLimitedUntil);
       return;
     }
 
@@ -245,7 +299,9 @@ document.addEventListener('DOMContentLoaded', () => {
     browserAPI.storage.local.set({ autoQueryFollowersEnabled: enabled });
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
-        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'AUTO_QUERY_FOLLOWERS_CHANGED', enabled });
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'AUTO_QUERY_FOLLOWERS_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
       }
     });
   });
@@ -255,7 +311,9 @@ document.addEventListener('DOMContentLoaded', () => {
     browserAPI.storage.local.set({ showFlags: enabled });
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
-        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'SHOW_FLAGS_CHANGED', enabled });
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'SHOW_FLAGS_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
       }
     });
   });
@@ -265,8 +323,16 @@ document.addEventListener('DOMContentLoaded', () => {
   browserAPI.runtime.onMessage.addListener((message) => {
     if (message.type === 'RATE_LIMITED') {
       disableAllToggles();
+      // Get the rate limit end time from storage
+      browserAPI.storage.local.get(['rateLimitedUntil']).then((result) => {
+        const rateLimitedUntil = result.rateLimitedUntil || 0;
+        if (Date.now() < rateLimitedUntil) {
+          showRateLimitBanner(rateLimitedUntil);
+        }
+      });
     } else if (message.type === 'RATE_LIMIT_CLEARED') {
       enableAllToggles();
+      hideRateLimitBanner();
     }
   });
 

@@ -207,6 +207,34 @@
         overflow-x: hidden;
       }
 
+      .rate-limit-banner {
+        display: none;
+        background: linear-gradient(135deg, #ff6b6b 0%, #ee5a6f 100%);
+        color: white;
+        padding: 12px 16px;
+        border-radius: 8px;
+        margin-bottom: 12px;
+        font-size: 13px;
+        line-height: 1.5;
+      }
+
+      .rate-limit-banner.visible {
+        display: block;
+      }
+
+      .rate-limit-banner-title {
+        font-weight: 600;
+        margin-bottom: 4px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+      }
+
+      .rate-limit-banner-message {
+        opacity: 0.95;
+        font-size: 12px;
+      }
+
       .stats {
         display: grid;
         grid-template-columns: 1fr 1fr 1fr;
@@ -1008,6 +1036,12 @@
     </div>
 
     <div class="content">
+      <div class="rate-limit-banner" id="rateLimitBanner">
+        <div class="rate-limit-banner-title">⏸ Rate Limited by Threads</div>
+        <div class="rate-limit-banner-message" id="rateLimitMessage">
+          Auto-query will resume in <span id="rateLimitCountdown">--</span>
+        </div>
+      </div>
       <div class="stats">
         <div class="stat-card">
           <div class="stat-label" data-i18n="feedLabel">Feed</div>
