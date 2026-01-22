@@ -202,5 +202,23 @@
   },
   "pickEmojiFor": {
     "message": "为以下位置选择表情符号："
+  },
+  "noDataToExport": {
+    "message": "没有可导出的个人资料"
+  },
+  "noDataToCopy": {
+    "message": "没有可复制的个人资料"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "confirm": {
+    "message": "清除"
+  },
+  "clearFailed": {
+    "message": "清除缓存失败"
+  },
+  "clearing": {
+    "message": "清除中..."
   }
 }

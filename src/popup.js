@@ -498,6 +498,13 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Export profiles as JSON
   exportBtn.addEventListener('click', () => {
+    const profileCount = Object.keys(profiles).length;
+
+    if (profileCount === 0) {
+      showToast(browserAPI.i18n.getMessage('noDataToExport') || 'No profiles to export', true);
+      return;
+    }
+
     const dataStr = JSON.stringify(profiles, null, 2);
     const blob = new Blob([dataStr], { type: 'application/json' });
     const url = URL.createObjectURL(blob);
@@ -505,15 +512,29 @@ document.addEventListener('DOMContentLoaded', () => {
     const a = document.createElement('a');
     a.href = url;
     a.download = `threads-profiles-${new Date().toISOString().split('T')[0]}.json`;
-    a.click();
 
-    URL.revokeObjectURL(url);
+    // Safari workaround: append to body, click, then remove
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+
+    // Delay cleanup to ensure download starts
+    setTimeout(() => {
+      URL.revokeObjectURL(url);
+    }, 100);
 
     showToast(browserAPI.i18n.getMessage('exportSuccess') || 'Exported successfully!');
   });
 
   // Copy to clipboard
   copyBtn.addEventListener('click', async () => {
+    const profileCount = Object.keys(profiles).length;
+
+    if (profileCount === 0) {
+      showToast(browserAPI.i18n.getMessage('noDataToCopy') || 'No profiles to copy', true);
+      return;
+    }
+
     const dataStr = JSON.stringify(profiles, null, 2);
 
     try {
@@ -525,34 +546,178 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   });
 
+  // Show custom confirmation dialog
+  function showConfirmDialog(message, onConfirm) {
+    const dialogId = `confirm-dialog-${Date.now()}`;
+    const messageId = `${dialogId}-message`;
+
+    const overlay = document.createElement('div');
+    overlay.style.cssText = `
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      background: rgba(0, 0, 0, 0.5);
+      backdrop-filter: blur(4px);
+      z-index: 10001;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: fadeIn 0.2s ease;
+    `;
+
+    const dialog = document.createElement('div');
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', messageId);
+    dialog.style.cssText = `
+      background: var(--bg-gradient-start);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      padding: 20px;
+      max-width: 280px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3);
+      animation: slideUp 0.3s ease;
+    `;
+
+    const messageEl = document.createElement('div');
+    messageEl.id = messageId;
+    messageEl.style.cssText = `
+      color: var(--text-primary);
+      font-size: 14px;
+      line-height: 1.5;
+      margin-bottom: 16px;
+      text-align: center;
+    `;
+    messageEl.textContent = message;
+
+    const buttonContainer = document.createElement('div');
+    buttonContainer.style.cssText = `
+      display: flex;
+      gap: 8px;
+      justify-content: center;
+    `;
+
+    const cancelBtn = document.createElement('button');
+    cancelBtn.textContent = browserAPI.i18n.getMessage('cancel') || 'Cancel';
+    cancelBtn.setAttribute('type', 'button');
+    cancelBtn.style.cssText = `
+      flex: 1;
+      padding: 8px 16px;
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      background: var(--bg-overlay-5);
+      color: var(--text-primary);
+      font-size: 13px;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    cancelBtn.onmouseover = () => cancelBtn.style.background = 'var(--bg-overlay-10)';
+    cancelBtn.onmouseout = () => cancelBtn.style.background = 'var(--bg-overlay-5)';
+
+    const confirmBtn = document.createElement('button');
+    confirmBtn.textContent = browserAPI.i18n.getMessage('confirm') || 'Clear';
+    confirmBtn.setAttribute('type', 'button');
+    confirmBtn.style.cssText = `
+      flex: 1;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #ef4444;
+      color: white;
+      font-size: 13px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.2s;
+    `;
+    confirmBtn.onmouseover = () => confirmBtn.style.background = '#dc2626';
+    confirmBtn.onmouseout = () => confirmBtn.style.background = '#ef4444';
+
+    const focusableElements = [cancelBtn, confirmBtn];
+    let currentFocusIndex = 1; // Start with confirm button
+
+    const closeDialog = () => {
+      document.removeEventListener('keydown', handleKeyDown);
+      overlay.style.opacity = '0';
+      setTimeout(() => overlay.remove(), 200);
+    };
+
+    // Handle keyboard navigation
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeDialog();
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        // Focus trap: cycle through focusable elements
+        currentFocusIndex = (currentFocusIndex + (e.shiftKey ? -1 : 1) + focusableElements.length) % focusableElements.length;
+        focusableElements[currentFocusIndex].focus();
+      }
+    };
+
+    cancelBtn.onclick = closeDialog;
+    confirmBtn.onclick = () => {
+      closeDialog();
+      onConfirm();
+    };
+    overlay.onclick = (e) => {
+      if (e.target === overlay) closeDialog();
+    };
+
+    buttonContainer.appendChild(cancelBtn);
+    buttonContainer.appendChild(confirmBtn);
+    dialog.appendChild(messageEl);
+    dialog.appendChild(buttonContainer);
+    overlay.appendChild(dialog);
+    document.body.appendChild(overlay);
+
+    // Add keyboard event listener
+    document.addEventListener('keydown', handleKeyDown);
+
+    // Focus confirm button
+    setTimeout(() => {
+      confirmBtn.focus();
+      currentFocusIndex = 1;
+    }, 100);
+  }
+
   // Clear cache
   clearBtn.addEventListener('click', () => {
-    if (confirm(browserAPI.i18n.getMessage('confirmClear') || 'Are you sure you want to clear all cached profiles?')) {
-      // Show loading state
-      const originalText = clearBtn.textContent;
-      clearBtn.textContent = '⏳ ' + (browserAPI.i18n.getMessage('clearing') || 'Clearing...');
-      clearBtn.disabled = true;
+    showConfirmDialog(
+      browserAPI.i18n.getMessage('confirmClear') || 'Are you sure you want to clear all cached profiles?',
+      () => {
+        // Show loading state
+        const originalText = clearBtn.textContent;
+        clearBtn.textContent = '⏳ ' + (browserAPI.i18n.getMessage('clearing') || 'Clearing...');
+        clearBtn.disabled = true;
 
-      // Clear both profile cache and user ID cache
-      browserAPI.storage.local.set({ profileCache: {}, userIdCache: {} }).then(() => {
-        // Reload profiles from storage (now empty)
-        loadProfiles();
+        // Clear both profile cache and user ID cache
+        browserAPI.storage.local.set({ profileCache: {}, userIdCache: {} }).then(() => {
+          // Reload profiles from storage (now empty)
+          loadProfiles();
 
-        // Reset button state
-        clearBtn.textContent = originalText;
-        clearBtn.disabled = false;
+          // If location stats tab is active, refresh it too
+          if (activeTab === 'locations') {
+            renderLocationStats();
+          }
 
-        showToast(browserAPI.i18n.getMessage('cacheCleared') || '✓ Cache cleared successfully!');
-      }).catch((err) => {
-        console.error('Failed to clear cache:', err);
+          // Reset button state
+          clearBtn.textContent = originalText;
+          clearBtn.disabled = false;
 
-        // Reset button state
-        clearBtn.textContent = originalText;
-        clearBtn.disabled = false;
+          showToast(browserAPI.i18n.getMessage('cacheCleared') || '✓ Cache cleared successfully!');
+        }).catch((err) => {
+          console.error('Failed to clear cache:', err);
 
-        showToast(browserAPI.i18n.getMessage('clearFailed') || 'Failed to clear cache', true);
-      });
-    }
+          // Reset button state
+          clearBtn.textContent = originalText;
+          clearBtn.disabled = false;
+
+          showToast(browserAPI.i18n.getMessage('clearFailed') || 'Failed to clear cache', true);
+        });
+      }
+    );
   });
 
   // Onboarding link
@@ -621,11 +786,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Refresh popup display
     renderProfileList();
-  }
-
-  // Reset custom emoji for a location
-  async function resetCustomEmoji(location) {
-    await saveCustomEmoji(location, '');
   }
 
   // Set up emoji picker sheet modal event listeners (once, outside of renderLocationStats)
