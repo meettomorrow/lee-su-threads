@@ -205,5 +205,23 @@
   },
   "pickEmojiFor": {
     "message": "為以下地點選擇表情符號："
+  },
+  "noDataToExport": {
+    "message": "沒有可匯出的個人檔案"
+  },
+  "noDataToCopy": {
+    "message": "沒有可複製的個人檔案"
+  },
+  "cancel": {
+    "message": "取消"
+  },
+  "confirm": {
+    "message": "清除"
+  },
+  "clearFailed": {
+    "message": "清除快取失敗"
+  },
+  "clearing": {
+    "message": "清除中..."
   }
 }

@@ -202,5 +202,23 @@
   },
   "pickEmojiFor": {
     "message": "다음 위치의 이모티콘 선택:"
+  },
+  "noDataToExport": {
+    "message": "내보낼 프로필이 없습니다"
+  },
+  "noDataToCopy": {
+    "message": "복사할 프로필이 없습니다"
+  },
+  "cancel": {
+    "message": "취소"
+  },
+  "confirm": {
+    "message": "지우기"
+  },
+  "clearFailed": {
+    "message": "캐시 지우기 실패"
+  },
+  "clearing": {
+    "message": "지우는 중..."
   }
 }

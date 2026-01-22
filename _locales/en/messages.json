@@ -199,5 +199,23 @@
   },
   "pickEmojiFor": {
     "message": "Pick emoji for"
+  },
+  "noDataToExport": {
+    "message": "No profiles to export"
+  },
+  "noDataToCopy": {
+    "message": "No profiles to copy"
+  },
+  "cancel": {
+    "message": "Cancel"
+  },
+  "confirm": {
+    "message": "Clear"
+  },
+  "clearFailed": {
+    "message": "Failed to clear cache"
+  },
+  "clearing": {
+    "message": "Clearing..."
   }
 }

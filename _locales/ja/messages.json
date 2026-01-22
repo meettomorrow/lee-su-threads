@@ -202,5 +202,23 @@
   },
   "pickEmojiFor": {
     "message": "次の場所の絵文字を選択："
+  },
+  "noDataToExport": {
+    "message": "エクスポートするプロフィールがありません"
+  },
+  "noDataToCopy": {
+    "message": "コピーするプロフィールがありません"
+  },
+  "cancel": {
+    "message": "キャンセル"
+  },
+  "confirm": {
+    "message": "クリア"
+  },
+  "clearFailed": {
+    "message": "キャッシュのクリアに失敗しました"
+  },
+  "clearing": {
+    "message": "クリア中..."
   }
 }

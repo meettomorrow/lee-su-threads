@@ -548,6 +548,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // Show custom confirmation dialog
   function showConfirmDialog(message, onConfirm) {
+    const dialogId = `confirm-dialog-${Date.now()}`;
+    const messageId = `${dialogId}-message`;
+
     const overlay = document.createElement('div');
     overlay.style.cssText = `
       position: fixed;
@@ -565,6 +568,9 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     const dialog = document.createElement('div');
+    dialog.setAttribute('role', 'dialog');
+    dialog.setAttribute('aria-modal', 'true');
+    dialog.setAttribute('aria-labelledby', messageId);
     dialog.style.cssText = `
       background: var(--bg-gradient-start);
       border: 1px solid var(--border-color);
@@ -576,6 +582,7 @@ document.addEventListener('DOMContentLoaded', () => {
     `;
 
     const messageEl = document.createElement('div');
+    messageEl.id = messageId;
     messageEl.style.cssText = `
       color: var(--text-primary);
       font-size: 14px;
@@ -594,6 +601,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const cancelBtn = document.createElement('button');
     cancelBtn.textContent = browserAPI.i18n.getMessage('cancel') || 'Cancel';
+    cancelBtn.setAttribute('type', 'button');
     cancelBtn.style.cssText = `
       flex: 1;
       padding: 8px 16px;
@@ -610,6 +618,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const confirmBtn = document.createElement('button');
     confirmBtn.textContent = browserAPI.i18n.getMessage('confirm') || 'Clear';
+    confirmBtn.setAttribute('type', 'button');
     confirmBtn.style.cssText = `
       flex: 1;
       padding: 8px 16px;
@@ -625,9 +634,26 @@ document.addEventListener('DOMContentLoaded', () => {
     confirmBtn.onmouseover = () => confirmBtn.style.background = '#dc2626';
     confirmBtn.onmouseout = () => confirmBtn.style.background = '#ef4444';
 
+    const focusableElements = [cancelBtn, confirmBtn];
+    let currentFocusIndex = 1; // Start with confirm button
+
     const closeDialog = () => {
+      document.removeEventListener('keydown', handleKeyDown);
       overlay.style.opacity = '0';
       setTimeout(() => overlay.remove(), 200);
+    };
+
+    // Handle keyboard navigation
+    const handleKeyDown = (e) => {
+      if (e.key === 'Escape') {
+        e.preventDefault();
+        closeDialog();
+      } else if (e.key === 'Tab') {
+        e.preventDefault();
+        // Focus trap: cycle through focusable elements
+        currentFocusIndex = (currentFocusIndex + (e.shiftKey ? -1 : 1) + focusableElements.length) % focusableElements.length;
+        focusableElements[currentFocusIndex].focus();
+      }
     };
 
     cancelBtn.onclick = closeDialog;
@@ -646,8 +672,14 @@ document.addEventListener('DOMContentLoaded', () => {
     overlay.appendChild(dialog);
     document.body.appendChild(overlay);
 
+    // Add keyboard event listener
+    document.addEventListener('keydown', handleKeyDown);
+
     // Focus confirm button
-    setTimeout(() => confirmBtn.focus(), 100);
+    setTimeout(() => {
+      confirmBtn.focus();
+      currentFocusIndex = 1;
+    }, 100);
   }
 
   // Clear cache
