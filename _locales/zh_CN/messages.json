@@ -38,6 +38,9 @@
   "exportSuccess": {
     "message": "导出成功！"
   },
+  "exportFailed": {
+    "message": "导出失败"
+  },
   "copySuccess": {
     "message": "已复制到剪贴板！"
   },

@@ -41,6 +41,9 @@
   "exportSuccess": {
     "message": "Exported successfully!"
   },
+  "exportFailed": {
+    "message": "Export failed"
+  },
   "copySuccess": {
     "message": "Copied to clipboard!"
   },

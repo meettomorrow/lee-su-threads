@@ -38,6 +38,9 @@
   "exportSuccess": {
     "message": "내보내기 성공!"
   },
+  "exportFailed": {
+    "message": "내보내기 실패"
+  },
   "copySuccess": {
     "message": "클립보드에 복사됨!"
   },

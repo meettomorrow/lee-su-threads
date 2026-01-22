@@ -41,6 +41,9 @@
   "exportSuccess": {
     "message": "匯出成功！"
   },
+  "exportFailed": {
+    "message": "匯出失敗"
+  },
   "copySuccess": {
     "message": "已複製到剪貼簿！"
   },
