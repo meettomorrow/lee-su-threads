@@ -496,6 +496,12 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
+  // Hide export button on iOS Safari (downloads don't work reliably)
+  const isIOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+  if (isIOS && exportBtn) {
+    exportBtn.style.display = 'none';
+  }
+
   // Export profiles as JSON
   exportBtn.addEventListener('click', () => {
     const profileCount = Object.keys(profiles).length;
@@ -506,22 +512,18 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     const dataStr = JSON.stringify(profiles, null, 2);
-    const blob = new Blob([dataStr], { type: 'application/json' });
-    const url = URL.createObjectURL(blob);
+    const filename = `threads-profiles-${new Date().toISOString().split('T')[0]}.json`;
+
+    // Use data URL with octet-stream to force download and preserve filename in Safari
+    const dataUrl = 'data:application/octet-stream;charset=utf-8,' + encodeURIComponent(dataStr);
 
     const a = document.createElement('a');
-    a.href = url;
-    a.download = `threads-profiles-${new Date().toISOString().split('T')[0]}.json`;
+    a.href = dataUrl;
+    a.download = filename;
 
-    // Safari workaround: append to body, click, then remove
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);
-
-    // Delay cleanup to ensure download starts
-    setTimeout(() => {
-      URL.revokeObjectURL(url);
-    }, 100);
 
     showToast(browserAPI.i18n.getMessage('exportSuccess') || 'Exported successfully!');
   });

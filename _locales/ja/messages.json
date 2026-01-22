@@ -38,6 +38,9 @@
   "exportSuccess": {
     "message": "エクスポート成功！"
   },
+  "exportFailed": {
+    "message": "エクスポート失敗"
+  },
   "copySuccess": {
     "message": "クリップボードにコピーしました！"
   },
