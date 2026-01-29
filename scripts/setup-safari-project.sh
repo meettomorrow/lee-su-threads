@@ -7,7 +7,7 @@ set -e  # Exit on error
 
 PROJECT_ROOT="$(cd "$(dirname "$0")/.." && pwd)"
 DIST_SAFARI="$PROJECT_ROOT/dist-safari"
-PROJECT_NAME="Lee-Su-Threads"
+PROJECT_NAME="Lee-Su-Sui"
 BUNDLE_ID="com.meettomorrow.leesuthreads"
 
 echo "🍎 Setting up Safari Xcode project..."
@@ -36,6 +36,7 @@ echo "   $DIST_SAFARI/safari-project/"
 
 xcrun safari-web-extension-converter dist/safari \
   --project-location "$DIST_SAFARI/safari-project" \
+  --app-name "Lee-Su-Sui" \
   --bundle-identifier "$BUNDLE_ID" \
   --swift \
   --force

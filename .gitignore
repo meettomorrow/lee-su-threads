@@ -13,7 +13,13 @@
 # Build output
 dist/
 dist-zip/
-dist-safari/
+
+# Safari Xcode build artifacts
+dist-safari/**/build/
+dist-safari/**/DerivedData/
+dist-safari/**/*.xcworkspace/xcuserdata/
+dist-safari/**/*.xcodeproj/xcuserdata/
+dist-safari/**/*.xcodeproj/project.xcworkspace/xcshareddata/swiftpm/
 
 # Node.js
 node_modules/

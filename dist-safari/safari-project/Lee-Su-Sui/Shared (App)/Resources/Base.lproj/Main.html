@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'">
+
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+    <link rel="stylesheet" href="../Style.css">
+    <script src="../Script.js" defer></script>
+</head>
+<body>
+    <header>
+        <img src="../Icon.png" width="80" height="80" alt="Lee-Su-Sui Icon">
+        <h1>Lee-Su-Sui</h1>
+        <p class="tagline" data-i18n="tagline"></p>
+    </header>
+
+    <!-- iOS Content -->
+    <main class="platform-ios">
+        <section class="intro">
+            <p data-i18n="introDescription"></p>
+            <p data-i18n="introFollowSteps"></p>
+        </section>
+
+        <section class="installation">
+            <h2 data-i18n="howToEnable"></h2>
+            <ol class="steps">
+                <li>
+                    <span class="step-number">1</span>
+                    <div class="step-content">
+                        <strong data-i18n="step1Title"></strong>
+                        <p data-i18n="step1Desc"></p>
+                    </div>
+                </li>
+                <li>
+                    <span class="step-number">2</span>
+                    <div class="step-content">
+                        <strong data-i18n="step2Title"></strong>
+                        <p data-i18n="step2Desc"></p>
+                        <img src="../step_1.png" alt="Page Settings button in Safari toolbar">
+                    </div>
+                </li>
+                <li>
+                    <span class="step-number">3</span>
+                    <div class="step-content">
+                        <strong data-i18n="step3Title"></strong>
+                        <p data-i18n="step3Desc"></p>
+                        <img src="../step_2.png" alt="Manage Extensions menu item">
+                    </div>
+                </li>
+                <li>
+                    <span class="step-number">4</span>
+                    <div class="step-content">
+                        <strong data-i18n="step4Title"></strong>
+                        <p data-i18n="step4Desc"></p>
+                        <img src="../step_3.png" alt="Toggle Lee-Su-Sui on">
+                    </div>
+                </li>
+            </ol>
+        </section>
+
+        <button class="open-threads" data-i18n="openThreads"></button>
+
+        <section class="features">
+            <h2 data-i18n="features"></h2>
+            <ul>
+                <li data-i18n="feature1"></li>
+                <li data-i18n="feature2"></li>
+                <li data-i18n="feature3"></li>
+                <li data-i18n="feature4"></li>
+            </ul>
+        </section>
+
+        <section class="usage">
+            <h2 data-i18n="howToUse"></h2>
+            <p data-i18n="usageDesc"></p>
+        </section>
+    </main>
+
+    <!-- macOS Content -->
+    <main class="platform-mac">
+        <p class="state-unknown" data-i18n="macStateUnknown"></p>
+        <p class="state-on" data-i18n="macStateOn"></p>
+        <p class="state-off" data-i18n="macStateOff"></p>
+        <button class="open-preferences" data-i18n="macOpenPrefs"></button>
+    </main>
+
+    <footer>
+        <p id="app-version"></p>
+    </footer>
+</body>
+</html>

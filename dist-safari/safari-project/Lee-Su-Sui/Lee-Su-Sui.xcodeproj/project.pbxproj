@@ -1,0 +1,1067 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 77;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		D22ECD7E2F246B1000AA2B69 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22ECD7D2F246B1000AA2B69 /* AppDelegate.swift */; };
+		D22ECD802F246B1000AA2B69 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22ECD7F2F246B1000AA2B69 /* SceneDelegate.swift */; };
+		D22ECD832F246B1000AA2B69 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD812F246B1000AA2B69 /* LaunchScreen.storyboard */; };
+		D22ECD862F246B1000AA2B69 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD842F246B1000AA2B69 /* Main.storyboard */; };
+		D22ECD8F2F246B1000AA2B69 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22ECD8E2F246B1000AA2B69 /* AppDelegate.swift */; };
+		D22ECD922F246B1000AA2B69 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD902F246B1000AA2B69 /* Main.storyboard */; };
+		D22ECD992F246B1000AA2B69 /* Lee-Su-Sui Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D22ECD982F246B1000AA2B69 /* Lee-Su-Sui Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D22ECDA32F246B1000AA2B69 /* Lee-Su-Sui Extension.appex in Embed Foundation Extensions */ = {isa = PBXBuildFile; fileRef = D22ECDA22F246B1000AA2B69 /* Lee-Su-Sui Extension.appex */; settings = {ATTRIBUTES = (RemoveHeadersOnCopy, ); }; };
+		D22ECDA82F246B1000AA2B69 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD6D2F246B0F00AA2B69 /* Main.html */; };
+		D22ECDA92F246B1000AA2B69 /* Main.html in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD6D2F246B0F00AA2B69 /* Main.html */; };
+		D22ECDAA2F246B1000AA2B69 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD6F2F246B0F00AA2B69 /* Icon.png */; };
+		D22ECDAB2F246B1000AA2B69 /* Icon.png in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD6F2F246B0F00AA2B69 /* Icon.png */; };
+		D22ECDAC2F246B1000AA2B69 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD702F246B0F00AA2B69 /* Style.css */; };
+		D22ECDAD2F246B1000AA2B69 /* Style.css in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD702F246B0F00AA2B69 /* Style.css */; };
+		D22ECDAE2F246B1000AA2B69 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD712F246B0F00AA2B69 /* Script.js */; };
+		D22ECDAF2F246B1000AA2B69 /* Script.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD712F246B0F00AA2B69 /* Script.js */; };
+		D22ECDB02F246B1000AA2B69 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22ECD722F246B0F00AA2B69 /* ViewController.swift */; };
+		D22ECDB12F246B1000AA2B69 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22ECD722F246B0F00AA2B69 /* ViewController.swift */; };
+		D22ECDB22F246B1000AA2B69 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD732F246B1000AA2B69 /* Assets.xcassets */; };
+		D22ECDB32F246B1000AA2B69 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = D22ECD732F246B1000AA2B69 /* Assets.xcassets */; };
+		D22ECDB42F246B1000AA2B69 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22ECD752F246B1000AA2B69 /* SafariWebExtensionHandler.swift */; };
+		D22ECDB52F246B1000AA2B69 /* SafariWebExtensionHandler.swift in Sources */ = {isa = PBXBuildFile; fileRef = D22ECD752F246B1000AA2B69 /* SafariWebExtensionHandler.swift */; };
+		D22ECDD72F246B1100AA2B69 /* onboarding.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDC72F246B1100AA2B69 /* onboarding.js */; };
+		D22ECDD82F246B1100AA2B69 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDC82F246B1100AA2B69 /* popup.js */; };
+		D22ECDD92F246B1100AA2B69 /* styles.css in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDC92F246B1100AA2B69 /* styles.css */; };
+		D22ECDDA2F246B1100AA2B69 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDCB2F246B1100AA2B69 /* background.js */; };
+		D22ECDDB2F246B1100AA2B69 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDCC2F246B1100AA2B69 /* popup.html */; };
+		D22ECDDC2F246B1100AA2B69 /* injected.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDCE2F246B1100AA2B69 /* injected.js */; };
+		D22ECDDD2F246B1100AA2B69 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDCF2F246B1100AA2B69 /* icons */; };
+		D22ECDDE2F246B1100AA2B69 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD02F246B1100AA2B69 /* manifest.json */; };
+		D22ECDDF2F246B1100AA2B69 /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD22F246B1100AA2B69 /* _locales */; };
+		D22ECDE02F246B1100AA2B69 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD32F246B1100AA2B69 /* content.js */; };
+		D22ECDE12F246B1100AA2B69 /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD52F246B1100AA2B69 /* fonts */; };
+		D22ECDE22F246B1100AA2B69 /* onboarding.html in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD62F246B1100AA2B69 /* onboarding.html */; };
+		D22ECDE32F246B1100AA2B69 /* onboarding.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDC72F246B1100AA2B69 /* onboarding.js */; };
+		D22ECDE42F246B1100AA2B69 /* popup.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDC82F246B1100AA2B69 /* popup.js */; };
+		D22ECDE52F246B1100AA2B69 /* styles.css in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDC92F246B1100AA2B69 /* styles.css */; };
+		D22ECDE62F246B1100AA2B69 /* background.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDCB2F246B1100AA2B69 /* background.js */; };
+		D22ECDE72F246B1100AA2B69 /* popup.html in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDCC2F246B1100AA2B69 /* popup.html */; };
+		D22ECDE82F246B1100AA2B69 /* injected.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDCE2F246B1100AA2B69 /* injected.js */; };
+		D22ECDE92F246B1100AA2B69 /* icons in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDCF2F246B1100AA2B69 /* icons */; };
+		D22ECDEA2F246B1100AA2B69 /* manifest.json in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD02F246B1100AA2B69 /* manifest.json */; };
+		D22ECDEB2F246B1100AA2B69 /* _locales in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD22F246B1100AA2B69 /* _locales */; };
+		D22ECDEC2F246B1100AA2B69 /* content.js in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD32F246B1100AA2B69 /* content.js */; };
+		D22ECDED2F246B1100AA2B69 /* fonts in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD52F246B1100AA2B69 /* fonts */; };
+		D22ECDEE2F246B1100AA2B69 /* onboarding.html in Resources */ = {isa = PBXBuildFile; fileRef = D22ECDD62F246B1100AA2B69 /* onboarding.html */; };
+		D25417B32F2BB17100AC2233 /* step_1.png in Resources */ = {isa = PBXBuildFile; fileRef = D25417B02F2BB17100AC2233 /* step_1.png */; };
+		D25417B42F2BB17100AC2233 /* step_2.png in Resources */ = {isa = PBXBuildFile; fileRef = D25417B12F2BB17100AC2233 /* step_2.png */; };
+		D25417B52F2BB17100AC2233 /* step_3.png in Resources */ = {isa = PBXBuildFile; fileRef = D25417B22F2BB17100AC2233 /* step_3.png */; };
+		D25417B62F2BB17100AC2233 /* step_1.png in Resources */ = {isa = PBXBuildFile; fileRef = D25417B02F2BB17100AC2233 /* step_1.png */; };
+		D25417B72F2BB17100AC2233 /* step_2.png in Resources */ = {isa = PBXBuildFile; fileRef = D25417B12F2BB17100AC2233 /* step_2.png */; };
+		D25417B82F2BB17100AC2233 /* step_3.png in Resources */ = {isa = PBXBuildFile; fileRef = D25417B22F2BB17100AC2233 /* step_3.png */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXContainerItemProxy section */
+		D22ECD9A2F246B1000AA2B69 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D22ECD672F246B0F00AA2B69 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D22ECD972F246B1000AA2B69;
+			remoteInfo = "Lee-Su-Sui Extension (iOS)";
+		};
+		D22ECDA42F246B1000AA2B69 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = D22ECD672F246B0F00AA2B69 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = D22ECDA12F246B1000AA2B69;
+			remoteInfo = "Lee-Su-Sui Extension (macOS)";
+		};
+/* End PBXContainerItemProxy section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		D22ECDBB2F246B1000AA2B69 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D22ECD992F246B1000AA2B69 /* Lee-Su-Sui Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECDC22F246B1000AA2B69 /* Embed Foundation Extensions */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 13;
+			files = (
+				D22ECDA32F246B1000AA2B69 /* Lee-Su-Sui Extension.appex in Embed Foundation Extensions */,
+			);
+			name = "Embed Foundation Extensions";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		D22ECD6E2F246B0F00AA2B69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = Base; path = Base.lproj/Main.html; sourceTree = "<group>"; };
+		D22ECD6F2F246B0F00AA2B69 /* Icon.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = Icon.png; sourceTree = "<group>"; };
+		D22ECD702F246B0F00AA2B69 /* Style.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; path = Style.css; sourceTree = "<group>"; };
+		D22ECD712F246B0F00AA2B69 /* Script.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; path = Script.js; sourceTree = "<group>"; };
+		D22ECD722F246B0F00AA2B69 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		D22ECD732F246B1000AA2B69 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
+		D22ECD752F246B1000AA2B69 /* SafariWebExtensionHandler.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SafariWebExtensionHandler.swift; sourceTree = "<group>"; };
+		D22ECD7A2F246B1000AA2B69 /* Lee-Su-Sui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lee-Su-Sui.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D22ECD7D2F246B1000AA2B69 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D22ECD7F2F246B1000AA2B69 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
+		D22ECD822F246B1000AA2B69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
+		D22ECD852F246B1000AA2B69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D22ECD872F246B1000AA2B69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D22ECD8C2F246B1000AA2B69 /* Lee-Su-Sui.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "Lee-Su-Sui.app"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D22ECD8E2F246B1000AA2B69 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
+		D22ECD912F246B1000AA2B69 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
+		D22ECD932F246B1000AA2B69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D22ECD982F246B1000AA2B69 /* Lee-Su-Sui Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Lee-Su-Sui Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D22ECD9D2F246B1000AA2B69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D22ECDA22F246B1000AA2B69 /* Lee-Su-Sui Extension.appex */ = {isa = PBXFileReference; explicitFileType = "wrapper.app-extension"; includeInIndex = 0; path = "Lee-Su-Sui Extension.appex"; sourceTree = BUILT_PRODUCTS_DIR; };
+		D22ECDA72F246B1000AA2B69 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D22ECDC72F246B1100AA2B69 /* onboarding.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = onboarding.js; path = ../../../../dist/safari/onboarding.js; sourceTree = "<group>"; };
+		D22ECDC82F246B1100AA2B69 /* popup.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = popup.js; path = ../../../../dist/safari/popup.js; sourceTree = "<group>"; };
+		D22ECDC92F246B1100AA2B69 /* styles.css */ = {isa = PBXFileReference; lastKnownFileType = text.css; name = styles.css; path = ../../../../dist/safari/styles.css; sourceTree = "<group>"; };
+		D22ECDCA2F246B1100AA2B69 /* popup.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = popup.js.map; path = ../../../../dist/safari/popup.js.map; sourceTree = "<group>"; };
+		D22ECDCB2F246B1100AA2B69 /* background.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = background.js; path = ../../../../dist/safari/background.js; sourceTree = "<group>"; };
+		D22ECDCC2F246B1100AA2B69 /* popup.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = popup.html; path = ../../../../dist/safari/popup.html; sourceTree = "<group>"; };
+		D22ECDCD2F246B1100AA2B69 /* content.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = content.js.map; path = ../../../../dist/safari/content.js.map; sourceTree = "<group>"; };
+		D22ECDCE2F246B1100AA2B69 /* injected.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = injected.js; path = ../../../../dist/safari/injected.js; sourceTree = "<group>"; };
+		D22ECDCF2F246B1100AA2B69 /* icons */ = {isa = PBXFileReference; lastKnownFileType = folder; name = icons; path = ../../../../dist/safari/icons; sourceTree = "<group>"; };
+		D22ECDD02F246B1100AA2B69 /* manifest.json */ = {isa = PBXFileReference; lastKnownFileType = text.json; name = manifest.json; path = ../../../../dist/safari/manifest.json; sourceTree = "<group>"; };
+		D22ECDD12F246B1100AA2B69 /* injected.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = injected.js.map; path = ../../../../dist/safari/injected.js.map; sourceTree = "<group>"; };
+		D22ECDD22F246B1100AA2B69 /* _locales */ = {isa = PBXFileReference; lastKnownFileType = folder; name = _locales; path = ../../../../dist/safari/_locales; sourceTree = "<group>"; };
+		D22ECDD32F246B1100AA2B69 /* content.js */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.javascript; name = content.js; path = ../../../../dist/safari/content.js; sourceTree = "<group>"; };
+		D22ECDD42F246B1100AA2B69 /* background.js.map */ = {isa = PBXFileReference; lastKnownFileType = "sourcecode.module-map"; name = background.js.map; path = ../../../../dist/safari/background.js.map; sourceTree = "<group>"; };
+		D22ECDD52F246B1100AA2B69 /* fonts */ = {isa = PBXFileReference; lastKnownFileType = folder; name = fonts; path = ../../../../dist/safari/fonts; sourceTree = "<group>"; };
+		D22ECDD62F246B1100AA2B69 /* onboarding.html */ = {isa = PBXFileReference; lastKnownFileType = text.html; name = onboarding.html; path = ../../../../dist/safari/onboarding.html; sourceTree = "<group>"; };
+		D25417B02F2BB17100AC2233 /* step_1.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = step_1.png; sourceTree = "<group>"; };
+		D25417B12F2BB17100AC2233 /* step_2.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = step_2.png; sourceTree = "<group>"; };
+		D25417B22F2BB17100AC2233 /* step_3.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; path = step_3.png; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		D22ECD772F246B1000AA2B69 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECD892F246B1000AA2B69 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECD952F246B1000AA2B69 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECD9F2F246B1000AA2B69 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		D22ECD662F246B0F00AA2B69 = {
+			isa = PBXGroup;
+			children = (
+				D22ECD6B2F246B0F00AA2B69 /* Shared (App) */,
+				D22ECD742F246B1000AA2B69 /* Shared (Extension) */,
+				D22ECD7C2F246B1000AA2B69 /* iOS (App) */,
+				D22ECD8D2F246B1000AA2B69 /* macOS (App) */,
+				D22ECD9C2F246B1000AA2B69 /* iOS (Extension) */,
+				D22ECDA62F246B1000AA2B69 /* macOS (Extension) */,
+				D22ECD7B2F246B1000AA2B69 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		D22ECD6B2F246B0F00AA2B69 /* Shared (App) */ = {
+			isa = PBXGroup;
+			children = (
+				D22ECD722F246B0F00AA2B69 /* ViewController.swift */,
+				D22ECD732F246B1000AA2B69 /* Assets.xcassets */,
+				D22ECD6C2F246B0F00AA2B69 /* Resources */,
+			);
+			path = "Shared (App)";
+			sourceTree = "<group>";
+		};
+		D22ECD6C2F246B0F00AA2B69 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D25417B02F2BB17100AC2233 /* step_1.png */,
+				D25417B12F2BB17100AC2233 /* step_2.png */,
+				D25417B22F2BB17100AC2233 /* step_3.png */,
+				D22ECD6D2F246B0F00AA2B69 /* Main.html */,
+				D22ECD6F2F246B0F00AA2B69 /* Icon.png */,
+				D22ECD702F246B0F00AA2B69 /* Style.css */,
+				D22ECD712F246B0F00AA2B69 /* Script.js */,
+			);
+			path = Resources;
+			sourceTree = "<group>";
+		};
+		D22ECD742F246B1000AA2B69 /* Shared (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				D22ECDC62F246B1100AA2B69 /* Resources */,
+				D22ECD752F246B1000AA2B69 /* SafariWebExtensionHandler.swift */,
+			);
+			path = "Shared (Extension)";
+			sourceTree = "<group>";
+		};
+		D22ECD7B2F246B1000AA2B69 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				D22ECD7A2F246B1000AA2B69 /* Lee-Su-Sui.app */,
+				D22ECD8C2F246B1000AA2B69 /* Lee-Su-Sui.app */,
+				D22ECD982F246B1000AA2B69 /* Lee-Su-Sui Extension.appex */,
+				D22ECDA22F246B1000AA2B69 /* Lee-Su-Sui Extension.appex */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		D22ECD7C2F246B1000AA2B69 /* iOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				D22ECD7D2F246B1000AA2B69 /* AppDelegate.swift */,
+				D22ECD7F2F246B1000AA2B69 /* SceneDelegate.swift */,
+				D22ECD812F246B1000AA2B69 /* LaunchScreen.storyboard */,
+				D22ECD842F246B1000AA2B69 /* Main.storyboard */,
+				D22ECD872F246B1000AA2B69 /* Info.plist */,
+			);
+			path = "iOS (App)";
+			sourceTree = "<group>";
+		};
+		D22ECD8D2F246B1000AA2B69 /* macOS (App) */ = {
+			isa = PBXGroup;
+			children = (
+				D22ECD8E2F246B1000AA2B69 /* AppDelegate.swift */,
+				D22ECD902F246B1000AA2B69 /* Main.storyboard */,
+				D22ECD932F246B1000AA2B69 /* Info.plist */,
+			);
+			path = "macOS (App)";
+			sourceTree = "<group>";
+		};
+		D22ECD9C2F246B1000AA2B69 /* iOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				D22ECD9D2F246B1000AA2B69 /* Info.plist */,
+			);
+			path = "iOS (Extension)";
+			sourceTree = "<group>";
+		};
+		D22ECDA62F246B1000AA2B69 /* macOS (Extension) */ = {
+			isa = PBXGroup;
+			children = (
+				D22ECDA72F246B1000AA2B69 /* Info.plist */,
+			);
+			path = "macOS (Extension)";
+			sourceTree = "<group>";
+		};
+		D22ECDC62F246B1100AA2B69 /* Resources */ = {
+			isa = PBXGroup;
+			children = (
+				D22ECDC72F246B1100AA2B69 /* onboarding.js */,
+				D22ECDC82F246B1100AA2B69 /* popup.js */,
+				D22ECDC92F246B1100AA2B69 /* styles.css */,
+				D22ECDCA2F246B1100AA2B69 /* popup.js.map */,
+				D22ECDCB2F246B1100AA2B69 /* background.js */,
+				D22ECDCC2F246B1100AA2B69 /* popup.html */,
+				D22ECDCD2F246B1100AA2B69 /* content.js.map */,
+				D22ECDCE2F246B1100AA2B69 /* injected.js */,
+				D22ECDCF2F246B1100AA2B69 /* icons */,
+				D22ECDD02F246B1100AA2B69 /* manifest.json */,
+				D22ECDD12F246B1100AA2B69 /* injected.js.map */,
+				D22ECDD22F246B1100AA2B69 /* _locales */,
+				D22ECDD32F246B1100AA2B69 /* content.js */,
+				D22ECDD42F246B1100AA2B69 /* background.js.map */,
+				D22ECDD52F246B1100AA2B69 /* fonts */,
+				D22ECDD62F246B1100AA2B69 /* onboarding.html */,
+			);
+			name = Resources;
+			path = "Shared (Extension)";
+			sourceTree = SOURCE_ROOT;
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		D22ECD792F246B1000AA2B69 /* Lee-Su-Sui (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D22ECDBC2F246B1000AA2B69 /* Build configuration list for PBXNativeTarget "Lee-Su-Sui (iOS)" */;
+			buildPhases = (
+				D22ECD762F246B1000AA2B69 /* Sources */,
+				D22ECD772F246B1000AA2B69 /* Frameworks */,
+				D22ECD782F246B1000AA2B69 /* Resources */,
+				D22ECDBB2F246B1000AA2B69 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D22ECD9B2F246B1000AA2B69 /* PBXTargetDependency */,
+			);
+			name = "Lee-Su-Sui (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Lee-Su-Sui (iOS)";
+			productReference = D22ECD7A2F246B1000AA2B69 /* Lee-Su-Sui.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D22ECD8B2F246B1000AA2B69 /* Lee-Su-Sui (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D22ECDC32F246B1000AA2B69 /* Build configuration list for PBXNativeTarget "Lee-Su-Sui (macOS)" */;
+			buildPhases = (
+				D22ECD882F246B1000AA2B69 /* Sources */,
+				D22ECD892F246B1000AA2B69 /* Frameworks */,
+				D22ECD8A2F246B1000AA2B69 /* Resources */,
+				D22ECDC22F246B1000AA2B69 /* Embed Foundation Extensions */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+				D22ECDA52F246B1000AA2B69 /* PBXTargetDependency */,
+			);
+			name = "Lee-Su-Sui (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "Lee-Su-Sui (macOS)";
+			productReference = D22ECD8C2F246B1000AA2B69 /* Lee-Su-Sui.app */;
+			productType = "com.apple.product-type.application";
+		};
+		D22ECD972F246B1000AA2B69 /* Lee-Su-Sui Extension (iOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D22ECDB82F246B1000AA2B69 /* Build configuration list for PBXNativeTarget "Lee-Su-Sui Extension (iOS)" */;
+			buildPhases = (
+				D22ECD942F246B1000AA2B69 /* Sources */,
+				D22ECD952F246B1000AA2B69 /* Frameworks */,
+				D22ECD962F246B1000AA2B69 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Lee-Su-Sui Extension (iOS)";
+			packageProductDependencies = (
+			);
+			productName = "Lee-Su-Sui Extension (iOS)";
+			productReference = D22ECD982F246B1000AA2B69 /* Lee-Su-Sui Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+		D22ECDA12F246B1000AA2B69 /* Lee-Su-Sui Extension (macOS) */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = D22ECDBF2F246B1000AA2B69 /* Build configuration list for PBXNativeTarget "Lee-Su-Sui Extension (macOS)" */;
+			buildPhases = (
+				D22ECD9E2F246B1000AA2B69 /* Sources */,
+				D22ECD9F2F246B1000AA2B69 /* Frameworks */,
+				D22ECDA02F246B1000AA2B69 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = "Lee-Su-Sui Extension (macOS)";
+			packageProductDependencies = (
+			);
+			productName = "Lee-Su-Sui Extension (macOS)";
+			productReference = D22ECDA22F246B1000AA2B69 /* Lee-Su-Sui Extension.appex */;
+			productType = "com.apple.product-type.app-extension";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		D22ECD672F246B0F00AA2B69 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastSwiftUpdateCheck = 2620;
+				LastUpgradeCheck = 2620;
+				TargetAttributes = {
+					D22ECD792F246B1000AA2B69 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					D22ECD8B2F246B1000AA2B69 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					D22ECD972F246B1000AA2B69 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+					D22ECDA12F246B1000AA2B69 = {
+						CreatedOnToolsVersion = 26.2;
+					};
+				};
+			};
+			buildConfigurationList = D22ECD6A2F246B0F00AA2B69 /* Build configuration list for PBXProject "Lee-Su-Sui" */;
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = D22ECD662F246B0F00AA2B69;
+			minimizedProjectReferenceProxies = 1;
+			preferredProjectObjectVersion = 77;
+			productRefGroup = D22ECD7B2F246B1000AA2B69 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				D22ECD792F246B1000AA2B69 /* Lee-Su-Sui (iOS) */,
+				D22ECD8B2F246B1000AA2B69 /* Lee-Su-Sui (macOS) */,
+				D22ECD972F246B1000AA2B69 /* Lee-Su-Sui Extension (iOS) */,
+				D22ECDA12F246B1000AA2B69 /* Lee-Su-Sui Extension (macOS) */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		D22ECD782F246B1000AA2B69 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D22ECDAA2F246B1000AA2B69 /* Icon.png in Resources */,
+				D22ECD832F246B1000AA2B69 /* LaunchScreen.storyboard in Resources */,
+				D22ECDA82F246B1000AA2B69 /* Main.html in Resources */,
+				D22ECDAE2F246B1000AA2B69 /* Script.js in Resources */,
+				D22ECDB22F246B1000AA2B69 /* Assets.xcassets in Resources */,
+				D22ECD862F246B1000AA2B69 /* Main.storyboard in Resources */,
+				D25417B62F2BB17100AC2233 /* step_1.png in Resources */,
+				D25417B72F2BB17100AC2233 /* step_2.png in Resources */,
+				D25417B82F2BB17100AC2233 /* step_3.png in Resources */,
+				D22ECDAC2F246B1000AA2B69 /* Style.css in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECD8A2F246B1000AA2B69 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D22ECDAB2F246B1000AA2B69 /* Icon.png in Resources */,
+				D22ECDAD2F246B1000AA2B69 /* Style.css in Resources */,
+				D25417B32F2BB17100AC2233 /* step_1.png in Resources */,
+				D25417B42F2BB17100AC2233 /* step_2.png in Resources */,
+				D25417B52F2BB17100AC2233 /* step_3.png in Resources */,
+				D22ECD922F246B1000AA2B69 /* Main.storyboard in Resources */,
+				D22ECDAF2F246B1000AA2B69 /* Script.js in Resources */,
+				D22ECDB32F246B1000AA2B69 /* Assets.xcassets in Resources */,
+				D22ECDA92F246B1000AA2B69 /* Main.html in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECD962F246B1000AA2B69 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D22ECDED2F246B1100AA2B69 /* fonts in Resources */,
+				D22ECDEB2F246B1100AA2B69 /* _locales in Resources */,
+				D22ECDE62F246B1100AA2B69 /* background.js in Resources */,
+				D22ECDE72F246B1100AA2B69 /* popup.html in Resources */,
+				D22ECDE52F246B1100AA2B69 /* styles.css in Resources */,
+				D22ECDEC2F246B1100AA2B69 /* content.js in Resources */,
+				D22ECDE32F246B1100AA2B69 /* onboarding.js in Resources */,
+				D22ECDEA2F246B1100AA2B69 /* manifest.json in Resources */,
+				D22ECDE82F246B1100AA2B69 /* injected.js in Resources */,
+				D22ECDEE2F246B1100AA2B69 /* onboarding.html in Resources */,
+				D22ECDE92F246B1100AA2B69 /* icons in Resources */,
+				D22ECDE42F246B1100AA2B69 /* popup.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECDA02F246B1000AA2B69 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D22ECDE12F246B1100AA2B69 /* fonts in Resources */,
+				D22ECDDF2F246B1100AA2B69 /* _locales in Resources */,
+				D22ECDDA2F246B1100AA2B69 /* background.js in Resources */,
+				D22ECDDB2F246B1100AA2B69 /* popup.html in Resources */,
+				D22ECDD92F246B1100AA2B69 /* styles.css in Resources */,
+				D22ECDE02F246B1100AA2B69 /* content.js in Resources */,
+				D22ECDD72F246B1100AA2B69 /* onboarding.js in Resources */,
+				D22ECDDE2F246B1100AA2B69 /* manifest.json in Resources */,
+				D22ECDDC2F246B1100AA2B69 /* injected.js in Resources */,
+				D22ECDE22F246B1100AA2B69 /* onboarding.html in Resources */,
+				D22ECDDD2F246B1100AA2B69 /* icons in Resources */,
+				D22ECDD82F246B1100AA2B69 /* popup.js in Resources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		D22ECD762F246B1000AA2B69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D22ECDB02F246B1000AA2B69 /* ViewController.swift in Sources */,
+				D22ECD7E2F246B1000AA2B69 /* AppDelegate.swift in Sources */,
+				D22ECD802F246B1000AA2B69 /* SceneDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECD882F246B1000AA2B69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D22ECDB12F246B1000AA2B69 /* ViewController.swift in Sources */,
+				D22ECD8F2F246B1000AA2B69 /* AppDelegate.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECD942F246B1000AA2B69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D22ECDB42F246B1000AA2B69 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		D22ECD9E2F246B1000AA2B69 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				D22ECDB52F246B1000AA2B69 /* SafariWebExtensionHandler.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin PBXTargetDependency section */
+		D22ECD9B2F246B1000AA2B69 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D22ECD972F246B1000AA2B69 /* Lee-Su-Sui Extension (iOS) */;
+			targetProxy = D22ECD9A2F246B1000AA2B69 /* PBXContainerItemProxy */;
+		};
+		D22ECDA52F246B1000AA2B69 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = D22ECDA12F246B1000AA2B69 /* Lee-Su-Sui Extension (macOS) */;
+			targetProxy = D22ECDA42F246B1000AA2B69 /* PBXContainerItemProxy */;
+		};
+/* End PBXTargetDependency section */
+
+/* Begin PBXVariantGroup section */
+		D22ECD6D2F246B0F00AA2B69 /* Main.html */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D22ECD6E2F246B0F00AA2B69 /* Base */,
+			);
+			name = Main.html;
+			sourceTree = "<group>";
+		};
+		D22ECD812F246B1000AA2B69 /* LaunchScreen.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D22ECD822F246B1000AA2B69 /* Base */,
+			);
+			name = LaunchScreen.storyboard;
+			sourceTree = "<group>";
+		};
+		D22ECD842F246B1000AA2B69 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D22ECD852F246B1000AA2B69 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+		D22ECD902F246B1000AA2B69 /* Main.storyboard */ = {
+			isa = PBXVariantGroup;
+			children = (
+				D22ECD912F246B1000AA2B69 /* Base */,
+			);
+			name = Main.storyboard;
+			sourceTree = "<group>";
+		};
+/* End PBXVariantGroup section */
+
+/* Begin XCBuildConfiguration section */
+		D22ECDB62F246B1000AA2B69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = INCLUDE_SOURCE;
+				MTL_FAST_MATH = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = "DEBUG $(inherited)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		D22ECDB72F246B1000AA2B69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				ASSETCATALOG_COMPILER_GENERATE_SWIFT_ASSET_SYMBOL_EXTENSIONS = YES;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ANALYZER_NUMBER_OBJECT_CONVERSION = YES_AGGRESSIVE;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++20";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_ENABLE_OBJC_WEAK = YES;
+				CLANG_WARN_BLOCK_CAPTURE_AUTORELEASING = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_COMMA = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DEPRECATED_OBJC_IMPLEMENTATIONS = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_DOCUMENTATION_COMMENTS = YES;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INFINITE_RECURSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_NON_LITERAL_NULL_CONVERSION = YES;
+				CLANG_WARN_OBJC_IMPLICIT_RETAIN_SELF = YES;
+				CLANG_WARN_OBJC_LITERAL_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_QUOTED_INCLUDE_IN_FRAMEWORK_HEADER = YES;
+				CLANG_WARN_RANGE_LOOP_ANALYSIS = YES;
+				CLANG_WARN_STRICT_PROTOTYPES = YES;
+				CLANG_WARN_SUSPICIOUS_MOVE = YES;
+				CLANG_WARN_UNGUARDED_AVAILABILITY = YES_AGGRESSIVE;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_USER_SCRIPT_SANDBOXING = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu17;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				LOCALIZATION_PREFERS_STRING_CATALOGS = YES;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				MTL_FAST_MATH = YES;
+				SWIFT_COMPILATION_MODE = wholemodule;
+			};
+			name = Release;
+		};
+		D22ECDB92F246B1000AA2B69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H53K9CP399;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lee-Su-Sui Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.5;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meettomorrow.leesuthreads.Extension;
+				PRODUCT_NAME = "Lee-Su-Sui Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D22ECDBA2F246B1000AA2B69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H53K9CP399;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lee-Su-Sui Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+					"@executable_path/../../Frameworks",
+				);
+				MARKETING_VERSION = 1.0.5;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meettomorrow.leesuthreads.Extension;
+				PRODUCT_NAME = "Lee-Su-Sui Extension";
+				SDKROOT = iphoneos;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D22ECDBD2F246B1000AA2B69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H53K9CP399;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lee-Su-Sui";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.5;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meettomorrow.leesuthreads;
+				PRODUCT_NAME = "Lee-Su-Sui";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		D22ECDBE2F246B1000AA2B69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H53K9CP399;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "iOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lee-Su-Sui";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_UIApplicationSupportsIndirectInputEvents = YES;
+				INFOPLIST_KEY_UILaunchStoryboardName = LaunchScreen;
+				INFOPLIST_KEY_UIMainStoryboardFile = Main;
+				INFOPLIST_KEY_UISupportedInterfaceOrientations = "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad = "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight";
+				IPHONEOS_DEPLOYMENT_TARGET = 15.0;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.5;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meettomorrow.leesuthreads;
+				PRODUCT_NAME = "Lee-Su-Sui";
+				SDKROOT = iphoneos;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		D22ECDC02F246B1000AA2B69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H53K9CP399;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lee-Su-Sui Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0.5;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meettomorrow.leesuthreads.Extension;
+				PRODUCT_NAME = "Lee-Su-Sui Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D22ECDC12F246B1000AA2B69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H53K9CP399;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (Extension)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lee-Su-Sui Extension";
+				INFOPLIST_KEY_NSHumanReadableCopyright = "";
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+					"@executable_path/../../../../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0.5;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meettomorrow.leesuthreads.Extension;
+				PRODUCT_NAME = "Lee-Su-Sui Extension";
+				SDKROOT = macosx;
+				SKIP_INSTALL = YES;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+		D22ECDC42F246B1000AA2B69 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H53K9CP399;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lee-Su-Sui";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0.5;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meettomorrow.leesuthreads;
+				PRODUCT_NAME = "Lee-Su-Sui";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		D22ECDC52F246B1000AA2B69 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				DEVELOPMENT_TEAM = H53K9CP399;
+				ENABLE_APP_SANDBOX = YES;
+				ENABLE_HARDENED_RUNTIME = YES;
+				ENABLE_OUTGOING_NETWORK_CONNECTIONS = YES;
+				ENABLE_USER_SELECTED_FILES = readonly;
+				GENERATE_INFOPLIST_FILE = YES;
+				INFOPLIST_FILE = "macOS (App)/Info.plist";
+				INFOPLIST_KEY_CFBundleDisplayName = "Lee-Su-Sui";
+				INFOPLIST_KEY_LSApplicationCategoryType = "public.app-category.utilities";
+				INFOPLIST_KEY_NSMainStoryboardFile = Main;
+				INFOPLIST_KEY_NSPrincipalClass = NSApplication;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/../Frameworks",
+				);
+				MACOSX_DEPLOYMENT_TARGET = 10.14;
+				MARKETING_VERSION = 1.0.5;
+				OTHER_LDFLAGS = (
+					"-framework",
+					SafariServices,
+					"-framework",
+					WebKit,
+				);
+				PRODUCT_BUNDLE_IDENTIFIER = com.meettomorrow.leesuthreads;
+				PRODUCT_NAME = "Lee-Su-Sui";
+				REGISTER_APP_GROUPS = YES;
+				SDKROOT = macosx;
+				STRING_CATALOG_GENERATE_SYMBOLS = YES;
+				SWIFT_APPROACHABLE_CONCURRENCY = YES;
+				SWIFT_DEFAULT_ACTOR_ISOLATION = MainActor;
+				SWIFT_EMIT_LOC_STRINGS = YES;
+				SWIFT_UPCOMING_FEATURE_MEMBER_IMPORT_VISIBILITY = YES;
+				SWIFT_VERSION = 5.0;
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		D22ECD6A2F246B0F00AA2B69 /* Build configuration list for PBXProject "Lee-Su-Sui" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D22ECDB62F246B1000AA2B69 /* Debug */,
+				D22ECDB72F246B1000AA2B69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D22ECDB82F246B1000AA2B69 /* Build configuration list for PBXNativeTarget "Lee-Su-Sui Extension (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D22ECDB92F246B1000AA2B69 /* Debug */,
+				D22ECDBA2F246B1000AA2B69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D22ECDBC2F246B1000AA2B69 /* Build configuration list for PBXNativeTarget "Lee-Su-Sui (iOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D22ECDBD2F246B1000AA2B69 /* Debug */,
+				D22ECDBE2F246B1000AA2B69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D22ECDBF2F246B1000AA2B69 /* Build configuration list for PBXNativeTarget "Lee-Su-Sui Extension (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D22ECDC02F246B1000AA2B69 /* Debug */,
+				D22ECDC12F246B1000AA2B69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		D22ECDC32F246B1000AA2B69 /* Build configuration list for PBXNativeTarget "Lee-Su-Sui (macOS)" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				D22ECDC42F246B1000AA2B69 /* Debug */,
+				D22ECDC52F246B1000AA2B69 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = D22ECD672F246B0F00AA2B69 /* Project object */;
+}

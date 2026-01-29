@@ -1,0 +1,251 @@
+* {
+    -webkit-user-select: none;
+    -webkit-user-drag: none;
+    cursor: default;
+    box-sizing: border-box;
+}
+
+:root {
+    color-scheme: light dark;
+
+    --spacing: 20px;
+    --accent-color: #0095f6;
+    --bg-secondary: rgba(128, 128, 128, 0.1);
+    --border-color: rgba(128, 128, 128, 0.2);
+}
+
+html {
+    height: 100%;
+}
+
+body {
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+    padding: var(--spacing);
+    min-height: 100%;
+    font: -apple-system-short-body;
+    line-height: 1.5;
+}
+
+/* Platform visibility */
+body:not(.platform-mac, .platform-ios) :is(.platform-mac, .platform-ios) {
+    display: none;
+}
+
+body.platform-ios .platform-mac {
+    display: none;
+}
+
+body.platform-mac .platform-ios {
+    display: none;
+}
+
+/* State visibility for macOS */
+body:not(.state-on, .state-off) :is(.state-on, .state-off) {
+    display: none;
+}
+
+body.state-on :is(.state-off, .state-unknown) {
+    display: none;
+}
+
+body.state-off :is(.state-on, .state-unknown) {
+    display: none;
+}
+
+/* Header */
+header {
+    text-align: center;
+    padding: var(--spacing) 0;
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: var(--spacing);
+}
+
+header img {
+    margin-bottom: 12px;
+}
+
+header h1 {
+    margin: 0;
+    font-size: 1.5em;
+    font-weight: 600;
+}
+
+header .tagline {
+    margin: 8px 0 0;
+    opacity: 0.7;
+    font-size: 0.95em;
+}
+
+/* Main content */
+main {
+    flex: 1;
+}
+
+/* Sections */
+section {
+    margin-bottom: calc(var(--spacing) * 1.5);
+}
+
+section h2 {
+    font-size: 1.1em;
+    font-weight: 600;
+    margin: 0 0 12px;
+    color: var(--accent-color);
+}
+
+/* Intro */
+.intro p {
+    margin: 0 0 8px;
+}
+
+.intro p:last-child {
+    margin-bottom: 0;
+}
+
+/* iOS action buttons */
+.open-settings,
+.open-threads {
+    display: block;
+    width: 100%;
+    margin-bottom: 8px;
+}
+
+.open-threads {
+    background: transparent;
+    color: var(--accent-color);
+    border: 1px solid var(--accent-color);
+    margin-bottom: calc(var(--spacing) * 1.5);
+}
+
+/* Installation steps */
+.steps {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.steps li {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+    padding: 12px;
+    background: var(--bg-secondary);
+    border-radius: 10px;
+    margin-bottom: 8px;
+}
+
+.step-number {
+    flex-shrink: 0;
+    width: 28px;
+    height: 28px;
+    background: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 600;
+    font-size: 0.9em;
+}
+
+.step-content {
+    flex: 1;
+}
+
+.step-content strong {
+    display: block;
+    margin-bottom: 2px;
+}
+
+.step-content p {
+    margin: 0;
+    opacity: 0.7;
+    font-size: 0.9em;
+}
+
+.step-content img {
+    display: block;
+    width: 100%;
+    margin-top: 8px;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+/* Features list */
+.features ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.features li {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border-color);
+    padding-left: 24px;
+    position: relative;
+}
+
+.features li:last-child {
+    border-bottom: none;
+}
+
+.features li::before {
+    content: "✓";
+    position: absolute;
+    left: 0;
+    color: var(--accent-color);
+    font-weight: bold;
+}
+
+/* Usage section */
+.usage p {
+    background: var(--bg-secondary);
+    padding: 12px;
+    border-radius: 10px;
+    margin: 0;
+}
+
+/* macOS content */
+body.platform-mac {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+}
+
+body.platform-mac main {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: var(--spacing);
+}
+
+/* Footer */
+footer {
+    text-align: center;
+    padding-top: var(--spacing);
+    border-top: 1px solid var(--border-color);
+    margin-top: auto;
+}
+
+footer p {
+    margin: 0;
+    opacity: 0.5;
+    font-size: 0.85em;
+}
+
+/* Button */
+button {
+    font-size: 1em;
+    padding: 12px 20px;
+    background: var(--accent-color);
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+button:active {
+    opacity: 0.8;
+}

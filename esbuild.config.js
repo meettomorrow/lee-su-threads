@@ -188,6 +188,20 @@ async function copyStaticFilesForSafari() {
   // Copy _locales directory recursively
   await cp('_locales', `${distDir}/_locales`, { recursive: true });
 
+  // Replace extension name for Safari (Apple requires different name)
+  const locales = ['en', 'zh_TW', 'zh_CN', 'ja', 'ko'];
+  for (const locale of locales) {
+    const messagesPath = `${distDir}/_locales/${locale}/messages.json`;
+    try {
+      let content = await readFile(messagesPath, 'utf-8');
+      // Replace all occurrences of "Lee-Su-Threads" with "Lee-Su-Sui"
+      content = content.replaceAll('Lee-Su-Threads', 'Lee-Su-Sui');
+      await writeFile(messagesPath, content);
+    } catch (error) {
+      // Skip if locale file doesn't exist
+    }
+  }
+
   // Copy icons directory
   await cp('icons', `${distDir}/icons`, { recursive: true });
 

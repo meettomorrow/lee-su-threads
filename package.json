@@ -17,7 +17,7 @@
     "start:firefox": "web-ext run --source-dir=dist/firefox-direct --start-url=https://www.threads.com",
     "start:firefox:android": "bash scripts/run-firefox-android.sh",
     "setup:safari": "bash scripts/setup-safari-project.sh",
-    "open:safari": "open dist-safari/safari-project/Lee-Su-Threads/Lee-Su-Threads.xcodeproj"
+    "open:safari": "open dist-safari/safari-project/Lee-Su-Sui/Lee-Su-Sui.xcodeproj"
   },
   "repository": {
     "type": "git",
