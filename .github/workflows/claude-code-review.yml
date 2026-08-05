@@ -6,14 +6,16 @@ on:
   issue_comment:
     types: [created]
 
-# One in-flight review per PR *per path*. Rapid pushes coalesce and repeated
-# /claude-review comments coalesce — but the event name is part of the key so a
+# One in-flight review per PR per path. The event name is in the key so a
 # pull_request (synchronize) run can't cancel a maintainer's in-flight
-# issue_comment manual review for the same PR (a shared key would cancel it and
-# then skip every job, silently losing the requested review).
+# issue_comment manual review. cancel-in-progress is disabled for issue_comment
+# because that event fires on *every* comment (not just /claude-review): a
+# contributor replying mid-review would otherwise join the group and cancel the
+# running manual review, then skip all its own jobs — silently losing it. Pushes
+# still coalesce (a newer synchronize supersedes an older one).
 concurrency:
   group: claude-review-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number }}
-  cancel-in-progress: true
+  cancel-in-progress: ${{ github.event_name != 'issue_comment' }}
 
 jobs:
   # Path 1: same-repo PRs get an automatic review on every open/update. Only
