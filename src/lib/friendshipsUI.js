@@ -280,7 +280,7 @@ export async function createLocationBadge(profileInfo) {
     badge.appendChild(newTag);
   }
 
-  // Add disposable-handle (免洗帳號) tag if enabled and the username matches the
+  // Add disposable-handle (隨機帳號) tag if enabled and the username matches the
   // Threads system-default format. Does not affect location / new-user logic.
   if (disposableAccountEnabled && isDisposableHandle(profileInfo.username).isDisposable) {
     const disposableTag = createDisposableTag();

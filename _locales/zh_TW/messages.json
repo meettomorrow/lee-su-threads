@@ -228,12 +228,12 @@
     "message": "清除中..."
   },
   "disposableAccount": {
-    "message": "免洗帳號"
+    "message": "隨機帳號"
   },
   "disposableAccountTooltip": {
-    "message": "此帳號使用 Threads 系統預設指派的用戶名，從未自行修改。這不代表它是假帳號。"
+    "message": "此帳號使用 Threads 系統隨機指派的用戶名，從未自行修改。這不代表它是假帳號。"
   },
   "disposableToggle": {
-    "message": "免洗帳號"
+    "message": "隨機帳號"
   }
 }

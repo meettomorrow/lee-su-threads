@@ -1,5 +1,5 @@
 /**
- * Disposable-handle detection (免洗帳號判定)
+ * Disposable-handle detection (隨機帳號判定)
  *
  * Threads/Meta assigns a fixed default username when a user does not set one
  * during sign-up: an English animal word + a half-width dot + 6–8 digits,

@@ -225,12 +225,12 @@
     "message": "清除中..."
   },
   "disposableAccount": {
-    "message": "一次性账号"
+    "message": "随机账号"
   },
   "disposableAccountTooltip": {
-    "message": "此账号使用 Threads 系统默认分配的用户名，从未自行修改。这并不代表它是假账号。"
+    "message": "此账号使用 Threads 系统随机分配的用户名，从未自行修改。这并不代表它是假账号。"
   },
   "disposableToggle": {
-    "message": "一次性账号"
+    "message": "随机账号"
   }
 }

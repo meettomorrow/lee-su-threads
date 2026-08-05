@@ -225,12 +225,12 @@
     "message": "지우는 중..."
   },
   "disposableAccount": {
-    "message": "기본 아이디"
+    "message": "랜덤 아이디"
   },
   "disposableAccountTooltip": {
-    "message": "이 계정은 Threads가 기본으로 지정한 사용자 이름을 한 번도 변경하지 않았습니다. 가짜 계정이라는 뜻은 아닙니다."
+    "message": "이 계정은 Threads가 무작위로 지정한 기본 사용자 이름을 한 번도 변경하지 않았습니다. 가짜 계정이라는 뜻은 아닙니다."
   },
   "disposableToggle": {
-    "message": "기본 아이디"
+    "message": "랜덤 아이디"
   }
 }

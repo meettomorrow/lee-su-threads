@@ -225,12 +225,12 @@
     "message": "クリア中..."
   },
   "disposableAccount": {
-    "message": "捨てアカ"
+    "message": "ランダムID"
   },
   "disposableAccountTooltip": {
-    "message": "このアカウントは Threads が自動で割り当てたデフォルトのユーザーネームのままで、一度も変更されていません。偽アカウントという意味ではありません。"
+    "message": "このアカウントは Threads がランダムに割り当てたデフォルトのユーザーネームのままで、一度も変更されていません。偽アカウントという意味ではありません。"
   },
   "disposableToggle": {
-    "message": "捨てアカ"
+    "message": "ランダムID"
   }
 }
