@@ -6,14 +6,25 @@ on:
   issue_comment:
     types: [created]
 
+# One in-flight review per PR. Prevents stacked runs from a rapid push sequence
+# (synchronize) or repeated /claude-review comments.
+concurrency:
+  group: claude-review-${{ github.event.pull_request.number || github.event.issue.number }}
+  cancel-in-progress: true
+
 jobs:
   # Path 1: same-repo PRs get an automatic review on every open/update. Only
   # people with write access can push a branch to this repo, so a same-repo head
   # means the author will pass the claude-code-action write check. External
   # contributors open PRs from forks and are skipped here (they use Path 2).
-  # NOTE: we key on fork status rather than author_association because private
-  # org membership makes author_association come through as NONE/CONTRIBUTOR in
-  # the webhook payload, which would wrongly skip members' own PRs.
+  #
+  # We key on fork status rather than author_association for two reasons:
+  #   1. Private org membership surfaces as NONE/CONTRIBUTOR in webhook payloads,
+  #      which would wrongly skip members' own PRs.
+  #   2. GitHub never passes repository secrets (ANTHROPIC_API_KEY) to
+  #      pull_request runs from a fork, so auto-review could not work on a fork
+  #      PR regardless of who authored it — even a maintainer's own fork PR.
+  #      Those must use the /claude-review comment path (Path 2).
   auto-review:
     if: >
       github.event_name == 'pull_request' &&
@@ -57,18 +68,63 @@ jobs:
             Use top-level comments for general observations.
           claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"'
 
-  # Path 2: external contributor PRs are reviewed on demand. A maintainer
-  # comments "/claude-review" on the PR to trigger it. The actor is the
-  # commenter, so the action's own write-permission check is what gates access:
-  # a maintainer passes and the review runs; an external contributor fails the
-  # check and the job stops without reviewing. We deliberately do NOT gate on
-  # comment.author_association here — private org membership would report the
-  # maintainer as NONE and wrongly skip the job.
-  manual-review:
+  # Gate for Path 2: resolve whether the commenter actually has write/admin
+  # access before spinning up the review. Reading the live collaborator
+  # permission avoids author_association (unreliable under private membership)
+  # and turns an unauthorized /claude-review into a clean skip on manual-review
+  # rather than a red failure inside claude-code-action. Fails closed: any lookup
+  # error denies access.
+  gate:
     if: >
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '/claude-review')
+      startsWith(github.event.comment.body, '/claude-review')
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+
+    permissions:
+      contents: read
+      pull-requests: read
+
+    outputs:
+      allowed: ${{ steps.check.outputs.allowed }}
+
+    steps:
+      - name: Check commenter permission
+        id: check
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+          ACTOR: ${{ github.actor }}
+        run: |
+          if perm=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" --jq .permission 2>/tmp/perr); then
+            echo "actor '$ACTOR' has '$perm' permission"
+          else
+            echo "::warning::permission lookup failed (denying): $(cat /tmp/perr)"
+            perm=none
+          fi
+          case "$perm" in
+            admin|write|maintain)
+              echo "allowed=true" >> "$GITHUB_OUTPUT"
+              ;;
+            *)
+              echo "::notice::'$ACTOR' lacks write access ('$perm') — skipping review"
+              echo "allowed=false" >> "$GITHUB_OUTPUT"
+              ;;
+          esac
+
+  # Path 2: external contributor PRs are reviewed on demand when a maintainer
+  # comments "/claude-review". Runs only if the gate confirmed write access, so
+  # the actor always passes claude-code-action's own check too.
+  #
+  # SECURITY: this job runs on an issue_comment event, which — unlike a fork
+  # pull_request run — has full access to repository secrets (ANTHROPIC_API_KEY)
+  # and a write-scoped token, and it checks out UNTRUSTED fork code. Never add a
+  # step that executes that code (npm ci / install / build / test): a postinstall
+  # hook or a patched test in the fork would be RCE with a live write token.
+  manual-review:
+    needs: gate
+    if: needs.gate.outputs.allowed == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -79,13 +135,16 @@ jobs:
       id-token: write
 
     steps:
-      # For issue_comment events the default checkout is the base branch, so we
-      # explicitly check out the PR head (works for fork PRs via refs/pull/N/head).
+      # issue_comment checks out the base branch by default, so fetch the PR head
+      # explicitly (works for fork PRs via refs/pull/N/head). persist-credentials:
+      # false keeps the token out of .git/config — this job never pushes and must
+      # not leave a credential on disk alongside untrusted fork code.
       - name: Checkout PR head
         uses: actions/checkout@v6
         with:
           ref: refs/pull/${{ github.event.issue.number }}/head
           fetch-depth: 1
+          persist-credentials: false
 
       - name: Run Claude Code Review
         uses: anthropics/claude-code-action@v1
