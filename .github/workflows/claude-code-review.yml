@@ -152,7 +152,10 @@ jobs:
       # issue_comment checks out the base branch by default, so fetch the PR head
       # explicitly (works for fork PRs via refs/pull/N/head). persist-credentials:
       # false keeps the token out of .git/config — this job never pushes and must
-      # not leave a credential on disk alongside untrusted fork code.
+      # not leave a credential on disk alongside untrusted fork code. Note this
+      # makes the action's own base-branch fetch (for the diff) anonymous, which
+      # only works while this repo is public; if it ever goes private, restore the
+      # credential here or the review loses its diff against main.
       - name: Checkout PR head
         uses: actions/checkout@v6
         with:
