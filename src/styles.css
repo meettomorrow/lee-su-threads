@@ -292,6 +292,33 @@
   font-weight: 600;
 }
 
+/* Disposable-handle (免洗帳號) tag - sits alongside the location / new-user
+   markers without overriding them. Neutral styling: this is a factual note
+   about the handle, not an accusation. */
+.threads-disposable-tag {
+  margin-left: 4px;
+  color: rgb(139, 92, 246);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: help;
+}
+
+/* Inside the friendships pill badge, inherit the pill's colors */
+.threads-friendships-location-badge .threads-disposable-tag {
+  color: inherit;
+  font-weight: 500;
+}
+
+@media (prefers-color-scheme: dark) {
+  .threads-disposable-tag {
+    color: rgb(167, 139, 250);
+  }
+}
+
+.__fb-dark-mode .threads-disposable-tag {
+  color: rgb(167, 139, 250);
+}
+
 /* Location badge in followers/following list */
 .threads-friendships-location-badge {
   display: inline-flex;

@@ -237,7 +237,7 @@
 
       .stats {
         display: grid;
-        grid-template-columns: 1fr 1fr 1fr;
+        grid-template-columns: 1fr 1fr 1fr 1fr;
         gap: 10px;
         margin-bottom: 12px;
         background: linear-gradient(
@@ -1079,6 +1079,20 @@
                 id="showFlagsToggle"
                 checked
                 aria-label="Toggle country flag display"
+              />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" data-i18n="disposableToggle">Default handle</div>
+          <div class="toggle-group single">
+            <label class="toggle-switch">
+              <input
+                type="checkbox"
+                id="disposableToggle"
+                checked
+                aria-label="Toggle disposable (default handle) account tag"
               />
               <span class="toggle-slider"></span>
             </label>

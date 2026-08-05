@@ -128,3 +128,26 @@ This runs automatically before every build (`npm run build`).
 - Includes Taiwan, Hong Kong, Macau, and other territories
 - Download script uses SHA-256 hashing to detect actual data changes
 - Generator uses locale-aware structure for efficient runtime lookup
+
+---
+
+### `handle-words.json` - Disposable Handle Animal Words
+
+用於「免洗帳號」判定（見 `src/lib/disposableHandle.js`）。
+
+Threads/Meta 在使用者註冊時「未自行填寫 username」的情況下，會自動指派固定
+格式的預設帳號名稱：**英文動物名 + 半形句點 + 6～8 位數字**，例如
+`camel.253044`、`leopard.7241883`。判定只認這個確定的系統格式，動物詞必須
+完整命中本清單才算數（`otter_88213`、`leopard1234`、`catherine.1990` 一律
+不算）。
+
+**Structure:**
+```json
+{ "animals": ["leopard", "camel", "otter", "..."] }
+```
+
+> ⚠️ **這份清單是社群觀察歸納的結果，並非 Meta 官方公布的名單，可能不完整。**
+> This list is **community-observed, not an official Meta list, and may be
+> incomplete.** 若你觀察到新的預設動物詞，歡迎補充到 `animals` 陣列（全部
+> 小寫、單字、不含標點）。由 esbuild 直接打包進 bundle，runtime 不會用
+> `fetch` 讀取。

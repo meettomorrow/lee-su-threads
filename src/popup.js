@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const autoQueryToggle = document.getElementById('autoQueryToggle');
   const autoQueryFollowersToggle = document.getElementById('autoQueryFollowersToggle');
   const showFlagsToggle = document.getElementById('showFlagsToggle');
+  const disposableToggle = document.getElementById('disposableToggle');
   const locationFilter = document.getElementById('locationFilter');
   const onboardingLink = document.getElementById('onboardingLink');
   const tabBtns = document.querySelectorAll('.tab-btn');
@@ -277,8 +278,13 @@ document.addEventListener('DOMContentLoaded', () => {
     'autoQueryEnabled',
     'autoQueryFollowersEnabled',
     'showFlags',
+    'disposableAccountEnabled',
     'rateLimitedUntil'
   ]).then((result) => {
+    // disposable-account tag is a purely local display setting, so it stays
+    // available even while rate limited (it never hits the network).
+    disposableToggle.checked = result.disposableAccountEnabled !== false;
+
     // Check if currently rate limited
     const rateLimitedUntil = result.rateLimitedUntil || 0;
     if (Date.now() < rateLimitedUntil) {
@@ -312,6 +318,18 @@ document.addEventListener('DOMContentLoaded', () => {
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
         browserAPI.tabs.sendMessage(tabs[0].id, { type: 'SHOW_FLAGS_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
+      }
+    });
+  });
+
+  disposableToggle.addEventListener('change', () => {
+    const enabled = disposableToggle.checked;
+    browserAPI.storage.local.set({ disposableAccountEnabled: enabled });
+    browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0]?.id) {
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'DISPOSABLE_ACCOUNT_CHANGED', enabled }).catch(() => {
           // Content script not loaded yet - that's ok
         });
       }

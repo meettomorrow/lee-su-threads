@@ -1,6 +1,8 @@
 // Post UI functions for displaying profile info on Threads posts
 import { isNewUser } from './dateParser.js';
 import { formatLocation } from './locationMapper.js';
+import { isDisposableHandle } from './disposableHandle.js';
+import { createDisposableTag } from './disposableTag.js';
 
 // Cross-browser compatibility
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -48,8 +50,8 @@ export async function createProfileBadge(profileInfo) {
   const isNew = isNewUser(profileInfo.joined);
   const newLabel = browserAPI.i18n.getMessage('newUser') || 'NEW';
 
-  // Get showFlags setting and custom emojis
-  const { showFlags = true, customLocationEmojis = {} } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis']);
+  // Get showFlags setting, custom emojis, and disposable-account setting
+  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled']);
 
   if (profileInfo.location) {
     // Get custom emoji for this location (if set)
@@ -85,6 +87,12 @@ export async function createProfileBadge(profileInfo) {
     newTag.className = 'threads-new-user-tag';
     newTag.textContent = `[${newLabel}]`;
     badge.appendChild(newTag);
+  }
+
+  // Add disposable-handle (免洗帳號) tag if enabled and the username matches the
+  // Threads system-default format. Does not affect location / new-user logic.
+  if (disposableAccountEnabled && isDisposableHandle(profileInfo.username).isDisposable) {
+    badge.appendChild(createDisposableTag());
   }
 
   return badge;
