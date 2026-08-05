@@ -6,10 +6,13 @@ on:
   issue_comment:
     types: [created]
 
-# One in-flight review per PR. Prevents stacked runs from a rapid push sequence
-# (synchronize) or repeated /claude-review comments.
+# One in-flight review per PR *per path*. Rapid pushes coalesce and repeated
+# /claude-review comments coalesce — but the event name is part of the key so a
+# pull_request (synchronize) run can't cancel a maintainer's in-flight
+# issue_comment manual review for the same PR (a shared key would cancel it and
+# then skip every job, silently losing the requested review).
 concurrency:
-  group: claude-review-${{ github.event.pull_request.number || github.event.issue.number }}
+  group: claude-review-${{ github.event_name }}-${{ github.event.pull_request.number || github.event.issue.number }}
   cancel-in-progress: true
 
 jobs:
@@ -97,14 +100,23 @@ jobs:
           REPO: ${{ github.repository }}
           ACTOR: ${{ github.actor }}
         run: |
-          if perm=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" --jq .permission 2>/tmp/perr); then
-            echo "actor '$ACTOR' has '$perm' permission"
-          else
-            echo "::warning::permission lookup failed (denying): $(cat /tmp/perr)"
-            perm=none
+          # Legacy .permission returns only admin|write|read|none (maintain maps
+          # to write, triage to read), so admin|write is the full "can trigger"
+          # set — no dead arms, and custom roles collapse to their base role.
+          if ! perm=$(gh api "repos/$REPO/collaborators/$ACTOR/permission" --jq .permission 2>/tmp/perr); then
+            # A lookup failure (e.g. the token can't read this endpoint) is an
+            # infrastructure bug, not an authorization decision. Fail closed AND
+            # loud — write the deny output, then exit non-zero so the gate job
+            # goes red instead of masquerading as a routine "not a maintainer"
+            # grey skip. (tr collapses gh's multi-line stderr; a workflow command
+            # only consumes its first line.)
+            echo "allowed=false" >> "$GITHUB_OUTPUT"
+            echo "::error::permission lookup failed for '$ACTOR' (denying): $(tr '\n' ' ' </tmp/perr)"
+            exit 1
           fi
+          echo "actor '$ACTOR' has '$perm' permission"
           case "$perm" in
-            admin|write|maintain)
+            admin|write)
               echo "allowed=true" >> "$GITHUB_OUTPUT"
               ;;
             *)
@@ -155,6 +167,10 @@ jobs:
           prompt: |
             REPO: ${{ github.repository }}
             PR NUMBER: ${{ github.event.issue.number }}
+
+            Always pass the PR number explicitly (e.g. `gh pr diff <PR NUMBER>`):
+            this job checks out a detached HEAD, so bare `gh pr diff`/`gh pr view`
+            cannot infer the PR from the current branch.
 
             Please review this pull request and provide feedback on:
             - Code quality and best practices
