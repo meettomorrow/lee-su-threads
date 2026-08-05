@@ -7,13 +7,17 @@ on:
     types: [created]
 
 jobs:
-  # Path 1: trusted authors (repo owner / org members) get an automatic review
-  # on every PR open/update. External contributors (fork PRs) are skipped here
-  # because the claude-code-action requires the actor to have write permission.
+  # Path 1: same-repo PRs get an automatic review on every open/update. Only
+  # people with write access can push a branch to this repo, so a same-repo head
+  # means the author will pass the claude-code-action write check. External
+  # contributors open PRs from forks and are skipped here (they use Path 2).
+  # NOTE: we key on fork status rather than author_association because private
+  # org membership makes author_association come through as NONE/CONTRIBUTOR in
+  # the webhook payload, which would wrongly skip members' own PRs.
   auto-review:
     if: >
       github.event_name == 'pull_request' &&
-      contains(fromJSON('["OWNER", "MEMBER"]'), github.event.pull_request.author_association)
+      github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
@@ -54,15 +58,17 @@ jobs:
           claude_args: '--allowedTools "mcp__github_inline_comment__create_inline_comment,Bash(gh pr comment:*),Bash(gh pr diff:*),Bash(gh pr view:*)"'
 
   # Path 2: external contributor PRs are reviewed on demand. A maintainer
-  # (owner / org member) comments "/claude-review" on the PR to trigger it.
-  # The actor here is the commenting maintainer, so the action's write-permission
-  # check passes even for fork PRs.
+  # comments "/claude-review" on the PR to trigger it. The actor is the
+  # commenter, so the action's own write-permission check is what gates access:
+  # a maintainer passes and the review runs; an external contributor fails the
+  # check and the job stops without reviewing. We deliberately do NOT gate on
+  # comment.author_association here — private org membership would report the
+  # maintainer as NONE and wrongly skip the job.
   manual-review:
     if: >
       github.event_name == 'issue_comment' &&
       github.event.issue.pull_request &&
-      contains(github.event.comment.body, '/claude-review') &&
-      contains(fromJSON('["OWNER", "MEMBER"]'), github.event.comment.author_association)
+      contains(github.event.comment.body, '/claude-review')
     runs-on: ubuntu-latest
     timeout-minutes: 10
 
