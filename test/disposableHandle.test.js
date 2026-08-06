@@ -4,6 +4,7 @@ import {
   DISPOSABLE_MIN_DIGITS,
   DISPOSABLE_MAX_DIGITS,
 } from '../src/lib/disposableHandle.js';
+import handleWords from '../data/handle-words.json';
 
 describe('isDisposableHandle', () => {
   describe('matches (system default format)', () => {
@@ -14,11 +15,24 @@ describe('isDisposableHandle', () => {
       expect(result.digits).toBe('253044');
     });
 
-    it('matches "leopard.7241883"', () => {
-      const result = isDisposableHandle('leopard.7241883');
+    it('matches "llama.70877115"', () => {
+      const result = isDisposableHandle('llama.70877115');
       expect(result.isDisposable).toBe(true);
-      expect(result.matchedWord).toBe('leopard');
-      expect(result.digits).toBe('7241883');
+      expect(result.matchedWord).toBe('llama');
+      expect(result.digits).toBe('70877115');
+    });
+
+    // Real handles observed in profile exports that the first dictionary
+    // missed. Keep them here so a future dictionary edit cannot silently
+    // regress the words we have actually confirmed in the wild.
+    it.each([
+      ['bear.2629908', 'bear', '2629908'],
+      ['elephant.1592186', 'elephant', '1592186'],
+    ])('matches observed default handle "%s"', (handle, word, digits) => {
+      const result = isDisposableHandle(handle);
+      expect(result.isDisposable).toBe(true);
+      expect(result.matchedWord).toBe(word);
+      expect(result.digits).toBe(digits);
     });
 
     it('matches "Camel.253044" (case-insensitive)', () => {
@@ -38,8 +52,8 @@ describe('isDisposableHandle', () => {
   });
 
   describe('does not match (user-chosen or malformed)', () => {
-    it('rejects "leopard1234" (no dot)', () => {
-      expect(isDisposableHandle('leopard1234').isDisposable).toBe(false);
+    it('rejects "elephant1234" (no dot)', () => {
+      expect(isDisposableHandle('elephant1234').isDisposable).toBe(false);
     });
 
     it('rejects "otter_88213" (underscore, not the system separator)', () => {
@@ -94,6 +108,17 @@ describe('isDisposableHandle', () => {
     it('exposes the documented 6–8 digit range', () => {
       expect(DISPOSABLE_MIN_DIGITS).toBe(6);
       expect(DISPOSABLE_MAX_DIGITS).toBe(8);
+    });
+  });
+
+  describe('animal dictionary', () => {
+    it('contains only lower-case single words', () => {
+      const invalid = handleWords.animals.filter((word) => !/^[a-z]+$/.test(word));
+      expect(invalid).toEqual([]);
+    });
+
+    it('has no duplicates', () => {
+      expect(new Set(handleWords.animals).size).toBe(handleWords.animals.length);
     });
   });
 });

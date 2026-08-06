@@ -3,10 +3,10 @@
  *
  * Threads/Meta assigns a fixed default username when a user does not set one
  * during sign-up: an English animal word + a half-width dot + 6–8 digits,
- * e.g. `camel.253044`, `leopard.7241883`.
+ * e.g. `camel.253044`, `llama.70877115`.
  *
  * This module ONLY matches that exact system-assigned format. Names that merely
- * "look bot-like" (e.g. `leopard1234`, `otter_88213`, `sunny.travel2847`) are
+ * "look bot-like" (e.g. `elephant1234`, `otter_88213`, `sunny.travel2847`) are
  * user-chosen and are deliberately NOT matched — we would rather miss than
  * over-flag, because the label only means "this handle was never changed from
  * the system default", not "this is a bot / fake / AI account".
