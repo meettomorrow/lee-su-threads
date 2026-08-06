@@ -292,6 +292,27 @@
   font-weight: 600;
 }
 
+/* Random-handle (隨機帳號) tag - a factual signal in the same family as the
+   [新帳號]/[NEW] marker: bracketed plain text, no emoji. Purple keeps it
+   distinct from the red new-user tag when both appear side by side. */
+.threads-disposable-tag {
+  margin-left: 4px;
+  color: rgb(139, 92, 246);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: help;
+}
+
+@media (prefers-color-scheme: dark) {
+  .threads-disposable-tag {
+    color: rgb(167, 139, 250);
+  }
+}
+
+.__fb-dark-mode .threads-disposable-tag {
+  color: rgb(167, 139, 250);
+}
+
 /* Location badge in followers/following list */
 .threads-friendships-location-badge {
   display: inline-flex;

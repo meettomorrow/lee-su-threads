@@ -223,5 +223,14 @@
   },
   "clearing": {
     "message": "クリア中..."
+  },
+  "disposableAccount": {
+    "message": "ランダムID"
+  },
+  "disposableAccountTooltip": {
+    "message": "このアカウントは Threads がランダムに割り当てたデフォルトのユーザーネームのままで、一度も変更されていません。偽アカウントという意味ではありません。"
+  },
+  "disposableToggle": {
+    "message": "ランダムID"
   }
 }

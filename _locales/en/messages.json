@@ -220,5 +220,14 @@
   },
   "clearing": {
     "message": "Clearing..."
+  },
+  "disposableAccount": {
+    "message": "Random handle"
+  },
+  "disposableAccountTooltip": {
+    "message": "This account still uses the random username Threads assigned by default and has never changed it. This doesn't mean it's a fake account."
+  },
+  "disposableToggle": {
+    "message": "Random handle"
   }
 }

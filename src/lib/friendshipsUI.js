@@ -7,6 +7,8 @@ import { findUsernameContainer } from './domHelpers.js';
 import { isNewUser } from './dateParser.js';
 import { formatLocation } from './locationMapper.js';
 import { fetchProfileByUserId, updateButtonWithFetchResult } from './profileFetcher.js';
+import { isDisposableHandle } from './disposableHandle.js';
+import { createDisposableTag } from './disposableTag.js';
 
 // Cross-browser compatibility
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -226,8 +228,8 @@ export async function createLocationBadge(profileInfo) {
   const badge = document.createElement('span');
   badge.className = 'threads-friendships-location-badge';
 
-  // Get showFlags setting and custom emojis
-  const { showFlags = true, customLocationEmojis = {} } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis']);
+  // Get showFlags setting, custom emojis, and disposable-account setting
+  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled']);
   const joinedLabel = browserAPI.i18n.getMessage('joined') || 'Joined';
 
   const locationText = document.createElement('span');
@@ -276,6 +278,14 @@ export async function createLocationBadge(profileInfo) {
     newTag.textContent = `[${newLabel}]`;
     newTag.style.marginLeft = '4px';
     badge.appendChild(newTag);
+  }
+
+  // Add disposable-handle (隨機帳號) tag if enabled and the username matches the
+  // Threads system-default format. Does not affect location / new-user logic.
+  if (disposableAccountEnabled && isDisposableHandle(profileInfo.username).isDisposable) {
+    const disposableTag = createDisposableTag();
+    disposableTag.style.marginLeft = '4px';
+    badge.appendChild(disposableTag);
   }
 
   return badge;
