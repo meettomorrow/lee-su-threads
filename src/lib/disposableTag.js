@@ -9,7 +9,7 @@
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
 
 /**
- * Build the disposable-handle tag element (emoji + localized label + tooltip).
+ * Build the disposable-handle tag element (bracketed localized label + tooltip).
  * Uses only createElement/textContent/appendChild — never innerHTML.
  *
  * @returns {HTMLSpanElement}
