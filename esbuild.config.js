@@ -1,6 +1,6 @@
 import * as esbuild from 'esbuild';
 import { copyFile, mkdir, cp, readFile, writeFile } from 'fs/promises';
-import { execSync } from 'child_process';
+import { getGitVersion, incrementVersion, isValidExtensionVersion, PLACEHOLDER_VERSION } from './scripts/lib/version.js';
 
 const isWatch = process.argv.includes('--watch');
 const isDev = isWatch || process.env.NODE_ENV === 'development';
@@ -8,38 +8,53 @@ const isDev = isWatch || process.env.NODE_ENV === 'development';
 // Build configuration for Firefox variants
 const FIREFOX_BUILD_TYPE = process.env.FIREFOX_BUILD_TYPE; // 'amo' or 'self-hosted'
 
-// Get version from git tags (supports both annotated and lightweight tags)
-function getGitVersion() {
-  try {
-    // Get the latest git tag (e.g., "v0.3.7" or "0.3.7")
-    const tag = execSync('git describe --tags --abbrev=0', { encoding: 'utf-8' }).trim();
-    // Remove 'v' prefix if present
-    return tag.startsWith('v') ? tag.slice(1) : tag;
-  } catch (error) {
-    const errorMessage = error.message || String(error);
-    if (errorMessage.includes('No names found') || errorMessage.includes('No tags')) {
-      console.warn('⚠️  No git tags found, using manifest version for dev build');
-    } else {
-      console.warn('⚠️  Could not get git version:', errorMessage.split('\n')[0]);
+// Version resolution (getGitVersion / incrementVersion / PLACEHOLDER_VERSION)
+// lives in scripts/lib/version.js so the build and the release guard share one
+// set of rules — see the import above.
+
+// Resolve the version to write into a built manifest.
+//
+// Single source of truth is the latest git tag (e.g. "v1.0.6"):
+//   - Production builds use the tag verbatim  → shipped version === git tag
+//   - Dev/watch builds use tag + 1            → a "next version" preview
+//
+// The `version` field in src/manifest*.json is NOT a source of truth; it is
+// only a fallback for when no git tag is reachable (e.g. a shallow CI checkout
+// without tags, where release.yml has already injected the tag via jq).
+function resolveManifestVersion(manifestVersion, label) {
+  const gitVersion = getGitVersion();
+  const base = gitVersion || manifestVersion;
+
+  // Never ship a bad version. `getGitVersion` is already validated, but `base`
+  // can fall back to the manifest value — which may be the placeholder (no tag)
+  // or an invalid version jq-injected from a non-semver tag (e.g. a prerelease).
+  // In production, fail loudly rather than writing either into a store artifact;
+  // dev/watch is allowed through (0.0.1) so a tagless clone stays buildable.
+  if (!isDev) {
+    if (base === PLACEHOLDER_VERSION) {
+      throw new Error(
+        `Cannot resolve a real version for "${label}": no semver git tag is reachable ` +
+        `and src/manifest is the ${PLACEHOLDER_VERSION} placeholder. ` +
+        `Run "git fetch --tags" (or tag the release) before a production build.`,
+      );
     }
-    return null;
-  }
-}
-
-// Increment the patch version (e.g., "0.3.7" -> "0.3.8")
-function incrementVersion(version) {
-  const parts = version.split('.');
-  if (parts.length < 3) {
-    throw new Error(`Invalid version format "${version}". Expected semver format (X.Y.Z)`);
-  }
-
-  const patchNum = Number(parts[2]);
-  if (isNaN(patchNum)) {
-    throw new Error(`Invalid patch version "${parts[2]}" in version "${version}". Must be a number`);
+    if (!isValidExtensionVersion(base)) {
+      // Only reachable when gitVersion is null (a non-null one is already
+      // validated by getGitVersion), so `base` is always the src/manifest value
+      // here — typically a non-semver tag jq-injected by release.yml.
+      throw new Error(
+        `Cannot resolve a valid version for "${label}": "${base}" (from src/manifest) ` +
+        `is not a valid extension version. ` +
+        `Tag the release with a plain version like vX.Y.Z (no prerelease suffix).`,
+      );
+    }
   }
 
-  parts[2] = String(patchNum + 1);
-  return parts.join('.');
+  const version = isDev ? incrementVersion(base) : base;
+  const source = gitVersion ? `git tag ${gitVersion}` : `manifest ${manifestVersion} (no git tag)`;
+  const arrow = version === base ? '' : ` → ${version}`;
+  console.log(`📦 ${label}: ${isDev ? 'Dev' : 'Prod'} build using ${source}${arrow}`);
+  return version;
 }
 
 // Build JavaScript bundles (shared between Chrome and Firefox)
@@ -105,20 +120,7 @@ async function copyStaticFilesForBrowser(browser) {
   const manifestContent = await readFile(sourceManifest, 'utf-8');
   const manifest = JSON.parse(manifestContent);
 
-  // In development, use git tag version + 1 (e.g., "0.3.7" -> "0.3.8")
-  if (isDev) {
-    const gitVersion = getGitVersion();
-    if (gitVersion) {
-      const newVersion = incrementVersion(gitVersion);
-      console.log(`📦 ${browser}: Dev build using git tag ${gitVersion} → ${newVersion}`);
-      manifest.version = newVersion;
-    } else {
-      const oldVersion = manifest.version;
-      const newVersion = incrementVersion(oldVersion);
-      console.log(`📦 ${browser}: Dev build using manifest version ${oldVersion} → ${newVersion}`);
-      manifest.version = newVersion;
-    }
-  }
+  manifest.version = resolveManifestVersion(manifest.version, browser);
 
   await writeFile(`${distDir}/manifest.json`, JSON.stringify(manifest, null, 2));
 
@@ -163,20 +165,7 @@ async function copyStaticFilesForSafari() {
   const manifestContent = await readFile('src/manifest.safari.json', 'utf-8');
   const manifest = JSON.parse(manifestContent);
 
-  // In development, use git tag version + 1
-  if (isDev) {
-    const gitVersion = getGitVersion();
-    if (gitVersion) {
-      const newVersion = incrementVersion(gitVersion);
-      console.log(`📦 safari: Dev build using git tag ${gitVersion} → ${newVersion}`);
-      manifest.version = newVersion;
-    } else {
-      const oldVersion = manifest.version;
-      const newVersion = incrementVersion(oldVersion);
-      console.log(`📦 safari: Dev build using manifest version ${oldVersion} → ${newVersion}`);
-      manifest.version = newVersion;
-    }
-  }
+  manifest.version = resolveManifestVersion(manifest.version, 'safari');
 
   await writeFile(`${distDir}/manifest.json`, JSON.stringify(manifest, null, 2));
 
