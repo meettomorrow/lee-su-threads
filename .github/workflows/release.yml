@@ -37,6 +37,19 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
+      # Fail fast on a tag the build can't version correctly. The workflow
+      # triggers on any `v*`, but the build resolves the version via a 3-part
+      # `git describe --match` glob — so a short tag like `v1.2` or a prerelease
+      # like `v1.2.3-beta.1` would silently resolve to the PREVIOUS release's
+      # version. Require a plain X.Y.Z (optional 4th part for Chrome) here.
+      - name: Validate release tag is a plain version
+        run: |
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$'; then
+            echo "::error::Release tag 'v$VERSION' is not a plain version. Use vX.Y.Z (no prerelease suffix, at least 3 parts)."
+            exit 1
+          fi
+          echo "✅ Release version: $VERSION"
+
       # Fallback only: with fetch-depth 0 the build reads the tag directly, but
       # keep the manifests patched in case describe ever fails. All four
       # manifests are covered so none can fall back to the 0.0.0 placeholder.

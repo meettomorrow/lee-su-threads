@@ -1,4 +1,8 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
+import { mkdtempSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import { execSync } from "node:child_process";
 import {
   EXTENSION_VERSION_RE,
   PLACEHOLDER_VERSION,
@@ -75,16 +79,57 @@ describe("incrementVersion", () => {
 });
 
 describe("getGitVersion", () => {
-  it("returns null or a valid extension version, and never a raw/invalid tag", () => {
+  const repos = [];
+
+  // A throwaway git repo whose newest matching tag is `tag` (or none).
+  function repoWithTag(tag) {
+    const dir = mkdtempSync(join(tmpdir(), "lst-ver-"));
+    repos.push(dir);
+    const run = (cmd) => execSync(cmd, { cwd: dir, stdio: "pipe" });
+    run("git init -q");
+    run('git config user.email "t@example.com"');
+    run('git config user.name "t"');
+    run('git commit -q --allow-empty -m init');
+    if (tag) run(`git tag ${tag}`);
+    return dir;
+  }
+
+  afterEach(() => {
     _resetGitVersionCache();
-    const v = getGitVersion();
-    if (v !== null) expect(isValidExtensionVersion(v)).toBe(true);
+    while (repos.length) rmSync(repos.pop(), { recursive: true, force: true });
   });
 
-  it("memoizes per cwd (repeated calls return the same value)", () => {
+  it("returns the stripped version for a valid tag", () => {
     _resetGitVersionCache();
-    const first = getGitVersion();
-    const second = getGitVersion();
-    expect(second).toBe(first);
+    expect(getGitVersion({ cwd: repoWithTag("v2.3.4") })).toBe("2.3.4");
+  });
+
+  it("returns null for a prerelease tag the glob lets through", () => {
+    _resetGitVersionCache();
+    expect(getGitVersion({ cwd: repoWithTag("v1.2.3-beta.1") })).toBeNull();
+  });
+
+  it("returns null when no matching tag exists", () => {
+    _resetGitVersionCache();
+    expect(getGitVersion({ cwd: repoWithTag(null) })).toBeNull();
+  });
+
+  it("memoizes per cwd — a tag added after the first call is not seen", () => {
+    _resetGitVersionCache();
+    const dir = repoWithTag("v1.0.0");
+    expect(getGitVersion({ cwd: dir })).toBe("1.0.0");
+    // Newer tag on a NEW commit so `git describe` deterministically prefers it.
+    execSync('git commit -q --allow-empty -m next && git tag v1.0.1', { cwd: dir, stdio: "pipe" });
+    expect(getGitVersion({ cwd: dir })).toBe("1.0.0"); // cached — new tag not seen
+    _resetGitVersionCache();
+    expect(getGitVersion({ cwd: dir })).toBe("1.0.1"); // re-read after reset
+  });
+
+  it("keys the cache per cwd (distinct repos resolve independently)", () => {
+    _resetGitVersionCache();
+    const a = repoWithTag("v3.0.0");
+    const b = repoWithTag("v4.0.0");
+    expect(getGitVersion({ cwd: a })).toBe("3.0.0");
+    expect(getGitVersion({ cwd: b })).toBe("4.0.0");
   });
 });

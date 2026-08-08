@@ -39,9 +39,12 @@ function resolveManifestVersion(manifestVersion, label) {
       );
     }
     if (!isValidExtensionVersion(base)) {
+      // Only reachable when gitVersion is null (a non-null one is already
+      // validated by getGitVersion), so `base` is always the src/manifest value
+      // here — typically a non-semver tag jq-injected by release.yml.
       throw new Error(
-        `Cannot resolve a valid version for "${label}": "${base}" ` +
-        `(from ${gitVersion ? 'the git tag' : 'src/manifest'}) is not a valid extension version. ` +
+        `Cannot resolve a valid version for "${label}": "${base}" (from src/manifest) ` +
+        `is not a valid extension version. ` +
         `Tag the release with a plain version like vX.Y.Z (no prerelease suffix).`,
       );
     }

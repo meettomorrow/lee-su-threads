@@ -58,7 +58,9 @@ function computeGitVersion(cwd) {
   } catch (error) {
     const message = error.message || String(error);
     if (/No names found|No tags|cannot describe/.test(message)) {
-      console.warn("⚠️  No matching git version tag found; falling back to manifest version");
+      // Neutral wording: this module is shared, and not every caller has a
+      // manifest fallback (check-versions.js does not).
+      console.warn("⚠️  No matching git version tag found");
     } else {
       console.warn("⚠️  Could not get git version:", message.split("\n")[0]);
     }
