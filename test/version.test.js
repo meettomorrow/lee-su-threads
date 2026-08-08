@@ -5,6 +5,8 @@ import {
   isValidExtensionVersion,
   normalizeTag,
   incrementVersion,
+  getGitVersion,
+  _resetGitVersionCache,
 } from "../scripts/lib/version.js";
 
 describe("isValidExtensionVersion", () => {
@@ -69,5 +71,20 @@ describe("incrementVersion", () => {
 
   it("throws when the patch component is not numeric", () => {
     expect(() => incrementVersion("1.0.x")).toThrow(/Invalid patch version/);
+  });
+});
+
+describe("getGitVersion", () => {
+  it("returns null or a valid extension version, and never a raw/invalid tag", () => {
+    _resetGitVersionCache();
+    const v = getGitVersion();
+    if (v !== null) expect(isValidExtensionVersion(v)).toBe(true);
+  });
+
+  it("memoizes per cwd (repeated calls return the same value)", () => {
+    _resetGitVersionCache();
+    const first = getGitVersion();
+    const second = getGitVersion();
+    expect(second).toBe(first);
   });
 });

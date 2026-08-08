@@ -27,7 +27,7 @@
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { getGitVersion, PLACEHOLDER_VERSION } from "./lib/version.js";
+import { getGitVersion, isValidExtensionVersion, PLACEHOLDER_VERSION } from "./lib/version.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
@@ -96,11 +96,13 @@ for (const rel of [
   const v = getManifestVersion(rel);
   if (v == null) continue;
   rows.push([rel, v]);
-  // A placeholder in a built manifest is always wrong — the build could not
-  // resolve a real version. Flag it even when no tag is reachable, since that
-  // is exactly the state that produces a bad 0.0.0 artifact.
+  // Flag bad built versions even when no tag is reachable — that is exactly the
+  // state that ships them. A placeholder means the build couldn't resolve a
+  // version; a non-semver value means a prerelease/invalid tag reached it.
   if (v === PLACEHOLDER_VERSION) {
     problems.push(`${rel} is the ${PLACEHOLDER_VERSION} placeholder — the build could not resolve a version. Run "git fetch --tags" and rebuild.`);
+  } else if (!isValidExtensionVersion(v)) {
+    problems.push(`${rel} has an invalid version "${v}" — not a valid extension version. A prerelease or malformed tag reached the build; tag with a plain vX.Y.Z and rebuild.`);
   } else if (tag && v !== tag) {
     problems.push(
       `${rel} (${v}) != git tag (${tag}). Rebuild with the tag checked out, or run "npm run clean" to clear a stale build.`,

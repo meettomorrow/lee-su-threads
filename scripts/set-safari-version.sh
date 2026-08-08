@@ -64,5 +64,5 @@ fi
 echo "🍎 Setting Safari MARKETING_VERSION → $VERSION"
 ( cd "$XCODE_DIR" && xcrun agvtool new-marketing-version "$VERSION" >/dev/null )
 
-CURRENT="$( cd "$XCODE_DIR" && xcrun agvtool what-marketing-version -terse 2>/dev/null | tail -n 1 || true )"
+CURRENT="$( cd "$XCODE_DIR" && xcrun agvtool what-marketing-version -terse1 2>/dev/null | tail -n 1 || true )"
 echo "✅ Done (MARKETING_VERSION is now ${CURRENT:-$VERSION})."

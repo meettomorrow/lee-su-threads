@@ -35,14 +35,17 @@ export function normalizeTag(tag) {
   return isValidExtensionVersion(version) ? version : null;
 }
 
-let cachedGitVersion;
+// Memoized per cwd so distinct working directories don't share a result and
+// repeated calls in one build spawn `git` once.
+const gitVersionCache = new Map();
 
 // Latest valid version from git tags (e.g. "v1.0.6" -> "1.0.6"), or null when
 // none is reachable or the newest matching tag isn't a valid extension version
-// (e.g. a prerelease tag). Memoized so one process resolves it once.
-export function getGitVersion(options = {}) {
-  if (cachedGitVersion === undefined) cachedGitVersion = computeGitVersion(options.cwd);
-  return cachedGitVersion;
+// (e.g. a prerelease tag).
+export function getGitVersion({ cwd } = {}) {
+  const key = cwd ?? "";
+  if (!gitVersionCache.has(key)) gitVersionCache.set(key, computeGitVersion(cwd));
+  return gitVersionCache.get(key);
 }
 
 function computeGitVersion(cwd) {
@@ -68,7 +71,7 @@ function computeGitVersion(cwd) {
 
 // Reset the memoized value (unit tests only).
 export function _resetGitVersionCache() {
-  cachedGitVersion = undefined;
+  gitVersionCache.clear();
 }
 
 // Increment the patch version (e.g., "0.3.7" -> "0.3.8").

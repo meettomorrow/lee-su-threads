@@ -1,6 +1,6 @@
 import * as esbuild from 'esbuild';
 import { copyFile, mkdir, cp, readFile, writeFile } from 'fs/promises';
-import { getGitVersion, incrementVersion, PLACEHOLDER_VERSION } from './scripts/lib/version.js';
+import { getGitVersion, incrementVersion, isValidExtensionVersion, PLACEHOLDER_VERSION } from './scripts/lib/version.js';
 
 const isWatch = process.argv.includes('--watch');
 const isDev = isWatch || process.env.NODE_ENV === 'development';
@@ -25,15 +25,26 @@ function resolveManifestVersion(manifestVersion, label) {
   const gitVersion = getGitVersion();
   const base = gitVersion || manifestVersion;
 
-  // Never ship the placeholder. In production, a missing tag means the version
-  // is unknown — fail loudly rather than writing 0.0.0 into a store artifact.
-  // Dev/watch is allowed through (0.0.1) so a tagless clone stays buildable.
-  if (!isDev && base === PLACEHOLDER_VERSION) {
-    throw new Error(
-      `Cannot resolve a real version for "${label}": no semver git tag is reachable ` +
-      `and src/manifest is the ${PLACEHOLDER_VERSION} placeholder. ` +
-      `Run "git fetch --tags" (or tag the release) before a production build.`,
-    );
+  // Never ship a bad version. `getGitVersion` is already validated, but `base`
+  // can fall back to the manifest value — which may be the placeholder (no tag)
+  // or an invalid version jq-injected from a non-semver tag (e.g. a prerelease).
+  // In production, fail loudly rather than writing either into a store artifact;
+  // dev/watch is allowed through (0.0.1) so a tagless clone stays buildable.
+  if (!isDev) {
+    if (base === PLACEHOLDER_VERSION) {
+      throw new Error(
+        `Cannot resolve a real version for "${label}": no semver git tag is reachable ` +
+        `and src/manifest is the ${PLACEHOLDER_VERSION} placeholder. ` +
+        `Run "git fetch --tags" (or tag the release) before a production build.`,
+      );
+    }
+    if (!isValidExtensionVersion(base)) {
+      throw new Error(
+        `Cannot resolve a valid version for "${label}": "${base}" ` +
+        `(from ${gitVersion ? 'the git tag' : 'src/manifest'}) is not a valid extension version. ` +
+        `Tag the release with a plain version like vX.Y.Z (no prerelease suffix).`,
+      );
+    }
   }
 
   const version = isDev ? incrementVersion(base) : base;

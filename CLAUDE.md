@@ -92,9 +92,9 @@ Use `browserAPI.storage`, `browserAPI.runtime`, `browserAPI.i18n`, etc.
 
 - **Production builds** (`npm run build`): Uses the latest git tag verbatim (e.g. tag `v1.0.6` → version `1.0.6`).
 - **Development builds** (`npm run build:watch`): Uses git tag + 1 as a next-version preview (e.g. tag `v1.0.6` → `1.0.7`).
-- **No tag reachable**: Falls back to the manifest's own value (e.g. a shallow CI checkout, where `release.yml` has already injected the tag via `jq`).
+- **No valid tag reachable**: falls back to the manifest's value only if it's a valid version (e.g. a shallow CI checkout where `release.yml` injected the tag via `jq`). A production build otherwise **fails** rather than shipping the `0.0.0` placeholder or an invalid version.
 
-**Releasing:** tag and push (`git tag vX.Y.Z && git push origin vX.Y.Z`). Chrome/Firefox are built & released automatically by `.github/workflows/release.yml`. For the Safari/iOS App Store build, follow the checklist in [docs/SAFARI_WORKFLOW.md](docs/SAFARI_WORKFLOW.md) — `npm run set:safari-version` sets the Xcode `MARKETING_VERSION` from the tag, and `npm run check:versions` verifies everything agrees.
+**Releasing:** Chrome/Firefox are built & released automatically by `.github/workflows/release.yml` when you push a `vX.Y.Z` tag. **For the Safari/iOS App Store build, don't just tag-and-push** — follow the verify-before-push checklist in [docs/SAFARI_WORKFLOW.md](docs/SAFARI_WORKFLOW.md) (`set:safari-version X.Y.Z` → commit → tag locally → `build` + `check:versions` → push last → Xcode archive), so the tagged commit already carries the matching `MARKETING_VERSION` and nothing ships before the versions are verified.
 
 ### Building the Extension
 
