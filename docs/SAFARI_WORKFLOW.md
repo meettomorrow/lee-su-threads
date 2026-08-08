@@ -52,6 +52,53 @@ npm run build:watch
 # No need to manually run npm build
 ```
 
+## Releasing to the App Store (iOS + macOS)
+
+> **You never hand-edit version numbers.** Both the extension version (shown in
+> the popup) and the app's `MARKETING_VERSION` (shown in App Store Connect) are
+> derived from the **git tag**. Editing `src/manifest*.json` or `MARKETING_VERSION`
+> by hand is what caused past drift (popup stuck at 0.3.7 while Apple saw 1.0.6).
+
+Copy-paste checklist to ship version `X.Y.Z`:
+
+```bash
+# 1. Tag the release — this is the single source of truth.
+#    (Also triggers the Chrome/Firefox release workflow via GitHub Actions.)
+git tag vX.Y.Z
+git push origin vX.Y.Z
+
+# 2. Sync the Safari app version from the tag, then rebuild the extension.
+npm run set:safari-version   # sets Xcode MARKETING_VERSION from the latest tag (agvtool)
+npm run build                # rebuilds dist/safari/ so the popup version == tag
+
+# 3. Verify every version source agrees with the tag. Fix before continuing.
+npm run check:versions
+
+# 4. Commit the version bump — project.pbxproj IS tracked in git.
+git add "dist-safari/safari-project/Lee-Su-Sui/Lee-Su-Sui.xcodeproj/project.pbxproj"
+git commit -m "chore: bump Safari MARKETING_VERSION to X.Y.Z"
+
+# 5. Archive & upload in Xcode:
+npm run open:safari
+#    - Select the iOS App (or macOS App) scheme
+#    - Set the run destination to "Any iOS Device (arm64)"
+#    - Product → Archive → Distribute App → App Store Connect
+```
+
+**Two version numbers, both from the tag automatically:**
+
+| Number | Where users see it | Set by |
+|--------|--------------------|--------|
+| Extension manifest `version` | Extension popup (`v1.0.6`) | `npm run build` |
+| App `MARKETING_VERSION` | App Store Connect / Apple | `npm run set:safari-version` |
+
+**Re-uploading the same version?** App Store Connect rejects a duplicate build
+number. Bump only the build number (not the version) with:
+
+```bash
+( cd "dist-safari/safari-project/Lee-Su-Sui" && xcrun agvtool next-version -all )
+```
+
 ## Commands Reference
 
 | Command | When to Use | Speed |
@@ -60,6 +107,8 @@ npm run build:watch
 | `npm run build:watch` | Development mode (auto-rebuild) | Fast |
 | `npm run setup:safari` | First time / project corrupted | Slow (20s) |
 | `npm run open:safari` | Open Xcode project | Instant |
+| `npm run set:safari-version` | Before App Store archive (sets version from git tag) | Instant |
+| `npm run check:versions` | Before release (verify versions match the tag) | Instant |
 
 ## How It Works
 
@@ -115,5 +164,10 @@ npm run build
 
 ❌ **DON'T:**
 - Run `npm run setup:safari` for every change
-- Edit files in `dist/safari/` directly (they get overwritten)
-- Commit `dist/` or `dist-safari/` to git (they're gitignored)
+- Edit files in `dist/safari/` directly (they get overwritten by `npm run build`)
+- Hand-edit `MARKETING_VERSION` or `src/manifest*.json` versions — use the git tag + `npm run set:safari-version`
+
+> **Note on what's committed:** `dist/` is gitignored (pure build output).
+> `dist-safari/` is **partially tracked** — the Xcode project (`project.pbxproj`,
+> assets, Swift sources) IS committed; only `build/`, `DerivedData/`, and
+> `xcuserdata/` are ignored. So a `MARKETING_VERSION` bump must be committed.

@@ -88,11 +88,13 @@ Use `browserAPI.storage`, `browserAPI.runtime`, `browserAPI.i18n`, etc.
 
 ### Version Management
 
-**IMPORTANT:** Do NOT manually update version numbers in `src/manifest.json`, `src/manifest.firefox.json`, or `src/manifest.firefox-direct.json` during development.
+**The git tag is the single source of truth for the version.** Do NOT hand-edit version numbers anywhere — not in `src/manifest*.json`, not in the Xcode `MARKETING_VERSION`. The `version` field in `src/manifest*.json` is a `0.0.0` placeholder; the build overwrites it from the git tag (see `resolveManifestVersion()` in `esbuild.config.js`).
 
-- **Development builds** (`npm run build:watch`): Automatically uses git tag version + 1 (e.g., if latest tag is `v0.3.7`, dev build shows `0.3.8`)
-- **Production builds** (`npm run build`): Uses the version from source manifests
-- **Release workflow**: Only update manifest versions when creating a release tag
+- **Production builds** (`npm run build`): Uses the latest git tag verbatim (e.g. tag `v1.0.6` → version `1.0.6`).
+- **Development builds** (`npm run build:watch`): Uses git tag + 1 as a next-version preview (e.g. tag `v1.0.6` → `1.0.7`).
+- **No tag reachable**: Falls back to the manifest's own value (e.g. a shallow CI checkout, where `release.yml` has already injected the tag via `jq`).
+
+**Releasing:** tag and push (`git tag vX.Y.Z && git push origin vX.Y.Z`). Chrome/Firefox are built & released automatically by `.github/workflows/release.yml`. For the Safari/iOS App Store build, follow the checklist in [docs/SAFARI_WORKFLOW.md](docs/SAFARI_WORKFLOW.md) — `npm run set:safari-version` sets the Xcode `MARKETING_VERSION` from the tag, and `npm run check:versions` verifies everything agrees.
 
 ### Building the Extension
 
