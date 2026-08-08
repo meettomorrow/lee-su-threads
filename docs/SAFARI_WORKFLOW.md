@@ -1,5 +1,17 @@
 # Safari Development Workflow
 
+There are **two separate modes** — don't mix them up:
+
+1. **Develop & test** (most of the time): edit code → `npm run build` → Run in
+   Xcode on the Simulator or a real iPhone. **No git tag, no version steps** —
+   build and run as often as you like. Version numbers are irrelevant here.
+2. **Release to the App Store** (only when shipping): decide the version, sync it
+   from a git tag, verify, then archive & upload. See
+   [Releasing to the App Store](#releasing-to-the-app-store-ios--macos).
+
+The version ceremony (`set:safari-version` / tag / `check:versions`) applies
+**only** to the App Store archive+upload — never to on-device test builds.
+
 ## One-Time Setup
 
 ```bash
@@ -52,6 +64,13 @@ npm run build:watch
 # No need to manually run npm build
 ```
 
+### Testing on a real iPhone
+
+Connect the iPhone, select it as the Xcode run destination, and Run (Cmd+R) —
+same as the Simulator. **No version steps and no git tag are needed**; the popup
+just shows whatever the latest version tag is (or `tag + 1` in watch mode). Test
+freely, then do the version ceremony only when you're ready to ship.
+
 ## Releasing to the App Store (iOS + macOS)
 
 > **You never hand-edit version numbers.** Both the extension version (shown in
@@ -59,31 +78,46 @@ npm run build:watch
 > derived from the **git tag**. Editing `src/manifest*.json` or `MARKETING_VERSION`
 > by hand is what caused past drift (popup stuck at 0.3.7 while Apple saw 1.0.6).
 
+**Order matters.** Pushing the tag immediately triggers the Chrome/Firefox
+release workflow and publishes a public GitHub Release — that half can't be
+un-shipped. So **verify everything locally first, and push the tag last.**
+Because `project.pbxproj` is committed, the version bump must also land *before*
+the tag points at it.
+
 Copy-paste checklist to ship version `X.Y.Z`:
 
 ```bash
-# 1. Tag the release — this is the single source of truth.
-#    (Also triggers the Chrome/Firefox release workflow via GitHub Actions.)
-git tag vX.Y.Z
-git push origin vX.Y.Z
+# 1. Set the Safari app version explicitly (no tag needed yet — this is what
+#    lets the version bump be committed BEFORE the tag exists).
+npm run set:safari-version X.Y.Z   # sets Xcode MARKETING_VERSION (agvtool)
 
-# 2. Sync the Safari app version from the tag, then rebuild the extension.
-npm run set:safari-version   # sets Xcode MARKETING_VERSION from the latest tag (agvtool)
-npm run build                # rebuilds dist/safari/ so the popup version == tag
-
-# 3. Verify every version source agrees with the tag. Fix before continuing.
-npm run check:versions
-
-# 4. Commit the version bump — project.pbxproj IS tracked in git.
+# 2. Commit the bump so the tag (next step) points at a commit that has it.
+#    project.pbxproj IS tracked in git.
 git add "dist-safari/safari-project/Lee-Su-Sui/Lee-Su-Sui.xcodeproj/project.pbxproj"
 git commit -m "chore: bump Safari MARKETING_VERSION to X.Y.Z"
 
-# 5. Archive & upload in Xcode:
+# 3. Tag that commit LOCALLY — do NOT push yet. The extension build reads the
+#    version from this tag.
+git tag vX.Y.Z
+
+# 4. Build from the tag, then verify everything agrees — BEFORE anything ships.
+npm run build            # dist/safari/manifest.json version == X.Y.Z
+npm run check:versions   # tag / MARKETING_VERSION / dist/* all == X.Y.Z
+
+# 5. Green? Push the tag. This ships Chrome/Firefox and publishes a public
+#    GitHub Release — the irreversible step, done last on purpose.
+git push origin vX.Y.Z
+
+# 6. Archive & upload the Safari/iOS app in Xcode:
 npm run open:safari
 #    - Select the iOS App (or macOS App) scheme
 #    - Set the run destination to "Any iOS Device (arm64)"
 #    - Product → Archive → Distribute App → App Store Connect
 ```
+
+If `check:versions` (step 4) fails, fix it and re-run — nothing has shipped yet
+because the tag is still local. If you need to abandon the version, delete the
+local tag (`git tag -d vX.Y.Z`) before it's pushed.
 
 **Two version numbers, both from the tag automatically:**
 
@@ -107,7 +141,7 @@ number. Bump only the build number (not the version) with:
 | `npm run build:watch` | Development mode (auto-rebuild) | Fast |
 | `npm run setup:safari` | First time / project corrupted | Slow (20s) |
 | `npm run open:safari` | Open Xcode project | Instant |
-| `npm run set:safari-version` | Before App Store archive (sets version from git tag) | Instant |
+| `npm run set:safari-version X.Y.Z` | Before App Store archive (sets `MARKETING_VERSION`) | Instant |
 | `npm run check:versions` | Before release (verify versions match the tag) | Instant |
 
 ## How It Works
@@ -143,6 +177,10 @@ npm run setup:safari
 npm run open:safari
 # Reconfigure signing for each target
 ```
+> ⚠️ `npm run setup:safari` runs the converter with `--force` and regenerates
+> `project.pbxproj` wholesale, resetting `MARKETING_VERSION` (and signing). After
+> re-running it, re-apply the version with `npm run set:safari-version X.Y.Z`
+> before archiving.
 
 **Q: Want to test production build**
 ```bash

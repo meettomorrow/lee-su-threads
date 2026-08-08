@@ -9,21 +9,47 @@ const isDev = isWatch || process.env.NODE_ENV === 'development';
 const FIREFOX_BUILD_TYPE = process.env.FIREFOX_BUILD_TYPE; // 'amo' or 'self-hosted'
 
 // Get version from git tags (supports both annotated and lightweight tags)
+// Placeholder written in src/manifest*.json — the real version is injected at
+// build time from the git tag. Must never reach a shipped artifact.
+const PLACEHOLDER_VERSION = '0.0.0';
+
+// A Chrome MV3 version: 1–4 dot-separated integers.
+const SEMVER_RE = /^\d+(\.\d+){1,3}$/;
+
+let cachedGitVersion;
+
+// Latest semver-shaped git tag (e.g. "v1.0.6" -> "1.0.6"), or null when none.
+// Memoized so every manifest in one build agrees and we spawn `git` once.
 function getGitVersion() {
+  if (cachedGitVersion === undefined) cachedGitVersion = computeGitVersion();
+  return cachedGitVersion;
+}
+
+function computeGitVersion() {
+  let tag;
   try {
-    // Get the latest git tag (e.g., "v0.3.7" or "0.3.7")
-    const tag = execSync('git describe --tags --abbrev=0', { encoding: 'utf-8' }).trim();
-    // Remove 'v' prefix if present
-    return tag.startsWith('v') ? tag.slice(1) : tag;
+    // --match restricts to version tags, so a stray tag like "ios-1.0.6" or
+    // "nightly" is never picked up as the version.
+    tag = execSync("git describe --tags --abbrev=0 --match='v[0-9]*.[0-9]*.[0-9]*'", {
+      encoding: 'utf-8',
+    }).trim();
   } catch (error) {
     const errorMessage = error.message || String(error);
-    if (errorMessage.includes('No names found') || errorMessage.includes('No tags')) {
-      console.warn('⚠️  No git tags found, using manifest version for dev build');
+    if (/No names found|No tags|cannot describe/.test(errorMessage)) {
+      console.warn('⚠️  No matching git version tag found; falling back to manifest version');
     } else {
       console.warn('⚠️  Could not get git version:', errorMessage.split('\n')[0]);
     }
     return null;
   }
+  // Remove 'v' prefix if present, then validate — a prerelease tag like
+  // "v1.1.0-beta.1" passes the glob but is not a valid manifest version.
+  const version = tag.startsWith('v') ? tag.slice(1) : tag;
+  if (!SEMVER_RE.test(version)) {
+    console.warn(`⚠️  Ignoring non-semver git tag "${tag}"`);
+    return null;
+  }
+  return version;
 }
 
 // Increment the patch version (e.g., "0.3.7" -> "0.3.8")
@@ -54,6 +80,18 @@ function incrementVersion(version) {
 function resolveManifestVersion(manifestVersion, label) {
   const gitVersion = getGitVersion();
   const base = gitVersion || manifestVersion;
+
+  // Never ship the placeholder. In production, a missing tag means the version
+  // is unknown — fail loudly rather than writing 0.0.0 into a store artifact.
+  // Dev/watch is allowed through (0.0.1) so a tagless clone stays buildable.
+  if (!isDev && base === PLACEHOLDER_VERSION) {
+    throw new Error(
+      `Cannot resolve a real version for "${label}": no semver git tag is reachable ` +
+      `and src/manifest is the ${PLACEHOLDER_VERSION} placeholder. ` +
+      `Run "git fetch --tags" (or tag the release) before a production build.`,
+    );
+  }
+
   const version = isDev ? incrementVersion(base) : base;
   const source = gitVersion ? `git tag ${gitVersion}` : `manifest ${manifestVersion} (no git tag)`;
   const arrow = version === base ? '' : ` → ${version}`;

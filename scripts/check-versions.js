@@ -5,12 +5,20 @@
 // anything drifts from it — run it before a release / Safari archive, or in
 // CI after building.
 //
-//   node scripts/check-versions.js
+//   node scripts/check-versions.js          # full check (use before a Safari archive)
+//   node scripts/check-versions.js --web     # web artifacts only (skip MARKETING_VERSION)
 //   npm run check:versions
 //
 // Sources checked (each only when present):
 //   - Xcode MARKETING_VERSION in the Safari project's project.pbxproj
 //   - built dist/*/manifest.json (skipped if not built yet)
+//
+// --web skips MARKETING_VERSION: a web-only (Chrome/Firefox) release legitimately
+// leaves the Safari app version lagging, so package.sh uses --web to avoid failing
+// on that. A human cutting a Safari release runs the full check.
+//
+// Note: this is a release gate. A dev/watch build writes tag+1 into dist, so it
+// will (correctly) report a mismatch — run it against a production build.
 //
 // Note: src/manifest*.json is intentionally NOT checked — its version is a
 // 0.0.0 placeholder that the build overwrites from the git tag.
@@ -22,9 +30,15 @@ import { dirname, join } from "node:path";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
+// Must match esbuild.config.js — the version the build actually injects.
+const PLACEHOLDER_VERSION = "0.0.0";
+
 function getTag() {
   try {
-    return execSync("git describe --tags --abbrev=0", { cwd: root, encoding: "utf-8" })
+    return execSync(
+      "git describe --tags --abbrev=0 --match='v[0-9]*.[0-9]*.[0-9]*'",
+      { cwd: root, encoding: "utf-8" },
+    )
       .trim()
       .replace(/^v/, "");
   } catch {
@@ -40,7 +54,8 @@ function getMarketingVersions() {
   if (!existsSync(pbxproj)) return null;
   const content = readFileSync(pbxproj, "utf-8");
   const versions = [...content.matchAll(/MARKETING_VERSION = ([^;]+);/g)].map((m) =>
-    m[1].trim(),
+    // pbxproj values may be quoted (MARKETING_VERSION = "1.0.6";) — strip them.
+    m[1].trim().replace(/^"|"$/g, ""),
   );
   return [...new Set(versions)];
 }
@@ -51,18 +66,17 @@ function getManifestVersion(rel) {
   return JSON.parse(readFileSync(p, "utf-8")).version;
 }
 
-const tag = getTag();
-if (!tag) {
-  console.error("❌ No git tag found. Tag the release first (git tag vX.Y.Z).");
-  process.exit(1);
-}
+const webOnly = process.argv.includes("--web");
 
-const rows = [["git tag (source of truth)", tag]];
+const tag = getTag();
+const rows = [["git tag (source of truth)", tag ?? "(none reachable)"]];
 const problems = [];
 
 // Xcode MARKETING_VERSION (the hand-edited value that drifted before).
-const mv = getMarketingVersions();
-if (mv === null) {
+const mv = webOnly ? null : getMarketingVersions();
+if (webOnly) {
+  rows.push(["Xcode MARKETING_VERSION", "(--web: skipped)"]);
+} else if (mv === null) {
   rows.push(["Xcode MARKETING_VERSION", "(project not found — skipped)"]);
 } else if (mv.length === 0) {
   rows.push(["Xcode MARKETING_VERSION", "(none found — skipped)"]);
@@ -70,9 +84,11 @@ if (mv === null) {
   rows.push(["Xcode MARKETING_VERSION", mv.join(", ")]);
   if (mv.length > 1) {
     problems.push(`MARKETING_VERSION is inconsistent across build configs: ${mv.join(", ")}`);
-  } else if (mv[0] !== tag) {
+  } else if (mv[0] === PLACEHOLDER_VERSION) {
+    problems.push(`MARKETING_VERSION is the ${PLACEHOLDER_VERSION} placeholder — run: bash scripts/set-safari-version.sh <version>`);
+  } else if (tag && mv[0] !== tag) {
     problems.push(
-      `MARKETING_VERSION (${mv[0]}) != git tag (${tag}). Run: bash scripts/set-safari-version.sh`,
+      `MARKETING_VERSION (${mv[0]}) != git tag (${tag}). Run: bash scripts/set-safari-version.sh ${tag}`,
     );
   }
 }
@@ -88,8 +104,15 @@ for (const rel of [
   const v = getManifestVersion(rel);
   if (v == null) continue;
   rows.push([rel, v]);
-  if (v !== tag) {
-    problems.push(`${rel} (${v}) != git tag (${tag}). Rebuild with the tag checked out.`);
+  // A placeholder in a built manifest is always wrong — the build could not
+  // resolve a real version. Flag it even when no tag is reachable, since that
+  // is exactly the state that produces a bad 0.0.0 artifact.
+  if (v === PLACEHOLDER_VERSION) {
+    problems.push(`${rel} is the ${PLACEHOLDER_VERSION} placeholder — the build could not resolve a version. Run "git fetch --tags" and rebuild.`);
+  } else if (tag && v !== tag) {
+    problems.push(
+      `${rel} (${v}) != git tag (${tag}). Rebuild with the tag checked out, or run "npm run clean" to clear a stale build.`,
+    );
   }
 }
 
@@ -98,8 +121,16 @@ console.log("\nVersion check:");
 for (const [k, v] of rows) console.log(`  ${k.padEnd(width)}  ${v}`);
 console.log("");
 
+// With no tag we can't verify against the source of truth. If nothing else is
+// obviously broken, still fail — an unverifiable release is not a passing one.
+if (!tag && problems.length === 0) {
+  console.error("⚠️  No semver git tag reachable — cannot verify versions against the source of truth.");
+  console.error('   Tag the release (git tag vX.Y.Z) or run "git fetch --tags".');
+  process.exit(1);
+}
+
 if (problems.length) {
-  console.error("❌ Version mismatch:");
+  console.error("❌ Version check failed:");
   for (const p of problems) console.error(`   - ${p}`);
   process.exit(1);
 }

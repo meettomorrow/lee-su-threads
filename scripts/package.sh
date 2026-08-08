@@ -10,9 +10,16 @@ PROJECT_ROOT="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 cd "$PROJECT_ROOT"
 
-# Build the extension first
+# Start from a clean dist/ so a leftover build from an older version can't be
+# packaged or trip the version guard below.
+echo "🧹 Cleaning previous build output..."
+npm run clean
+
+# Build both the default (dist/firefox) and AMO (dist/firefox-amo) outputs so
+# this script is self-contained and never packages a stale directory.
 echo "🔨 Building extension..."
 npm run build
+npm run build:firefox-amo
 
 # Get version from manifest.json in dist/chrome/
 VERSION=$(grep '"version"' dist/chrome/manifest.json | sed 's/.*"version": "\(.*\)".*/\1/')
@@ -38,13 +45,6 @@ echo "📊 Size: $(du -h dist-zip/lee-su-threads-chrome-v${VERSION}.zip | cut -f
 echo ""
 echo "🦊 Building Firefox extension..."
 
-# Check if firefox-amo directory exists (AMO unlisted build)
-if [ ! -d "dist/firefox-amo" ]; then
-  echo "❌ Error: dist/firefox-amo/ not found"
-  echo "   Run 'npm run build:firefox-amo' first"
-  exit 1
-fi
-
 echo "📦 Building AMO version (for unlisted review)..."
 cd dist/firefox-amo
 zip -r "$PROJECT_ROOT/dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip" . -x "*.DS_Store" "*.map"
@@ -52,6 +52,13 @@ cd "$PROJECT_ROOT"
 
 echo "✅ Created dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip (AMO unlisted)"
 echo "📊 Size: $(du -h dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip | cut -f1)"
+
+# Verify the packaged web artifacts match the git tag before we call it done.
+# --web skips MARKETING_VERSION: this script only packages Chrome/Firefox, and
+# the Safari app version legitimately lags on a web-only release.
+echo ""
+echo "🔎 Verifying versions against the git tag..."
+node "$SCRIPT_DIR/check-versions.js" --web
 
 echo ""
 echo "🎉 All builds complete!"

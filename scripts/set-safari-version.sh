@@ -7,9 +7,18 @@ set -euo pipefail
 # app for App Store submission so the App Store version always matches the
 # git tag — never hand-edit MARKETING_VERSION in project.pbxproj again.
 #
+# Because project.pbxproj is tracked in git, the commit that sets the version
+# must exist *before* the tag points at it. The reliable release order is:
+#
+#   bash scripts/set-safari-version.sh 1.0.7   # set + git commit the pbxproj
+#   git tag v1.0.7 && git push origin v1.0.7   # then tag that commit
+#
+# The no-argument form reads the latest tag and is meant for re-syncing an
+# existing project, not for cutting a new release.
+#
 # Usage:
-#   bash scripts/set-safari-version.sh          # use the latest git tag
-#   bash scripts/set-safari-version.sh 1.0.6    # override explicitly
+#   bash scripts/set-safari-version.sh 1.0.7    # explicit version (release)
+#   bash scripts/set-safari-version.sh          # re-sync from the latest git tag
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 XCODE_DIR="$PROJECT_ROOT/dist-safari/safari-project/Lee-Su-Sui"
@@ -28,12 +37,22 @@ fi
 
 VERSION="${1:-}"
 if [ -z "$VERSION" ]; then
-  TAG="$(git -C "$PROJECT_ROOT" describe --tags --abbrev=0 2>/dev/null || true)"
-  VERSION="${TAG#v}"
+  # --match keeps a stray tag (ios-*, nightly) from being read as the version.
+  TAG="$(git -C "$PROJECT_ROOT" describe --tags --abbrev=0 --match='v[0-9]*.[0-9]*.[0-9]*' 2>/dev/null || true)"
+  VERSION="$TAG"
 fi
 
+# Strip a leading 'v' on either path so "v1.0.6" and "1.0.6" both work.
+VERSION="${VERSION#v}"
+
 if [ -z "$VERSION" ]; then
-  echo "❌ No version given and no git tag found. Tag the release first (git tag vX.Y.Z)." >&2
+  echo "❌ No version given and no matching git tag found. Pass one explicitly: set-safari-version.sh 1.0.7" >&2
+  exit 1
+fi
+
+# App Store Connect only accepts a numeric dotted version.
+if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+(\.[0-9]+){1,2}$'; then
+  echo "❌ Invalid version \"$VERSION\". Expected a numeric version like 1.0.6." >&2
   exit 1
 fi
 

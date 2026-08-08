@@ -19,6 +19,10 @@ jobs:
 
     steps:
       - uses: actions/checkout@v6
+        with:
+          # Full history + tags so the build can derive the version from the
+          # git tag (esbuild.config.js getGitVersion), not just the jq fallback.
+          fetch-depth: 0
 
       - name: Setup Node.js
         uses: actions/setup-node@v6
@@ -33,25 +37,27 @@ jobs:
         id: get_version
         run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_ENV
 
+      # Fallback only: with fetch-depth 0 the build reads the tag directly, but
+      # keep the manifests patched in case describe ever fails. All four
+      # manifests are covered so none can fall back to the 0.0.0 placeholder.
       - name: Update version in manifests
         run: |
-          jq ".version = \"$VERSION\"" src/manifest.json > temp.json && mv temp.json src/manifest.json
-          jq ".version = \"$VERSION\"" src/manifest.firefox.json > temp.json && mv temp.json src/manifest.firefox.json
-          jq ".version = \"$VERSION\"" src/manifest.firefox-direct.json > temp.json && mv temp.json src/manifest.firefox-direct.json
+          for m in manifest.json manifest.firefox.json manifest.firefox-direct.json manifest.safari.json; do
+            jq ".version = \"$VERSION\"" "src/$m" > temp.json && mv temp.json "src/$m"
+          done
 
-      - name: Build Chrome and Firefox AMO version
-        run: |
-          echo "🔨 Building Chrome and Firefox AMO version (no update_url, version ${VERSION})..."
-          npm run build:firefox-amo
+      # package.sh cleans dist/, builds Chrome + Firefox AMO, zips them, and
+      # runs the version guard (--web).
+      - name: Package extensions
+        run: bash scripts/package.sh
 
+      # Built after packaging: package.sh wipes dist/, so this must run later to
+      # leave dist/firefox-direct in place for the signing step below.
       - name: Build Firefox self-hosted version (with update_url)
         if: env.ENABLE_FIREFOX_SIGNING == 'true'
         run: |
           echo "🔨 Building Firefox self-hosted version (different add-on ID, version ${VERSION})..."
           npm run build:firefox-self-hosted
-
-      - name: Package extensions
-        run: bash scripts/package.sh
 
       - name: Validate packaged files exist
         run: |
