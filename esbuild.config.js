@@ -42,6 +42,25 @@ function incrementVersion(version) {
   return parts.join('.');
 }
 
+// Resolve the version to write into a built manifest.
+//
+// Single source of truth is the latest git tag (e.g. "v1.0.6"):
+//   - Production builds use the tag verbatim  → shipped version === git tag
+//   - Dev/watch builds use tag + 1            → a "next version" preview
+//
+// The `version` field in src/manifest*.json is NOT a source of truth; it is
+// only a fallback for when no git tag is reachable (e.g. a shallow CI checkout
+// without tags, where release.yml has already injected the tag via jq).
+function resolveManifestVersion(manifestVersion, label) {
+  const gitVersion = getGitVersion();
+  const base = gitVersion || manifestVersion;
+  const version = isDev ? incrementVersion(base) : base;
+  const source = gitVersion ? `git tag ${gitVersion}` : `manifest ${manifestVersion} (no git tag)`;
+  const arrow = version === base ? '' : ` → ${version}`;
+  console.log(`📦 ${label}: ${isDev ? 'Dev' : 'Prod'} build using ${source}${arrow}`);
+  return version;
+}
+
 // Build JavaScript bundles (shared between Chrome and Firefox)
 const buildOptions = {
   entryPoints: [
@@ -105,20 +124,7 @@ async function copyStaticFilesForBrowser(browser) {
   const manifestContent = await readFile(sourceManifest, 'utf-8');
   const manifest = JSON.parse(manifestContent);
 
-  // In development, use git tag version + 1 (e.g., "0.3.7" -> "0.3.8")
-  if (isDev) {
-    const gitVersion = getGitVersion();
-    if (gitVersion) {
-      const newVersion = incrementVersion(gitVersion);
-      console.log(`📦 ${browser}: Dev build using git tag ${gitVersion} → ${newVersion}`);
-      manifest.version = newVersion;
-    } else {
-      const oldVersion = manifest.version;
-      const newVersion = incrementVersion(oldVersion);
-      console.log(`📦 ${browser}: Dev build using manifest version ${oldVersion} → ${newVersion}`);
-      manifest.version = newVersion;
-    }
-  }
+  manifest.version = resolveManifestVersion(manifest.version, browser);
 
   await writeFile(`${distDir}/manifest.json`, JSON.stringify(manifest, null, 2));
 
@@ -163,20 +169,7 @@ async function copyStaticFilesForSafari() {
   const manifestContent = await readFile('src/manifest.safari.json', 'utf-8');
   const manifest = JSON.parse(manifestContent);
 
-  // In development, use git tag version + 1
-  if (isDev) {
-    const gitVersion = getGitVersion();
-    if (gitVersion) {
-      const newVersion = incrementVersion(gitVersion);
-      console.log(`📦 safari: Dev build using git tag ${gitVersion} → ${newVersion}`);
-      manifest.version = newVersion;
-    } else {
-      const oldVersion = manifest.version;
-      const newVersion = incrementVersion(oldVersion);
-      console.log(`📦 safari: Dev build using manifest version ${oldVersion} → ${newVersion}`);
-      manifest.version = newVersion;
-    }
-  }
+  manifest.version = resolveManifestVersion(manifest.version, 'safari');
 
   await writeFile(`${distDir}/manifest.json`, JSON.stringify(manifest, null, 2));
 
