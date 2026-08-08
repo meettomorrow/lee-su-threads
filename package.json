@@ -6,6 +6,7 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
+    "icons": "bash scripts/generate-icons.sh",
     "download:world": "node scripts/download-world.cjs",
     "generate:mapper": "node scripts/generate-location-mapper.cjs",
     "prebuild": "npm run generate:mapper",
