@@ -26,6 +26,15 @@ export function isValidExtensionVersion(version) {
   return typeof version === "string" && EXTENSION_VERSION_RE.test(version);
 }
 
+// A release tag is exactly X.Y.Z — stricter than a manifest version (App Store
+// MARKETING_VERSION allows at most 3 parts), and what release.yml enforces on
+// the pushed tag. EXTENSION_VERSION_RE stays the looser "what a manifest holds".
+export const RELEASE_VERSION_RE = /^\d+\.\d+\.\d+$/;
+
+export function isReleaseVersion(version) {
+  return typeof version === "string" && RELEASE_VERSION_RE.test(version);
+}
+
 // Turn a raw `git describe` tag ("v1.0.6", "1.0.6", "v1.2.3-beta.1", …) into a
 // valid extension version, or null. Pure — the unit tests exercise this so the
 // glob/regex divergence that caused past bugs is caught without touching git.

@@ -81,12 +81,15 @@ describe("incrementVersion", () => {
 describe("getGitVersion", () => {
   const repos = [];
 
-  // Git env scrubbed so the fixture is hermetic: GIT_DIR/GIT_WORK_TREE (set when
-  // git runs us from a hook) would otherwise redirect these commands at the real
-  // repo, and a global commit.gpgsign would make --allow-empty fail.
-  const cleanEnv = { ...process.env, GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_SYSTEM: "/dev/null" };
-  delete cleanEnv.GIT_DIR;
-  delete cleanEnv.GIT_WORK_TREE;
+  // Git env scrubbed so the fixture is hermetic: any inherited GIT_* var (DIR,
+  // WORK_TREE, INDEX_FILE, OBJECT_DIRECTORY, COMMON_DIR — all set when git runs
+  // us from a hook) would redirect these commands at the real repo, and a global
+  // commit.gpgsign would make --allow-empty fail. Drop every GIT_* key, then
+  // point config at /dev/null.
+  const cleanEnv = { ...process.env };
+  for (const k of Object.keys(cleanEnv)) if (k.startsWith("GIT_")) delete cleanEnv[k];
+  cleanEnv.GIT_CONFIG_GLOBAL = "/dev/null";
+  cleanEnv.GIT_CONFIG_SYSTEM = "/dev/null";
 
   // A throwaway git repo whose newest matching tag is `tag` (or none).
   function repoWithTag(tag) {

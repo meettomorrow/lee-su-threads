@@ -28,20 +28,19 @@ import { execSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
-import { getGitVersion, isValidExtensionVersion, PLACEHOLDER_VERSION } from "./lib/version.js";
+import { getGitVersion, isValidExtensionVersion, isReleaseVersion, PLACEHOLDER_VERSION } from "./lib/version.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Tags pointing at HEAD, 'v' stripped. Used to catch the case where HEAD is
-// tagged with a shape the build can't use (e.g. `v1.2`), so the build resolves
+// Raw tags pointing at HEAD (e.g. ["v1.2", "nightly"]). Used to catch the case
+// where HEAD is tagged with a shape the build can't use, so the build resolves
 // to an ancestor tag and every other row agrees on that ancestor's version.
 function getHeadTags() {
   try {
     return execSync("git tag --points-at HEAD", { cwd: root, encoding: "utf-8" })
       .trim()
       .split("\n")
-      .filter(Boolean)
-      .map((t) => t.replace(/^v/, ""));
+      .filter(Boolean);
   } catch {
     return [];
   }
@@ -126,19 +125,24 @@ for (const rel of [
   }
 }
 
-// If HEAD is tagged but the build didn't resolve to that tag, HEAD's tag isn't a
-// version the build can use (e.g. `v1.2` or a prerelease) — `git describe` fell
-// back to an ancestor, so every other row agrees on the wrong version and would
-// otherwise pass. Catch it here so the LOCAL check matches release.yml's gate.
+// Catch a botched release tag so the LOCAL check matches release.yml's gate: if
+// HEAD carries a version-LIKE tag (starts with an optional `v` then a digit)
+// that isn't a plain vX.Y.Z equal to the resolved version, `git describe` fell
+// back to an ancestor and every other row would otherwise agree on it. Unrelated
+// tags (`nightly`, `ios-1.0.7`, …) are not version-like, so they don't trip it.
 const headTags = getHeadTags();
-if (headTags.length > 0) {
-  rows.push(["git tag(s) on HEAD", headTags.map((t) => `v${t}`).join(", ")]);
-  if (!headTags.includes(tag)) {
-    problems.push(
-      `HEAD is tagged ${headTags.map((t) => `v${t}`).join(", ")} but the build resolved to ${tag ?? "no version"} ` +
-        `(an ancestor tag). The tag on HEAD is not a plain vX.Y.Z version — retag before releasing.`,
-    );
-  }
+rows.push(["git tag(s) on HEAD", headTags.length ? headTags.join(", ") : "(none)"]);
+const versionLikeHeadTags = headTags.filter((t) => /^v?\d/.test(t));
+const hasMatchingReleaseTag = versionLikeHeadTags.some((t) => {
+  const v = t.replace(/^v/, "");
+  return isReleaseVersion(v) && v === tag;
+});
+if (versionLikeHeadTags.length > 0 && !hasMatchingReleaseTag) {
+  problems.push(
+    `HEAD carries a version-like tag (${versionLikeHeadTags.join(", ")}) that is not a plain vX.Y.Z ` +
+      `matching the build's resolved version (${tag ?? "none"}). The build fell back to an ancestor tag — ` +
+      `retag with a 3-part vX.Y.Z before releasing.`,
+  );
 }
 
 const width = Math.max(...rows.map((r) => r[0].length));
