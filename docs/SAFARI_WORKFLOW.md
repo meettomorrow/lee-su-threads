@@ -89,7 +89,7 @@ Copy-paste checklist to ship version `X.Y.Z`:
 ```bash
 # 1. Set the Safari app version explicitly (no tag needed yet — this is what
 #    lets the version bump be committed BEFORE the tag exists).
-npm run set:safari-version X.Y.Z   # sets Xcode MARKETING_VERSION (agvtool)
+npm run set:safari-version X.Y.Z   # writes MARKETING_VERSION into project.pbxproj (no Xcode needed)
 
 # 2. Commit the bump so the tag (next step) points at a commit that has it.
 #    project.pbxproj IS tracked in git.
@@ -127,10 +127,18 @@ local tag (`git tag -d vX.Y.Z`) before it's pushed.
 | App `MARKETING_VERSION` | App Store Connect / Apple | `npm run set:safari-version` |
 
 **Re-uploading the same version?** App Store Connect rejects a duplicate build
-number. Bump only the build number (not the version) with:
+number. Bump only the build number (`CURRENT_PROJECT_VERSION`), not the version.
+It lives in `project.pbxproj` alongside `MARKETING_VERSION` — edit it directly.
+(Don't reach for `agvtool next-version`: this project sets no
+`VERSIONING_SYSTEM = APPLE_GENERIC` and the Info.plists carry no `CFBundleVersion`
+key, so agvtool writes nothing and reports success anyway — the same silent no-op
+that once left `MARKETING_VERSION` stale.)
 
 ```bash
-( cd "dist-safari/safari-project/Lee-Su-Sui" && xcrun agvtool next-version -all )
+PBXPROJ="dist-safari/safari-project/Lee-Su-Sui/Lee-Su-Sui.xcodeproj/project.pbxproj"
+BUILD=2   # next integer; they're all in sync (currently 1)
+perl -i -pe "s/CURRENT_PROJECT_VERSION\s*=\s*[^;]*;/CURRENT_PROJECT_VERSION = ${BUILD};/g" "$PBXPROJ"
+grep -Fc "CURRENT_PROJECT_VERSION = ${BUILD};" "$PBXPROJ"   # expect 8 — one per build config
 ```
 
 ## Commands Reference
@@ -178,9 +186,12 @@ npm run open:safari
 # Reconfigure signing for each target
 ```
 > ⚠️ `npm run setup:safari` runs the converter with `--force` and regenerates
-> `project.pbxproj` wholesale, resetting `MARKETING_VERSION` (and signing). After
-> re-running it, re-apply the version with `npm run set:safari-version X.Y.Z`
-> before archiving.
+> `project.pbxproj` wholesale, resetting `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`
+> (the build number, back to `1`), and signing. After re-running it, re-apply the
+> version with `npm run set:safari-version X.Y.Z` before archiving — and if you'd
+> already bumped the build number for a re-upload, re-apply that too (see the
+> `CURRENT_PROJECT_VERSION` snippet above), or App Store Connect will reject the
+> reused build `1`.
 
 **Q: Want to test production build**
 ```bash

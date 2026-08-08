@@ -3,9 +3,17 @@ set -euo pipefail
 
 # Set the Safari/iOS app's Xcode MARKETING_VERSION from the latest git tag.
 #
-# macOS + Xcode only (uses `agvtool`). Run this before archiving the Safari
-# app for App Store submission so the App Store version always matches the
-# git tag — never hand-edit MARKETING_VERSION in project.pbxproj again.
+# Run this before archiving the Safari app for App Store submission so the
+# App Store version always matches the git tag — never hand-edit
+# MARKETING_VERSION in project.pbxproj by hand.
+#
+# The Xcode project uses GENERATE_INFOPLIST_FILE = YES, so the App Store
+# version (CFBundleShortVersionString) is derived from the MARKETING_VERSION
+# build setting in project.pbxproj — the Info.plist files carry no version
+# key of their own. That's why this writes MARKETING_VERSION in the pbxproj
+# directly. (An earlier version used `agvtool new-marketing-version`, which
+# only rewrites CFBundleShortVersionString in Info.plist — a no-op here, since
+# those files have no such key — so it silently failed to change the version.)
 #
 # Because project.pbxproj is tracked in git, the commit that sets the version
 # must exist *before* the tag points at it. The reliable release order is:
@@ -21,16 +29,11 @@ set -euo pipefail
 #   bash scripts/set-safari-version.sh          # re-sync from the latest git tag
 
 PROJECT_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-XCODE_DIR="$PROJECT_ROOT/dist-safari/safari-project/Lee-Su-Sui"
+PBXPROJ="$PROJECT_ROOT/dist-safari/safari-project/Lee-Su-Sui/Lee-Su-Sui.xcodeproj/project.pbxproj"
 
-if ! command -v xcrun >/dev/null 2>&1 || ! xcrun --find agvtool >/dev/null 2>&1; then
-  echo "❌ agvtool not available. This script requires macOS with Xcode installed." >&2
-  exit 1
-fi
-
-if [ ! -d "$XCODE_DIR" ]; then
+if [ ! -f "$PBXPROJ" ]; then
   echo "❌ Xcode project not found at:" >&2
-  echo "   $XCODE_DIR" >&2
+  echo "   $PBXPROJ" >&2
   echo "   Run 'npm run setup:safari' first to generate it." >&2
   exit 1
 fi
@@ -62,7 +65,29 @@ if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+(\.[0-9]+){1,2}$'; then
 fi
 
 echo "🍎 Setting Safari MARKETING_VERSION → $VERSION"
-( cd "$XCODE_DIR" && xcrun agvtool new-marketing-version "$VERSION" >/dev/null )
 
-CURRENT="$( cd "$XCODE_DIR" && xcrun agvtool what-marketing-version -terse1 2>/dev/null | tail -n 1 || true )"
-echo "✅ Done (MARKETING_VERSION is now ${CURRENT:-$VERSION})."
+# Count every MARKETING_VERSION entry, tolerating any spacing around '='.
+BEFORE="$(grep -Ec 'MARKETING_VERSION[[:space:]]*=' "$PBXPROJ" || true)"
+if [ "${BEFORE:-0}" -eq 0 ]; then
+  echo "❌ No MARKETING_VERSION entries found in project.pbxproj — nothing to set." >&2
+  exit 1
+fi
+
+# Rewrite the value of every entry. Tolerates any spacing and an optionally
+# quoted old value (MARKETING_VERSION = "1.0.6";); always writes it bare, since
+# a plain numeric version needs no quoting.
+perl -i -pe "s/MARKETING_VERSION\s*=\s*[^;]*;/MARKETING_VERSION = ${VERSION};/g" "$PBXPROJ"
+
+# Verify by VALUE, not by count: every entry must now read exactly $VERSION.
+# The dots are escaped so it's a literal compare (not a regex wildcard), and
+# spacing/quotes are tolerated — so an oddly-spaced entry the rewrite missed is
+# caught here instead of passing silently (the very failure mode this script
+# exists to prevent).
+ESCAPED_VERSION="${VERSION//./\\.}"
+GOOD="$(grep -Ec "MARKETING_VERSION[[:space:]]*=[[:space:]]*\"?${ESCAPED_VERSION}\"?;" "$PBXPROJ" || true)"
+if [ "${GOOD:-0}" -ne "${BEFORE}" ]; then
+  echo "❌ Expected all ${BEFORE} MARKETING_VERSION entries to read ${VERSION}, but only ${GOOD} do." >&2
+  exit 1
+fi
+
+echo "✅ Done (${GOOD} MARKETING_VERSION entries now = ${VERSION})."
