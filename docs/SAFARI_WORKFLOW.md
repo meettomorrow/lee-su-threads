@@ -136,9 +136,9 @@ that once left `MARKETING_VERSION` stale.)
 
 ```bash
 PBXPROJ="dist-safari/safari-project/Lee-Su-Sui/Lee-Su-Sui.xcodeproj/project.pbxproj"
-# Pick the next integer (they're all in sync — currently 1, so use 2, etc.):
-perl -i -pe 's/CURRENT_PROJECT_VERSION = [^;]*;/CURRENT_PROJECT_VERSION = 2;/g' "$PBXPROJ"
-grep -c 'CURRENT_PROJECT_VERSION = 2;' "$PBXPROJ"   # expect 8 — one per build config
+BUILD=2   # next integer; they're all in sync (currently 1)
+perl -i -pe "s/CURRENT_PROJECT_VERSION\s*=\s*[^;]*;/CURRENT_PROJECT_VERSION = ${BUILD};/g" "$PBXPROJ"
+grep -Fc "CURRENT_PROJECT_VERSION = ${BUILD};" "$PBXPROJ"   # expect 8 — one per build config
 ```
 
 ## Commands Reference
@@ -186,9 +186,12 @@ npm run open:safari
 # Reconfigure signing for each target
 ```
 > ⚠️ `npm run setup:safari` runs the converter with `--force` and regenerates
-> `project.pbxproj` wholesale, resetting `MARKETING_VERSION` (and signing). After
-> re-running it, re-apply the version with `npm run set:safari-version X.Y.Z`
-> before archiving.
+> `project.pbxproj` wholesale, resetting `MARKETING_VERSION`, `CURRENT_PROJECT_VERSION`
+> (the build number, back to `1`), and signing. After re-running it, re-apply the
+> version with `npm run set:safari-version X.Y.Z` before archiving — and if you'd
+> already bumped the build number for a re-upload, re-apply that too (see the
+> `CURRENT_PROJECT_VERSION` snippet above), or App Store Connect will reject the
+> reused build `1`.
 
 **Q: Want to test production build**
 ```bash

@@ -60,7 +60,9 @@ function getMarketingVersions() {
   );
   if (!existsSync(pbxproj)) return null;
   const content = readFileSync(pbxproj, "utf-8");
-  const versions = [...content.matchAll(/MARKETING_VERSION = ([^;]+);/g)].map((m) =>
+  // \s*=\s* tolerates any spacing — a hand-edited MARKETING_VERSION=1.0.6;
+  // (no spaces) must not slip past the release guard.
+  const versions = [...content.matchAll(/MARKETING_VERSION\s*=\s*([^;]+);/g)].map((m) =>
     // pbxproj values may be quoted (MARKETING_VERSION = "1.0.6";) — strip them.
     m[1].trim().replace(/^"|"$/g, ""),
   );
