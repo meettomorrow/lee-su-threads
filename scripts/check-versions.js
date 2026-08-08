@@ -20,30 +20,22 @@
 // Note: this is a release gate. A dev/watch build writes tag+1 into dist, so it
 // will (correctly) report a mismatch — run it against a production build.
 //
-// Note: src/manifest*.json is intentionally NOT checked — its version is a
-// 0.0.0 placeholder that the build overwrites from the git tag.
+// Not checked, by design: src/manifest*.json (a 0.0.0 placeholder the build
+// overwrites from the tag) and package.json's version (npm-local metadata, not
+// read by the build and not shipped in any artifact).
 
-import { execSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
+import { getGitVersion, PLACEHOLDER_VERSION } from "./lib/version.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
 
-// Must match esbuild.config.js — the version the build actually injects.
-const PLACEHOLDER_VERSION = "0.0.0";
-
+// Shared with the build (scripts/lib/version.js): same glob AND the same semver
+// validation, so a tag the build would reject (e.g. a prerelease) can't slip
+// past the guard by comparing an invalid version against itself.
 function getTag() {
-  try {
-    return execSync(
-      "git describe --tags --abbrev=0 --match='v[0-9]*.[0-9]*.[0-9]*'",
-      { cwd: root, encoding: "utf-8" },
-    )
-      .trim()
-      .replace(/^v/, "");
-  } catch {
-    return null;
-  }
+  return getGitVersion({ cwd: root });
 }
 
 function getMarketingVersions() {

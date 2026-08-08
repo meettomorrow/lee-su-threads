@@ -1,6 +1,6 @@
 import * as esbuild from 'esbuild';
 import { copyFile, mkdir, cp, readFile, writeFile } from 'fs/promises';
-import { execSync } from 'child_process';
+import { getGitVersion, incrementVersion, PLACEHOLDER_VERSION } from './scripts/lib/version.js';
 
 const isWatch = process.argv.includes('--watch');
 const isDev = isWatch || process.env.NODE_ENV === 'development';
@@ -8,65 +8,9 @@ const isDev = isWatch || process.env.NODE_ENV === 'development';
 // Build configuration for Firefox variants
 const FIREFOX_BUILD_TYPE = process.env.FIREFOX_BUILD_TYPE; // 'amo' or 'self-hosted'
 
-// Get version from git tags (supports both annotated and lightweight tags)
-// Placeholder written in src/manifest*.json — the real version is injected at
-// build time from the git tag. Must never reach a shipped artifact.
-const PLACEHOLDER_VERSION = '0.0.0';
-
-// A Chrome MV3 version: 1–4 dot-separated integers.
-const SEMVER_RE = /^\d+(\.\d+){1,3}$/;
-
-let cachedGitVersion;
-
-// Latest semver-shaped git tag (e.g. "v1.0.6" -> "1.0.6"), or null when none.
-// Memoized so every manifest in one build agrees and we spawn `git` once.
-function getGitVersion() {
-  if (cachedGitVersion === undefined) cachedGitVersion = computeGitVersion();
-  return cachedGitVersion;
-}
-
-function computeGitVersion() {
-  let tag;
-  try {
-    // --match restricts to version tags, so a stray tag like "ios-1.0.6" or
-    // "nightly" is never picked up as the version.
-    tag = execSync("git describe --tags --abbrev=0 --match='v[0-9]*.[0-9]*.[0-9]*'", {
-      encoding: 'utf-8',
-    }).trim();
-  } catch (error) {
-    const errorMessage = error.message || String(error);
-    if (/No names found|No tags|cannot describe/.test(errorMessage)) {
-      console.warn('⚠️  No matching git version tag found; falling back to manifest version');
-    } else {
-      console.warn('⚠️  Could not get git version:', errorMessage.split('\n')[0]);
-    }
-    return null;
-  }
-  // Remove 'v' prefix if present, then validate — a prerelease tag like
-  // "v1.1.0-beta.1" passes the glob but is not a valid manifest version.
-  const version = tag.startsWith('v') ? tag.slice(1) : tag;
-  if (!SEMVER_RE.test(version)) {
-    console.warn(`⚠️  Ignoring non-semver git tag "${tag}"`);
-    return null;
-  }
-  return version;
-}
-
-// Increment the patch version (e.g., "0.3.7" -> "0.3.8")
-function incrementVersion(version) {
-  const parts = version.split('.');
-  if (parts.length < 3) {
-    throw new Error(`Invalid version format "${version}". Expected semver format (X.Y.Z)`);
-  }
-
-  const patchNum = Number(parts[2]);
-  if (isNaN(patchNum)) {
-    throw new Error(`Invalid patch version "${parts[2]}" in version "${version}". Must be a number`);
-  }
-
-  parts[2] = String(patchNum + 1);
-  return parts.join('.');
-}
+// Version resolution (getGitVersion / incrementVersion / PLACEHOLDER_VERSION)
+// lives in scripts/lib/version.js so the build and the release guard share one
+// set of rules — see the import above.
 
 // Resolve the version to write into a built manifest.
 //

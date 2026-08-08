@@ -50,9 +50,14 @@ if [ -z "$VERSION" ]; then
   exit 1
 fi
 
-# App Store Connect only accepts a numeric dotted version.
+# App Store Connect only accepts a numeric version of at most three parts
+# (X, X.Y, or X.Y.Z). This is DELIBERATELY stricter than the extension's
+# EXTENSION_VERSION_RE in scripts/lib/version.js, which allows a 4th part
+# because Chrome MV3 does. Bash can't import that module, so the rule is
+# duplicated here on purpose — keep the two in sync when either platform's
+# constraints change.
 if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+(\.[0-9]+){1,2}$'; then
-  echo "❌ Invalid version \"$VERSION\". Expected a numeric version like 1.0.6." >&2
+  echo "❌ Invalid version \"$VERSION\". Expected a numeric version like 1.0.6 (max 3 parts for the App Store)." >&2
   exit 1
 fi
 

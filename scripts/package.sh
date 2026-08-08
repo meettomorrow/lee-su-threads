@@ -21,6 +21,13 @@ echo "🔨 Building extension..."
 npm run build
 npm run build:firefox-amo
 
+# Verify the built web artifacts match the git tag BEFORE zipping, so a
+# mismatch aborts (set -e) without leaving a wrongly-named zip in dist-zip/.
+# --web skips MARKETING_VERSION: this script only packages Chrome/Firefox, and
+# the Safari app version legitimately lags on a web-only release.
+echo "🔎 Verifying versions against the git tag..."
+node "$SCRIPT_DIR/check-versions.js" --web
+
 # Get version from manifest.json in dist/chrome/
 VERSION=$(grep '"version"' dist/chrome/manifest.json | sed 's/.*"version": "\(.*\)".*/\1/')
 
@@ -53,19 +60,9 @@ cd "$PROJECT_ROOT"
 echo "✅ Created dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip (AMO unlisted)"
 echo "📊 Size: $(du -h dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip | cut -f1)"
 
-# Verify the packaged web artifacts match the git tag before we call it done.
-# --web skips MARKETING_VERSION: this script only packages Chrome/Firefox, and
-# the Safari app version legitimately lags on a web-only release.
-echo ""
-echo "🔎 Verifying versions against the git tag..."
-node "$SCRIPT_DIR/check-versions.js" --web
-
 echo ""
 echo "🎉 All builds complete!"
 echo ""
 echo "Chrome:  dist-zip/lee-su-threads-chrome-v${VERSION}.zip"
-
 echo "Firefox (AMO): dist-zip/lee-su-threads-firefox-v${VERSION}-amo.zip"
-if [ -d "dist/firefox-direct" ]; then
-  echo "Firefox (Direct Install): Will be signed and created as .xpi in CI"
-fi
+echo "Firefox (Direct Install): built and signed as .xpi separately in CI"

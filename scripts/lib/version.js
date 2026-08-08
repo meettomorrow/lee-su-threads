@@ -1,0 +1,86 @@
+// Single source of truth for how a version is derived and validated.
+//
+// The build (esbuild.config.js) and the release guard (check-versions.js) both
+// import from here so the rules can't drift apart. set-safari-version.sh is
+// bash and can't import this — it keeps its own check, deliberately stricter
+// (App Store marketing versions allow at most 3 parts, Chrome MV3 allows 4);
+// that difference is intentional and noted in the shell script.
+
+import { execSync } from "node:child_process";
+
+// Placeholder written in src/manifest*.json — the real version is injected at
+// build time from the git tag and must never reach a shipped artifact.
+export const PLACEHOLDER_VERSION = "0.0.0";
+
+// git describe glob that pre-filters to version tags. This is a GLOB, not a
+// regex ('*' matches anything, including "-beta.1"), so it only narrows the
+// candidates — every result must still pass EXTENSION_VERSION_RE below.
+export const VERSION_TAG_GLOB = "v[0-9]*.[0-9]*.[0-9]*";
+
+// A valid Chrome MV3 version: 1–4 dot-separated integers. Authoritative for
+// anything written into a web extension manifest. (In practice the git-tag
+// glob only yields 3+ part versions; this stays faithful to the spec anyway.)
+export const EXTENSION_VERSION_RE = /^\d+(\.\d+){0,3}$/;
+
+export function isValidExtensionVersion(version) {
+  return typeof version === "string" && EXTENSION_VERSION_RE.test(version);
+}
+
+// Turn a raw `git describe` tag ("v1.0.6", "1.0.6", "v1.2.3-beta.1", …) into a
+// valid extension version, or null. Pure — the unit tests exercise this so the
+// glob/regex divergence that caused past bugs is caught without touching git.
+export function normalizeTag(tag) {
+  if (!tag) return null;
+  const version = tag.startsWith("v") ? tag.slice(1) : tag;
+  return isValidExtensionVersion(version) ? version : null;
+}
+
+let cachedGitVersion;
+
+// Latest valid version from git tags (e.g. "v1.0.6" -> "1.0.6"), or null when
+// none is reachable or the newest matching tag isn't a valid extension version
+// (e.g. a prerelease tag). Memoized so one process resolves it once.
+export function getGitVersion(options = {}) {
+  if (cachedGitVersion === undefined) cachedGitVersion = computeGitVersion(options.cwd);
+  return cachedGitVersion;
+}
+
+function computeGitVersion(cwd) {
+  let tag;
+  try {
+    tag = execSync(`git describe --tags --abbrev=0 --match='${VERSION_TAG_GLOB}'`, {
+      cwd,
+      encoding: "utf-8",
+    }).trim();
+  } catch (error) {
+    const message = error.message || String(error);
+    if (/No names found|No tags|cannot describe/.test(message)) {
+      console.warn("⚠️  No matching git version tag found; falling back to manifest version");
+    } else {
+      console.warn("⚠️  Could not get git version:", message.split("\n")[0]);
+    }
+    return null;
+  }
+  const version = normalizeTag(tag);
+  if (version === null) console.warn(`⚠️  Ignoring non-semver git tag "${tag}"`);
+  return version;
+}
+
+// Reset the memoized value (unit tests only).
+export function _resetGitVersionCache() {
+  cachedGitVersion = undefined;
+}
+
+// Increment the patch version (e.g., "0.3.7" -> "0.3.8").
+export function incrementVersion(version) {
+  const parts = version.split(".");
+  if (parts.length < 3) {
+    throw new Error(`Invalid version format "${version}". Expected semver format (X.Y.Z)`);
+  }
+  const patchNum = Number(parts[2]);
+  if (isNaN(patchNum)) {
+    throw new Error(`Invalid patch version "${parts[2]}" in version "${version}". Must be a number`);
+  }
+  parts[2] = String(patchNum + 1);
+  return parts.join(".");
+}
