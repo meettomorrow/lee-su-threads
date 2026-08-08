@@ -66,22 +66,28 @@ fi
 
 echo "🍎 Setting Safari MARKETING_VERSION → $VERSION"
 
-# Rewrite every build config's MARKETING_VERSION. The value may be bare
-# (MARKETING_VERSION = 1.0.6;) or quoted (MARKETING_VERSION = "1.0.6";);
-# [^;]* covers both, and we always write it bare (a plain numeric version
-# needs no quoting).
-BEFORE="$(grep -c 'MARKETING_VERSION = ' "$PBXPROJ" || true)"
+# Count every MARKETING_VERSION entry, tolerating any spacing around '='.
+BEFORE="$(grep -Ec 'MARKETING_VERSION[[:space:]]*=' "$PBXPROJ" || true)"
 if [ "${BEFORE:-0}" -eq 0 ]; then
   echo "❌ No MARKETING_VERSION entries found in project.pbxproj — nothing to set." >&2
   exit 1
 fi
 
-perl -i -pe "s/MARKETING_VERSION = [^;]*;/MARKETING_VERSION = ${VERSION};/g" "$PBXPROJ"
+# Rewrite the value of every entry. Tolerates any spacing and an optionally
+# quoted old value (MARKETING_VERSION = "1.0.6";); always writes it bare, since
+# a plain numeric version needs no quoting.
+perl -i -pe "s/MARKETING_VERSION\s*=\s*[^;]*;/MARKETING_VERSION = ${VERSION};/g" "$PBXPROJ"
 
-UPDATED="$(grep -c "MARKETING_VERSION = ${VERSION};" "$PBXPROJ" || true)"
-if [ "${UPDATED:-0}" -ne "${BEFORE}" ]; then
-  echo "❌ Expected to set ${BEFORE} MARKETING_VERSION entries but only ${UPDATED} now read ${VERSION}." >&2
+# Verify by VALUE, not by count: every entry must now read exactly $VERSION.
+# The dots are escaped so it's a literal compare (not a regex wildcard), and
+# spacing/quotes are tolerated — so an oddly-spaced entry the rewrite missed is
+# caught here instead of passing silently (the very failure mode this script
+# exists to prevent).
+ESCAPED_VERSION="${VERSION//./\\.}"
+GOOD="$(grep -Ec "MARKETING_VERSION[[:space:]]*=[[:space:]]*\"?${ESCAPED_VERSION}\"?;" "$PBXPROJ" || true)"
+if [ "${GOOD:-0}" -ne "${BEFORE}" ]; then
+  echo "❌ Expected all ${BEFORE} MARKETING_VERSION entries to read ${VERSION}, but only ${GOOD} do." >&2
   exit 1
 fi
 
-echo "✅ Done (${UPDATED} MARKETING_VERSION ent(ies) now = ${VERSION})."
+echo "✅ Done (${GOOD} MARKETING_VERSION entries now = ${VERSION})."

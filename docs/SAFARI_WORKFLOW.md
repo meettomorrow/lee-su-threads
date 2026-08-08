@@ -89,7 +89,7 @@ Copy-paste checklist to ship version `X.Y.Z`:
 ```bash
 # 1. Set the Safari app version explicitly (no tag needed yet — this is what
 #    lets the version bump be committed BEFORE the tag exists).
-npm run set:safari-version X.Y.Z   # sets Xcode MARKETING_VERSION (agvtool)
+npm run set:safari-version X.Y.Z   # writes MARKETING_VERSION into project.pbxproj (no Xcode needed)
 
 # 2. Commit the bump so the tag (next step) points at a commit that has it.
 #    project.pbxproj IS tracked in git.
@@ -127,10 +127,18 @@ local tag (`git tag -d vX.Y.Z`) before it's pushed.
 | App `MARKETING_VERSION` | App Store Connect / Apple | `npm run set:safari-version` |
 
 **Re-uploading the same version?** App Store Connect rejects a duplicate build
-number. Bump only the build number (not the version) with:
+number. Bump only the build number (`CURRENT_PROJECT_VERSION`), not the version.
+It lives in `project.pbxproj` alongside `MARKETING_VERSION` — edit it directly.
+(Don't reach for `agvtool next-version`: this project sets no
+`VERSIONING_SYSTEM = APPLE_GENERIC` and the Info.plists carry no `CFBundleVersion`
+key, so agvtool writes nothing and reports success anyway — the same silent no-op
+that once left `MARKETING_VERSION` stale.)
 
 ```bash
-( cd "dist-safari/safari-project/Lee-Su-Sui" && xcrun agvtool next-version -all )
+PBXPROJ="dist-safari/safari-project/Lee-Su-Sui/Lee-Su-Sui.xcodeproj/project.pbxproj"
+# Pick the next integer (they're all in sync — currently 1, so use 2, etc.):
+perl -i -pe 's/CURRENT_PROJECT_VERSION = [^;]*;/CURRENT_PROJECT_VERSION = 2;/g' "$PBXPROJ"
+grep -c 'CURRENT_PROJECT_VERSION = 2;' "$PBXPROJ"   # expect 8 — one per build config
 ```
 
 ## Commands Reference
