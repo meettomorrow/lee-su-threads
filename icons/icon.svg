@@ -1,4 +1,7 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="4 4 120 120">
+  <!-- viewBox is cropped to the disc's bounding box (r=60 at 64,64 spans 4..124)
+       so the disc renders full-bleed without a scaling wrapper. -->
+
   <!-- Background circle -->
   <circle cx="64" cy="64" r="60" fill="#4A57FF"/>
 
