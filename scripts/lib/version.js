@@ -1,10 +1,11 @@
 // Single source of truth for how a version is derived and validated.
 //
 // The build (esbuild.config.js) and the release guard (check-versions.js) both
-// import from here so the rules can't drift apart. set-safari-version.sh is
-// bash and can't import this — it keeps its own check, deliberately stricter
-// (App Store marketing versions allow at most 3 parts, Chrome MV3 allows 4);
-// that difference is intentional and noted in the shell script.
+// import from here so the rules can't drift apart. Two callers can't import it
+// and keep their own copy on purpose: set-safari-version.sh (bash) and
+// .github/workflows/release.yml both validate the release tag as exactly 3
+// parts — deliberately stricter than EXTENSION_VERSION_RE (Chrome MV3 allows 4,
+// the App Store allows 3). Keep those in sync with RELEASE_VERSION_RE below.
 
 import { execSync } from "node:child_process";
 

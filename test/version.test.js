@@ -7,6 +7,7 @@ import {
   EXTENSION_VERSION_RE,
   PLACEHOLDER_VERSION,
   isValidExtensionVersion,
+  isReleaseVersion,
   normalizeTag,
   incrementVersion,
   getGitVersion,
@@ -36,6 +37,25 @@ describe("isValidExtensionVersion", () => {
     // 0.0.0 is a shape-valid version; the build/guard reject it by identity,
     // not by shape. This documents that distinction.
     expect(EXTENSION_VERSION_RE.test(PLACEHOLDER_VERSION)).toBe(true);
+  });
+});
+
+describe("isReleaseVersion", () => {
+  it("accepts exactly three numeric parts", () => {
+    for (const v of ["1.0.6", "0.0.0", "10.20.30"]) expect(isReleaseVersion(v)).toBe(true);
+  });
+
+  it("rejects fewer or more than three parts, and prereleases", () => {
+    // The deliberate divergence: 1.2.3.4 is a valid manifest version but NOT a
+    // valid release tag. Pinning it so a later regex "harmonisation" can't undo it.
+    for (const v of ["1.2", "1", "1.2.3.4", "1.2.3-beta.1", "v1.0.6"]) {
+      expect(isReleaseVersion(v)).toBe(false);
+    }
+  });
+
+  it("is stricter than isValidExtensionVersion for a 4-part version", () => {
+    expect(isValidExtensionVersion("1.2.3.4")).toBe(true);
+    expect(isReleaseVersion("1.2.3.4")).toBe(false);
   });
 });
 

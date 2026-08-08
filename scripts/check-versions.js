@@ -132,15 +132,22 @@ for (const rel of [
 // tags (`nightly`, `ios-1.0.7`, …) are not version-like, so they don't trip it.
 const headTags = getHeadTags();
 rows.push(["git tag(s) on HEAD", headTags.length ? headTags.join(", ") : "(none)"]);
-const versionLikeHeadTags = headTags.filter((t) => /^v?\d/.test(t));
-const hasMatchingReleaseTag = versionLikeHeadTags.some((t) => {
-  const v = t.replace(/^v/, "");
-  return isReleaseVersion(v) && v === tag;
-});
-if (versionLikeHeadTags.length > 0 && !hasMatchingReleaseTag) {
+// A version-like HEAD tag is optional-`v` then `digits.digit` — enough to catch
+// `v1.2` / `v1.2.3.4` while ignoring dates (`2026-08-08`) and unrelated tags
+// (`nightly`, `ios-1.0.7`). EVERY such tag must be a plain vX.Y.Z equal to the
+// resolved version: a per-tag check (not `.some`), so a good tag can't excuse a
+// bad sibling — e.g. `v1.2` + `v1.0.7` on one commit, where pushing `v1.2` is
+// what triggers release.yml.
+const badHeadTag = headTags
+  .filter((t) => /^v?\d+\.\d/.test(t))
+  .find((t) => {
+    const v = t.replace(/^v/, "");
+    return !(isReleaseVersion(v) && v === tag);
+  });
+if (badHeadTag) {
   problems.push(
-    `HEAD carries a version-like tag (${versionLikeHeadTags.join(", ")}) that is not a plain vX.Y.Z ` +
-      `matching the build's resolved version (${tag ?? "none"}). The build fell back to an ancestor tag — ` +
+    `HEAD carries a version-like tag "${badHeadTag}" that is not a plain vX.Y.Z matching the build's ` +
+      `resolved version (${tag ?? "none"}). The build would fall back to an ancestor tag — ` +
       `retag with a 3-part vX.Y.Z before releasing.`,
   );
 }
