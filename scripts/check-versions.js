@@ -24,12 +24,28 @@
 // overwrites from the tag) and package.json's version (npm-local metadata, not
 // read by the build and not shipped in any artifact).
 
+import { execSync } from "node:child_process";
 import { readFileSync, existsSync } from "node:fs";
 import { fileURLToPath } from "node:url";
 import { dirname, join } from "node:path";
 import { getGitVersion, isValidExtensionVersion, PLACEHOLDER_VERSION } from "./lib/version.js";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
+
+// Tags pointing at HEAD, 'v' stripped. Used to catch the case where HEAD is
+// tagged with a shape the build can't use (e.g. `v1.2`), so the build resolves
+// to an ancestor tag and every other row agrees on that ancestor's version.
+function getHeadTags() {
+  try {
+    return execSync("git tag --points-at HEAD", { cwd: root, encoding: "utf-8" })
+      .trim()
+      .split("\n")
+      .filter(Boolean)
+      .map((t) => t.replace(/^v/, ""));
+  } catch {
+    return [];
+  }
+}
 
 // Shared with the build (scripts/lib/version.js): same glob AND the same semver
 // validation, so a tag the build would reject (e.g. a prerelease) can't slip
@@ -106,6 +122,21 @@ for (const rel of [
   } else if (tag && v !== tag) {
     problems.push(
       `${rel} (${v}) != git tag (${tag}). Rebuild with the tag checked out, or run "npm run clean" to clear a stale build.`,
+    );
+  }
+}
+
+// If HEAD is tagged but the build didn't resolve to that tag, HEAD's tag isn't a
+// version the build can use (e.g. `v1.2` or a prerelease) — `git describe` fell
+// back to an ancestor, so every other row agrees on the wrong version and would
+// otherwise pass. Catch it here so the LOCAL check matches release.yml's gate.
+const headTags = getHeadTags();
+if (headTags.length > 0) {
+  rows.push(["git tag(s) on HEAD", headTags.map((t) => `v${t}`).join(", ")]);
+  if (!headTags.includes(tag)) {
+    problems.push(
+      `HEAD is tagged ${headTags.map((t) => `v${t}`).join(", ")} but the build resolved to ${tag ?? "no version"} ` +
+        `(an ancestor tag). The tag on HEAD is not a plain vX.Y.Z version — retag before releasing.`,
     );
   }
 }

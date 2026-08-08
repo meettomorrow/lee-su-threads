@@ -41,11 +41,14 @@ jobs:
       # triggers on any `v*`, but the build resolves the version via a 3-part
       # `git describe --match` glob — so a short tag like `v1.2` or a prerelease
       # like `v1.2.3-beta.1` would silently resolve to the PREVIOUS release's
-      # version. Require a plain X.Y.Z (optional 4th part for Chrome) here.
+      # version. Require exactly X.Y.Z: it's the only shape that resolves end to
+      # end (App Store MARKETING_VERSION allows at most 3 parts) and what every
+      # doc example uses. (EXTENSION_VERSION_RE stays looser — a manifest can
+      # hold a 4th part — but a release *tag* must be 3 parts.)
       - name: Validate release tag is a plain version
         run: |
-          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+(\.[0-9]+)?$'; then
-            echo "::error::Release tag 'v$VERSION' is not a plain version. Use vX.Y.Z (no prerelease suffix, at least 3 parts)."
+          if ! printf '%s' "$VERSION" | grep -Eq '^[0-9]+\.[0-9]+\.[0-9]+$'; then
+            echo "::error::Release tag 'v$VERSION' is not a plain version. Use vX.Y.Z (exactly three numeric parts, no prerelease suffix)."
             exit 1
           fi
           echo "✅ Release version: $VERSION"

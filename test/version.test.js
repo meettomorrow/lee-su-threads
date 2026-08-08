@@ -81,11 +81,18 @@ describe("incrementVersion", () => {
 describe("getGitVersion", () => {
   const repos = [];
 
+  // Git env scrubbed so the fixture is hermetic: GIT_DIR/GIT_WORK_TREE (set when
+  // git runs us from a hook) would otherwise redirect these commands at the real
+  // repo, and a global commit.gpgsign would make --allow-empty fail.
+  const cleanEnv = { ...process.env, GIT_CONFIG_GLOBAL: "/dev/null", GIT_CONFIG_SYSTEM: "/dev/null" };
+  delete cleanEnv.GIT_DIR;
+  delete cleanEnv.GIT_WORK_TREE;
+
   // A throwaway git repo whose newest matching tag is `tag` (or none).
   function repoWithTag(tag) {
     const dir = mkdtempSync(join(tmpdir(), "lst-ver-"));
     repos.push(dir);
-    const run = (cmd) => execSync(cmd, { cwd: dir, stdio: "pipe" });
+    const run = (cmd) => execSync(cmd, { cwd: dir, stdio: "pipe", env: cleanEnv });
     run("git init -q");
     run('git config user.email "t@example.com"');
     run('git config user.name "t"');
@@ -119,7 +126,7 @@ describe("getGitVersion", () => {
     const dir = repoWithTag("v1.0.0");
     expect(getGitVersion({ cwd: dir })).toBe("1.0.0");
     // Newer tag on a NEW commit so `git describe` deterministically prefers it.
-    execSync('git commit -q --allow-empty -m next && git tag v1.0.1', { cwd: dir, stdio: "pipe" });
+    execSync('git commit -q --allow-empty -m next && git tag v1.0.1', { cwd: dir, stdio: "pipe", env: cleanEnv });
     expect(getGitVersion({ cwd: dir })).toBe("1.0.0"); // cached — new tag not seen
     _resetGitVersionCache();
     expect(getGitVersion({ cwd: dir })).toBe("1.0.1"); // re-read after reset
