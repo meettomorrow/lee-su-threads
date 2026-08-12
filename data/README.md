@@ -147,7 +147,7 @@ Threads/Meta 在使用者註冊時「未自行填寫 username」的情況下，�
 ```
 
 清單以字母排序、全部小寫、單字、不含標點，方便 diff 與去重（`test/disposableHandle.test.js`
-會驗證這三項）。
+會驗證這些項目）。
 
 #### 名單來源
 
