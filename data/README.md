@@ -151,7 +151,7 @@ Threads/Meta 在使用者註冊時「未自行填寫 username」的情況下，�
 
 #### 名單來源
 
-目前的 63 個動物詞是拿 Threads API 回傳的真實 profile 資料逐一比對出來的：
+清單中的動物詞是拿 Threads API 回傳的真實 profile 資料逐一比對出來的：
 把 `<動物詞>.<6～8 位數字>` 形式的 handle 撈出來，查回該帳號確實存在、且
 username 仍是系統預設值，才收進清單。先前手寫歸納的版本會漏掉 `bear`、
 `elephant` 這類常見詞（review 中回報的真實案例），因此整份重編。
