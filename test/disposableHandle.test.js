@@ -120,5 +120,9 @@ describe('isDisposableHandle', () => {
     it('has no duplicates', () => {
       expect(new Set(handleWords.animals).size).toBe(handleWords.animals.length);
     });
+
+    it('is alphabetically sorted', () => {
+      expect(handleWords.animals).toEqual([...handleWords.animals].sort());
+    });
   });
 });
