@@ -172,6 +172,41 @@ describe('createProfileRefresh', () => {
     expect(fetchProfileByUserId).not.toHaveBeenCalled();
   });
 
+  it('resumes on its own when a rate-limit cooldown ends', async () => {
+    const refresh = setup();
+    state.rateLimitedUntil = Date.now() + 5_000;
+    const cached = { username: 'a' };
+    profileCache.set('a', cached);
+    fetchProfileByUserId.mockResolvedValue({ username: 'a', schemaVersion: CURRENT });
+
+    const badge = makeBadge();
+    refresh.observe(badge, cached);
+    await show(badge);
+    expect(fetchProfileByUserId).not.toHaveBeenCalled();
+
+    await vi.advanceTimersByTimeAsync(4_500); // cooldown ends
+    expect(fetchProfileByUserId).toHaveBeenCalledTimes(1);
+  });
+
+  it('resumes when asked, e.g. after auto-query is switched back on', async () => {
+    const refresh = setup();
+    state.autoQueryEnabled = false;
+    const cached = { username: 'a' };
+    profileCache.set('a', cached);
+    fetchProfileByUserId.mockResolvedValue({ username: 'a', schemaVersion: CURRENT });
+
+    const badge = makeBadge();
+    refresh.observe(badge, cached);
+    await show(badge);
+    await vi.advanceTimersByTimeAsync(60_000);
+    expect(fetchProfileByUserId).not.toHaveBeenCalled();
+
+    state.autoQueryEnabled = true;
+    refresh.resume();
+    await vi.advanceTimersByTimeAsync(0);
+    expect(fetchProfileByUserId).toHaveBeenCalledTimes(1);
+  });
+
   it('handles each user at most once per page', async () => {
     const refresh = setup();
     const cached = { username: 'a' };

@@ -576,7 +576,9 @@ const THREADS_IG_APP_ID = '238260118697367';
 let repliesTabDocId = '29534784646118646';
 // Set when the Replies tab query fails (e.g. the doc_id above went stale), so
 // the rest of this page doesn't spend 2 requests per user on a check that
-// can't finish. Cleared by a fresh doc_id.
+// can't finish. Cleared by a fresh doc_id. A 429 or a network error also sets
+// it, since runThreadsQuery can't tell them apart; that errs toward fewer
+// requests, and the next page load starts fresh.
 let repliesTabQueryFailed = false;
 
 window.addEventListener('message', (event) => {
@@ -688,15 +690,18 @@ async function runThreadsQuery(params, variables) {
 /**
  * Gather the 低粉高留言 signals for a user, cheapest gate first, stopping as
  * soon as one rules the user out. See lib/replyOnly.js.
- * @returns {Promise<Object>} whichever of threadCount / followerCount /
- *   blocking / hasManyReplies could be determined
+ * @returns {Promise<Object|null>} whichever of threadCount / followerCount /
+ *   blocking / hasManyReplies could be determined, or null when no request
+ *   was sent at all (so callers don't pace for it)
  */
 async function fetchReplierSignals(targetUserId) {
   const userId = String(targetUserId);
   const signals = {};
-  if (repliesTabQueryFailed) return signals;
+  if (repliesTabQueryFailed) return null;
+  const threadsTabParams = getQueryParams(THREADS_TAB_QUERY);
+  if (!threadsTabParams) return null;
 
-  const threadCount = parseThreadCount(await runThreadsQuery(getQueryParams(THREADS_TAB_QUERY), {
+  const threadCount = parseThreadCount(await runThreadsQuery(threadsTabParams, {
     allow_page_info_for_lox_user: false,
     first: MAX_THREADS + 1,
     userID: userId

@@ -769,6 +769,7 @@ browserAPI.runtime.onMessage.addListener((message) => {
     console.log('[Threads Extractor] Auto-query', state.autoQueryEnabled ? 'enabled' : 'disabled');
     if (state.autoQueryEnabled) {
       processFetchQueue(fetchQueue, state, profileCache, FETCH_DELAY_MS);
+      profileRefresh.resume();
     }
   } else if (message.type === 'AUTO_QUERY_FOLLOWERS_CHANGED') {
     state.autoQueryFollowersEnabled = message.enabled;

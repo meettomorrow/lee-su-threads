@@ -60,7 +60,7 @@ export function planProfileUpdate(profileInfo, { refresh, replier }) {
  *   Which kinds of update are switched on, checked before each user
  * @param {(profileInfo: Object, badge: HTMLElement) => void} [options.onUpdated] -
  *   Update an on-screen badge with the filled-in profile
- * @returns {{ observe: (badge: HTMLElement, profileInfo: Object) => void }}
+ * @returns {{ observe: (badge: HTMLElement, profileInfo: Object) => void, resume: () => void }}
  */
 export function createProfileRefresh({ state, profileCache, delayMs, getEnabled, onUpdated = () => {} }) {
   const queue = []; // [{ username, badge }], most recently visible first
@@ -68,6 +68,7 @@ export function createProfileRefresh({ state, profileCache, delayMs, getEnabled,
   const visibilityTimers = new Map(); // badge -> timeout id
   let lastRequestAt = 0; // when the last user that cost requests finished
   let running = false;
+  let resumeTimer = null; // scheduled run() for when a rate-limit cooldown ends
 
   const observer = new IntersectionObserver((entries) => {
     for (const entry of entries) {
@@ -142,6 +143,20 @@ export function createProfileRefresh({ state, profileCache, delayMs, getEnabled,
     } finally {
       running = false;
     }
+    scheduleResume();
+  }
+
+  // Queued badges are no longer observed, so nothing would restart the queue
+  // after a cooldown. Re-observing them would just loop (a visible badge fires
+  // at once and hits the gate again), so wake up once when the cooldown ends.
+  // Auto-query being switched back on is handled by resume().
+  function scheduleResume() {
+    const waitMs = state.rateLimitedUntil - Date.now();
+    if (queue.length === 0 || waitMs <= 0 || resumeTimer) return;
+    resumeTimer = setTimeout(() => {
+      resumeTimer = null;
+      run();
+    }, waitMs);
   }
 
   /**
@@ -177,6 +192,14 @@ export function createProfileRefresh({ state, profileCache, delayMs, getEnabled,
   }
 
   return {
+    /**
+     * Restart a queue stopped by the gates, e.g. when auto-query is switched
+     * back on. A no-op while still gated or already running.
+     */
+    resume() {
+      run();
+    },
+
     /**
      * Watch a post badge built from cache; fill in its profile once visible.
      * Cheap check only; the toggles are read when the user's turn comes.
