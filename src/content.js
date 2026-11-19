@@ -142,6 +142,11 @@ window.addEventListener('message', (event) => {
       fetchQueue.length = 0;
       state.isFetching = false;
     }
+
+    // Logged back in: restart the cached-profile queue the login gate stopped
+    if (wasLoggedIn === false && state.isUserLoggedIn === true) {
+      profileRefresh.resume();
+    }
   }
 
   // Persist the Replies tab doc_id so the low-follower replier check works on

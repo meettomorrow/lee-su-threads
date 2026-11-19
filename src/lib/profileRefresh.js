@@ -194,7 +194,8 @@ export function createProfileRefresh({ state, profileCache, delayMs, getEnabled,
   return {
     /**
      * Restart a queue stopped by the gates, e.g. when auto-query is switched
-     * back on. A no-op while still gated or already running.
+     * back on or the user logs back in. Safe to call any time: while still
+     * gated it at most (re)arms the cooldown timer.
      */
     resume() {
       run();
