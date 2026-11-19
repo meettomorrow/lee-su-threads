@@ -60,6 +60,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const autoQueryToggle = document.getElementById('autoQueryToggle');
   const autoQueryFollowersToggle = document.getElementById('autoQueryFollowersToggle');
   const showFlagsToggle = document.getElementById('showFlagsToggle');
+  const usernameChangeToggle = document.getElementById('usernameChangeToggle');
   const disposableToggle = document.getElementById('disposableToggle');
   const replyOnlyToggle = document.getElementById('replyOnlyToggle');
   const locationFilter = document.getElementById('locationFilter');
@@ -281,11 +282,14 @@ document.addEventListener('DOMContentLoaded', () => {
     'showFlags',
     'disposableAccountEnabled',
     'replyOnlyEnabled',
+    'usernameChangeEnabled',
     'rateLimitedUntil'
   ]).then((result) => {
     // disposable-account tag is a purely local display setting, so it stays
     // available even while rate limited (it never hits the network).
     disposableToggle.checked = result.disposableAccountEnabled !== false;
+    // username-change tag only reads data already in the profile response.
+    usernameChangeToggle.checked = result.usernameChangeEnabled !== false;
     // reply-only check piggybacks on profile fetches, which already pause while
     // rate limited, so its toggle can stay available too.
     replyOnlyToggle.checked = result.replyOnlyEnabled !== false;
@@ -323,6 +327,18 @@ document.addEventListener('DOMContentLoaded', () => {
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
         browserAPI.tabs.sendMessage(tabs[0].id, { type: 'SHOW_FLAGS_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
+      }
+    });
+  });
+
+  usernameChangeToggle.addEventListener('change', () => {
+    const enabled = usernameChangeToggle.checked;
+    browserAPI.storage.local.set({ usernameChangeEnabled: enabled });
+    browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0]?.id) {
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'USERNAME_CHANGE_CHANGED', enabled }).catch(() => {
           // Content script not loaded yet - that's ok
         });
       }

@@ -233,6 +233,25 @@
   "disposableToggle": {
     "message": "随机账号"
   },
+  "usernameChangeAccount": {
+    "message": "改名×$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeTooltip": {
+    "message": "$RAW$。只能看到改名次数，看不到之前的用户名。",
+    "placeholders": {
+      "raw": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeToggle": {
+    "message": "改名"
+  },
   "replyOnlyAccount": {
     "message": "低粉只回复"
   },

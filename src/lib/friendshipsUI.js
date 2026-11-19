@@ -9,6 +9,8 @@ import { formatLocation } from './locationMapper.js';
 import { fetchProfileByUserId, updateButtonWithFetchResult } from './profileFetcher.js';
 import { isDisposableHandle } from './disposableHandle.js';
 import { createDisposableTag } from './disposableTag.js';
+import { hasUsernameChange } from './usernameChange.js';
+import { createUsernameChangeTag } from './usernameChangeTag.js';
 import { createReplyOnlyTag } from './replyOnlyTag.js';
 import { isLowFollowerReplier } from './replyOnly.js';
 
@@ -231,7 +233,7 @@ export async function createLocationBadge(profileInfo) {
   badge.className = 'threads-friendships-location-badge';
 
   // Get showFlags setting, custom emojis, and disposable-account setting
-  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true, replyOnlyEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled', 'replyOnlyEnabled']);
+  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true, replyOnlyEnabled = true, usernameChangeEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled', 'replyOnlyEnabled', 'usernameChangeEnabled']);
   const joinedLabel = browserAPI.i18n.getMessage('joined') || 'Joined';
 
   const locationText = document.createElement('span');
@@ -280,6 +282,14 @@ export async function createLocationBadge(profileInfo) {
     newTag.textContent = `[${newLabel}]`;
     newTag.style.marginLeft = '4px';
     badge.appendChild(newTag);
+  }
+
+  // Add username-change (改名) tag right after [新帳號] if enabled and the
+  // profile sheet listed former usernames (see lib/usernameChange.js)
+  if (usernameChangeEnabled && hasUsernameChange(profileInfo)) {
+    const usernameChangeTag = createUsernameChangeTag(profileInfo);
+    usernameChangeTag.style.marginLeft = '4px';
+    badge.appendChild(usernameChangeTag);
   }
 
   // Add disposable-handle (隨機帳號) tag if enabled and the username matches the

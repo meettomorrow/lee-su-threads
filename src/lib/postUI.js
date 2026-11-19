@@ -3,6 +3,8 @@ import { isNewUser } from './dateParser.js';
 import { formatLocation } from './locationMapper.js';
 import { isDisposableHandle } from './disposableHandle.js';
 import { createDisposableTag } from './disposableTag.js';
+import { hasUsernameChange } from './usernameChange.js';
+import { createUsernameChangeTag } from './usernameChangeTag.js';
 import { createReplyOnlyTag, isReplyOnlyEnabled } from './replyOnlyTag.js';
 import { isLowFollowerReplier, isReplierCheckSettled } from './replyOnly.js';
 import { checkCachedReplier } from './profileFetcher.js';
@@ -54,7 +56,7 @@ export async function createProfileBadge(profileInfo) {
   const newLabel = browserAPI.i18n.getMessage('newUser') || 'NEW';
 
   // Get showFlags setting, custom emojis, and disposable-account setting
-  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true, replyOnlyEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled', 'replyOnlyEnabled']);
+  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true, replyOnlyEnabled = true, usernameChangeEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled', 'replyOnlyEnabled', 'usernameChangeEnabled']);
 
   if (profileInfo.location) {
     // Get custom emoji for this location (if set)
@@ -90,6 +92,12 @@ export async function createProfileBadge(profileInfo) {
     newTag.className = 'threads-new-user-tag';
     newTag.textContent = `[${newLabel}]`;
     badge.appendChild(newTag);
+  }
+
+  // Add username-change (改名) tag right after [新帳號] if enabled and the
+  // profile sheet listed former usernames (see lib/usernameChange.js)
+  if (usernameChangeEnabled && hasUsernameChange(profileInfo)) {
+    badge.appendChild(createUsernameChangeTag(profileInfo));
   }
 
   // Add disposable-handle (隨機帳號) tag if enabled and the username matches the

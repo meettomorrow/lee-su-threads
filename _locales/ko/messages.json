@@ -233,6 +233,25 @@
   "disposableToggle": {
     "message": "랜덤 아이디"
   },
+  "usernameChangeAccount": {
+    "message": "이름 변경×$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeTooltip": {
+    "message": "$RAW$. 변경 횟수만 표시되며 이전 사용자 이름은 알 수 없습니다.",
+    "placeholders": {
+      "raw": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeToggle": {
+    "message": "이름 변경"
+  },
   "replyOnlyAccount": {
     "message": "저팔로워 댓글 전용"
   },

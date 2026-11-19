@@ -752,6 +752,10 @@ browserAPI.runtime.onMessage.addListener((message) => {
     console.log('[Threads Extractor] Disposable-account tag', message.enabled ? 'enabled' : 'disabled');
     // Rebuild badges so the disposable-account tag appears/disappears
     updateBadgesForFlagsChange();
+  } else if (message.type === 'USERNAME_CHANGE_CHANGED') {
+    console.log('[Threads Extractor] Username-change tag', message.enabled ? 'enabled' : 'disabled');
+    // Rebuild badges so the username-change tag appears/disappears
+    updateBadgesForFlagsChange();
   } else if (message.type === 'REPLY_ONLY_CHANGED') {
     console.log('[Threads Extractor] Low-follower replier tag', message.enabled ? 'enabled' : 'disabled');
     // Rebuild badges so the low-follower replier tag appears/disappears

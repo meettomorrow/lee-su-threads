@@ -233,6 +233,25 @@
   "disposableToggle": {
     "message": "ランダムID"
   },
+  "usernameChangeAccount": {
+    "message": "改名×$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeTooltip": {
+    "message": "$RAW$。変更回数のみで、以前のユーザーネームはわかりません。",
+    "placeholders": {
+      "raw": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeToggle": {
+    "message": "改名"
+  },
   "replyOnlyAccount": {
     "message": "低フォロワーのリプ専"
   },
