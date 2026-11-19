@@ -33,3 +33,24 @@ export function createUsernameChangeTag(profileInfo) {
   tag.title = tooltip;
   return tag;
 }
+
+/**
+ * Add the username-change tag to an already-rendered badge, right after
+ * [新帳號] (or first among the tags when there is no new-user tag).
+ *
+ * @param {HTMLElement} badge
+ * @param {HTMLSpanElement} tag
+ */
+export function insertUsernameChangeTag(badge, tag) {
+  const newUserTag = badge.querySelector('.threads-new-user-tag');
+  if (newUserTag) {
+    newUserTag.after(tag);
+    return;
+  }
+  const firstOtherTag = badge.querySelector('.threads-disposable-tag, .threads-reply-only-tag');
+  if (firstOtherTag) {
+    firstOtherTag.before(tag);
+  } else {
+    badge.appendChild(tag);
+  }
+}

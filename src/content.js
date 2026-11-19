@@ -8,6 +8,9 @@ import { showRateLimitToast, showLoginRequiredBanner } from './lib/notifications
 import { queueFetch, processFetchQueue, processFollowersFetchQueue } from './lib/queueManager.js';
 import { createFeedVisibilityObserver, createFollowersVisibilityObserver } from './lib/autoFetchObservers.js';
 import { isReplyOnlyEnabled } from './lib/replyOnlyTag.js';
+import { createProfileRefresh } from './lib/profileRefresh.js';
+import { hasUsernameChange } from './lib/usernameChange.js';
+import { createUsernameChangeTag, insertUsernameChangeTag } from './lib/usernameChangeTag.js';
 import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
 
 'use strict';
@@ -47,6 +50,25 @@ const state = {
   rateLimitedUntil: 0, // Timestamp when rate limit cooldown ends
   isUserLoggedIn: null // null = unknown, true = logged in, false = logged out
 }
+
+// Re-fetch cached profiles parsed by an older parser once their post badge is
+// on screen (see lib/profileRefresh.js, lib/profileSchema.js). Twice the
+// normal delay, and it waits for the main auto-fetch queue.
+const profileRefresh = createProfileRefresh({
+  state,
+  profileCache,
+  delayMs: FETCH_DELAY_MS * 2,
+  // Schema v2 only adds former usernames; skip the fetch if that tag is off
+  shouldRefresh: async () => {
+    const { usernameChangeEnabled = true } = await browserAPI.storage.local.get(['usernameChangeEnabled']);
+    return usernameChangeEnabled;
+  },
+  onRefreshed: (profileInfo, badge) => {
+    if (hasUsernameChange(profileInfo) && !badge.querySelector('.threads-username-change-tag')) {
+      insertUsernameChangeTag(badge, createUsernameChangeTag(profileInfo));
+    }
+  }
+});
 
 // Inject the network interceptor script
 function injectScript() {
@@ -350,6 +372,7 @@ function addFetchButtons() {
         }
 
         addReplierTagFromCache(profileInfo, badge, profileCache);
+        profileRefresh.observe(badge, profileInfo);
       }
       return;
     }

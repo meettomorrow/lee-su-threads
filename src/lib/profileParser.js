@@ -4,6 +4,7 @@
  */
 
 import { parseFormerUsernames } from './usernameChange.js';
+import { PROFILE_SCHEMA_VERSION } from './profileSchema.js';
 
 function extractProfileInfo(obj, result = {}) {
   if (!obj || typeof obj !== 'object') return result;
@@ -147,11 +148,13 @@ function parseProfileResponse(responseText) {
 
       // Former usernames: kept out of relevantPairs (so the position-based
       // fallback below is unaffected) but read for the username-change tag
+      // null = checked, never renamed
       const formerPair = pairs.find(p => formerUsernameLabels.includes(p.label));
-      if (formerPair) {
-        const former = parseFormerUsernames(formerPair.value);
-        if (former) profileInfo.formerUsernames = former;
-      }
+      profileInfo.formerUsernames = formerPair ? parseFormerUsernames(formerPair.value) : null;
+
+      // Which parser produced this; outdated cached profiles get re-fetched
+      // (see lib/profileSchema.js)
+      profileInfo.schemaVersion = PROFILE_SCHEMA_VERSION;
 
       const verifiedPair = relevantPairs.find(p => verifiedLabels.includes(p.label));
       if (verifiedPair) {

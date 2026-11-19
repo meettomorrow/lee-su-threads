@@ -80,9 +80,11 @@ Use `browserAPI.storage`, `browserAPI.runtime`, `browserAPI.i18n`, etc.
 
 ### Caching
 
-- Profile data cached in `browserAPI.storage.local`
-- Cache expires after 72 hours
-- User ID → username mapping cached separately (30 days)
+- Profile data cached in `browserAPI.storage.local` (`profileCache`), expiry set in `src/background.js`:
+  - Profiles with a location: 21 days
+  - Profiles without a location: 1 day
+- User ID → username mapping cached separately (60 days)
+- **Schema version:** every profile parsed from "About this profile" carries `schemaVersion` (`src/lib/profileSchema.js`). When the parser starts extracting a new field, bump `PROFILE_SCHEMA_VERSION` and add a line to its history comment. Outdated cached profiles are re-fetched once their post badge is on screen (`src/lib/profileRefresh.js`), so users never need to clear their cache to get new fields. Entries without `schemaVersion` count as version 1.
 
 ## Build & Development
 

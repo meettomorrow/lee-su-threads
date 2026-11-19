@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseProfileResponse } from '../src/lib/profileParser.js';
+import { PROFILE_SCHEMA_VERSION } from '../src/lib/profileSchema.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -152,9 +153,14 @@ describe('parseProfileResponse', () => {
       expect(result.formerUsernames).toEqual({ raw: '在 Threads 變更過 2 次', count: 2, platform: 'threads' });
     });
 
-    it('should leave formerUsernames undefined when the row is absent', () => {
+    it('should set formerUsernames to null when the row is absent', () => {
       const result = parseProfileResponse(loadFixture('profile-basic-zh.txt'));
-      expect(result.formerUsernames).toBeUndefined();
+      expect(result.formerUsernames).toBeNull();
+    });
+
+    it('should stamp the current schema version', () => {
+      const result = parseProfileResponse(loadFixture('profile-basic-zh.txt'));
+      expect(result.schemaVersion).toBe(PROFILE_SCHEMA_VERSION);
     });
   });
 
