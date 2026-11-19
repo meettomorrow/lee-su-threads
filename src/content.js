@@ -1,13 +1,14 @@
 // Content script for Threads Profile Info Extractor
 import { findPostContainer, detectActiveTab, isUserListContext, findFollowButtonContainer, findUsernameFromTimeElement } from './lib/domHelpers.js';
 import { injectLocationUIForUser, createLocationBadge } from './lib/friendshipsUI.js';
-import { displayProfileInfo, autoFetchProfile, createProfileBadge, addReplierTagFromCache } from './lib/postUI.js';
+import { displayProfileInfo, autoFetchProfile, createProfileBadge } from './lib/postUI.js';
 import { isSingleUserNotification, findIconElement, extractIconColor } from './lib/notificationDetector.js';
 import { fetchProfileByUserId, getUserIdByUsername, updateButtonWithFetchResult } from './lib/profileFetcher.js';
 import { showRateLimitToast, showLoginRequiredBanner } from './lib/notifications.js';
 import { queueFetch, processFetchQueue, processFollowersFetchQueue } from './lib/queueManager.js';
 import { createFeedVisibilityObserver, createFollowersVisibilityObserver } from './lib/autoFetchObservers.js';
-import { isReplyOnlyEnabled } from './lib/replyOnlyTag.js';
+import { isReplyOnlyEnabled, createReplyOnlyTag } from './lib/replyOnlyTag.js';
+import { isLowFollowerReplier } from './lib/replyOnly.js';
 import { createProfileRefresh } from './lib/profileRefresh.js';
 import { hasUsernameChange } from './lib/usernameChange.js';
 import { createUsernameChangeTag, insertUsernameChangeTag } from './lib/usernameChangeTag.js';
@@ -51,21 +52,27 @@ const state = {
   isUserLoggedIn: null // null = unknown, true = logged in, false = logged out
 }
 
-// Re-fetch cached profiles parsed by an older parser once their post badge is
-// on screen (see lib/profileRefresh.js, lib/profileSchema.js). Twice the
-// normal delay, and it waits for the main auto-fetch queue.
+// Fill in what cached profiles are missing (outdated schema, unsettled replier
+// check) once their post badge is on screen, under the same rules as the main
+// auto-fetch (see lib/profileRefresh.js). Twice the normal delay, and it waits
+// for the main auto-fetch queue.
 const profileRefresh = createProfileRefresh({
   state,
   profileCache,
   delayMs: FETCH_DELAY_MS * 2,
-  // Schema v2 only adds former usernames; skip the fetch if that tag is off
-  shouldRefresh: async () => {
-    const { usernameChangeEnabled = true } = await browserAPI.storage.local.get(['usernameChangeEnabled']);
-    return usernameChangeEnabled;
+  getEnabled: async () => {
+    const { usernameChangeEnabled = true, replyOnlyEnabled = true } =
+      await browserAPI.storage.local.get(['usernameChangeEnabled', 'replyOnlyEnabled']);
+    // Schema v2 only adds former usernames, so a refresh is only worth it
+    // while that tag is on
+    return { refresh: usernameChangeEnabled, replier: replyOnlyEnabled };
   },
-  onRefreshed: (profileInfo, badge) => {
+  onUpdated: (profileInfo, badge) => {
     if (hasUsernameChange(profileInfo) && !badge.querySelector('.threads-username-change-tag')) {
       insertUsernameChangeTag(badge, createUsernameChangeTag(profileInfo));
+    }
+    if (isLowFollowerReplier(profileInfo) && !badge.querySelector('.threads-reply-only-tag')) {
+      badge.appendChild(createReplyOnlyTag(profileInfo));
     }
   }
 });
@@ -371,7 +378,6 @@ function addFetchButtons() {
           }
         }
 
-        addReplierTagFromCache(profileInfo, badge, profileCache);
         profileRefresh.observe(badge, profileInfo);
       }
       return;

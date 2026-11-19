@@ -23,7 +23,9 @@ function handleAsyncMessage(message, sender, sendResponse) {
         cache[username] = {
           ...message.data,
           // A cached profile updated with replier signals keeps its original
-          // timestamp, so the location still expires on schedule
+          // timestamp, so the location still expires on schedule. Senders of
+          // freshly fetched data must therefore NOT include `timestamp`
+          // (lib/profileRefresh.js deletes it after a refresh).
           timestamp: message.data.timestamp ?? Date.now()
         };
         browserAPI.storage.local.set({ profileCache: cache });

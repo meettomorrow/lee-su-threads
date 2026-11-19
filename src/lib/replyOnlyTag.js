@@ -36,8 +36,8 @@ export function createReplyOnlyTag(profileInfo) {
     browserAPI.i18n.getMessage('replyOnlyAccountTooltip', [threads, followers, replies]) ||
     `This account has only ${threads} thread(s) of its own and ${followers} follower(s), yet has replied more than ${replies} times under other people's threads.`;
 
-  // Same bracketed plain-text family as [新帳號] / [隨機帳號]; amber keeps it
-  // distinct from the red new-user and purple random-handle tags.
+  // Same bracketed plain-text family as [新帳號] / [隨機帳號]; teal marks it
+  // as a behaviour signal (see the color groups in styles.css).
   const tag = document.createElement('span');
   tag.className = 'threads-reply-only-tag';
   tag.textContent = `[${label}]`;

@@ -6,8 +6,7 @@ import { createDisposableTag } from './disposableTag.js';
 import { hasUsernameChange } from './usernameChange.js';
 import { createUsernameChangeTag } from './usernameChangeTag.js';
 import { createReplyOnlyTag, isReplyOnlyEnabled } from './replyOnlyTag.js';
-import { isLowFollowerReplier, isReplierCheckSettled } from './replyOnly.js';
-import { checkCachedReplier } from './profileFetcher.js';
+import { isLowFollowerReplier } from './replyOnly.js';
 
 // Cross-browser compatibility
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -112,29 +111,6 @@ export async function createProfileBadge(profileInfo) {
   }
 
   return badge;
-}
-
-/**
- * A cached profile may predate the low-follower replier check, or have been
- * cached where the user wasn't seen replying. Fill in the missing signals and
- * add the tag to `badge` if they qualify.
- * @param {Object} profileInfo - Cached profile info
- * @param {HTMLElement} badge - The post badge showing this profile
- * @param {Map} profileCache - Profile cache
- */
-export async function addReplierTagFromCache(profileInfo, badge, profileCache) {
-  if (isReplierCheckSettled(profileInfo) || !(await isReplyOnlyEnabled())) return;
-
-  const signals = await checkCachedReplier(profileInfo.username);
-  if (!signals || Object.keys(signals).length === 0) return;
-
-  const updated = { ...(profileCache.get(profileInfo.username) ?? profileInfo), ...signals };
-  profileCache.set(updated.username, updated);
-  browserAPI.runtime.sendMessage({ type: 'PROFILE_INFO_EXTRACTED', data: updated });
-
-  if (isLowFollowerReplier(updated) && badge.isConnected && !badge.querySelector('.threads-reply-only-tag')) {
-    badge.appendChild(createReplyOnlyTag(updated));
-  }
 }
 
 /**

@@ -1,19 +1,31 @@
 /**
- * Refresh cached profiles parsed by an older parser (see lib/profileSchema.js).
+ * Fill in what cached profiles are missing, for post badges on screen.
  *
- * Cached profiles are kept for up to 21 days, so without this, data added in a
- * new version (e.g. the [改名] tag) would stay missing on familiar accounts for
- * weeks. Instead of clearing the cache, a post badge built from an outdated
- * profile is watched, and once it has been on screen for a moment the profile
- * is fetched again — one at a time, behind the main auto-fetch queue, and under
- * the same rules (auto-query on, not rate limited, logged in). Each account is
- * tried at most once per page.
+ * A post badge can be built straight from cache, which costs no requests. Two
+ * kinds of data may still be missing from that cached profile:
+ *
+ *   refresh  - it was parsed by an older parser (see lib/profileSchema.js),
+ *              e.g. before former usernames were read. Cached profiles live up
+ *              to 21 days, so without this, new fields would stay missing on
+ *              familiar accounts for weeks. One profile request (plus the
+ *              replier check when the user was seen replying).
+ *   replier  - the low-follower replier verdict isn't settled yet (see
+ *              lib/replyOnly.js). Up to 3 requests, and only for users seen
+ *              replying; for anyone else the injected script answers at once
+ *              without a request.
+ *
+ * Both go through one queue with the same rules as the main auto-fetch: the
+ * badge must be on screen for a moment, one user at a time, a pause after each
+ * user that cost requests, behind the main auto-fetch queue, and only while
+ * auto-query is on, not rate limited and logged in. Each user is handled at
+ * most once per page.
  *
  * Followers/following lists are left alone: they only fetch on a manual click.
  */
 
 import { isProfileOutdated } from './profileSchema.js';
-import { getUserIdByUsername, fetchProfileByUserId } from './profileFetcher.js';
+import { isReplierCheckSettled } from './replyOnly.js';
+import { getUserIdByUsername, fetchProfileByUserId, checkCachedReplier } from './profileFetcher.js';
 
 // Cross-browser compatibility
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -24,20 +36,37 @@ const VISIBILITY_DELAY_MS = 500; // How long a badge must be visible before queu
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 /**
+ * What, if anything, to fetch for a cached profile. Pure; safe to unit-test.
+ *
+ * @param {Object} profileInfo - Cached profile
+ * @param {Object} enabled
+ * @param {boolean} enabled.refresh - Re-fetch outdated profiles
+ * @param {boolean} enabled.replier - Run the low-follower replier check
+ * @returns {'refresh'|'replier'|null}
+ */
+export function planProfileUpdate(profileInfo, { refresh, replier }) {
+  if (!profileInfo || typeof profileInfo !== 'object' || profileInfo._userIdOnly) return null;
+  if (refresh && isProfileOutdated(profileInfo)) return 'refresh';
+  if (replier && !isReplierCheckSettled(profileInfo)) return 'replier';
+  return null;
+}
+
+/**
  * @param {Object} options
  * @param {Object} options.state - Shared content-script state (autoQueryEnabled, rateLimitedUntil, isUserLoggedIn, isFetching)
  * @param {Map} options.profileCache - In-memory profile cache
- * @param {number} options.delayMs - Pause between refresh fetches
- * @param {() => Promise<boolean>} [options.shouldRefresh] - Checked before each fetch;
- *   false skips it (e.g. when nothing the newer version adds is turned on)
- * @param {(profileInfo: Object, badge: HTMLElement) => void} [options.onRefreshed] -
- *   Update an on-screen badge with the refreshed profile
+ * @param {number} options.delayMs - Pause after each user that cost requests
+ * @param {() => Promise<{refresh: boolean, replier: boolean}>} options.getEnabled -
+ *   Which kinds of update are switched on, checked before each user
+ * @param {(profileInfo: Object, badge: HTMLElement) => void} [options.onUpdated] -
+ *   Update an on-screen badge with the filled-in profile
  * @returns {{ observe: (badge: HTMLElement, profileInfo: Object) => void }}
  */
-export function createProfileRefresh({ state, profileCache, delayMs, shouldRefresh = async () => true, onRefreshed = () => {} }) {
+export function createProfileRefresh({ state, profileCache, delayMs, getEnabled, onUpdated = () => {} }) {
   const queue = []; // [{ username, badge }], most recently visible first
-  const attempted = new Set(); // usernames already refreshed (or tried) on this page
+  const attempted = new Set(); // usernames already handled (or tried) on this page
   const visibilityTimers = new Map(); // badge -> timeout id
+  let lastRequestAt = 0; // when the last user that cost requests finished
   let running = false;
 
   const observer = new IntersectionObserver((entries) => {
@@ -90,48 +119,73 @@ export function createProfileRefresh({ state, profileCache, delayMs, shouldRefre
           continue;
         }
 
+        // Pace by time since the last request, not by queue length, so a user
+        // who scrolls into view right after one finished still waits
+        const wait = lastRequestAt + delayMs - Date.now();
+        if (wait > 0) {
+          await sleep(wait);
+          continue; // re-check the gates after waiting
+        }
+
         const { username, badge } = queue.shift();
+        if (attempted.has(username)) continue;
         const cached = profileCache.get(username);
-        if (attempted.has(username) || !isProfileOutdated(cached)) continue;
+        const enabled = await getEnabled();
+        const plan = planProfileUpdate(cached, enabled);
+        if (!plan) continue;
 
         attempted.add(username);
-        if (!(await shouldRefresh())) continue;
-        await refresh(username, badge, cached);
-
-        if (queue.length > 0) await sleep(delayMs);
+        if (await update(plan, username, badge, cached, enabled)) {
+          lastRequestAt = Date.now();
+        }
       }
     } finally {
       running = false;
     }
   }
 
-  async function refresh(username, badge, cached) {
-    const userId = await getUserIdByUsername(username);
-    if (!userId) return;
+  /**
+   * @returns {Promise<boolean>} whether any request was sent
+   */
+  async function update(plan, username, badge, cached, enabled) {
+    let result;
+    if (plan === 'refresh') {
+      const userId = await getUserIdByUsername(username);
+      if (!userId) return false;
+      result = await fetchProfileByUserId(userId, { checkReplyOnly: enabled.replier });
+      if (!result || result._rateLimited || result._loginRequired) return true;
+    } else {
+      // null: not seen replying, answered without a request
+      const signals = await checkCachedReplier(username);
+      if (signals === null) return false;
+      if (Object.keys(signals).length === 0) return true;
+      result = signals;
+    }
 
-    const result = await fetchProfileByUserId(userId);
-    if (!result || result._rateLimited || result._loginRequired) return;
-
-    // Keep what the old entry had that a plain profile fetch doesn't return
-    // (low-follower replier signals). The fetch refreshed the location too,
-    // so the entry gets a new timestamp.
-    const updated = { ...cached, ...result };
-    delete updated.timestamp;
+    // Merge onto the latest entry, not the one read before the requests
+    const latest = profileCache.get(username) ?? cached;
+    const updated = { ...latest, ...result };
+    // A refresh re-read the location too, so the entry gets a new timestamp;
+    // replier signals alone keep the old one (background.js keeps it if set)
+    if (plan === 'refresh') delete updated.timestamp;
 
     profileCache.set(username, updated);
     browserAPI.runtime.sendMessage({ type: 'PROFILE_INFO_EXTRACTED', data: updated });
 
-    if (badge.isConnected) onRefreshed(updated, badge);
+    if (badge.isConnected) onUpdated(updated, badge);
+    return true;
   }
 
   return {
     /**
-     * Watch a post badge built from cache; refresh once it has been visible.
+     * Watch a post badge built from cache; fill in its profile once visible.
+     * Cheap check only; the toggles are read when the user's turn comes.
      * @param {HTMLElement} badge
      * @param {Object} profileInfo
      */
     observe(badge, profileInfo) {
-      if (!isProfileOutdated(profileInfo) || attempted.has(profileInfo.username)) return;
+      if (attempted.has(profileInfo.username)) return;
+      if (!planProfileUpdate(profileInfo, { refresh: true, replier: true })) return;
       badge.dataset.refreshUsername = profileInfo.username;
       observer.observe(badge);
     },

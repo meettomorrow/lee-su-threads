@@ -193,6 +193,12 @@ function rememberReplyAuthors(data) {
   }
 }
 
+// Walking a whole response is only worth it when it contains a reply at all
+// (see getReplyAuthorId in lib/replyOnly.js)
+function mayContainReplies(text) {
+  return typeof text === 'string' && /"is_reply"\s*:\s*true/.test(text);
+}
+
 function extractUserIds(obj, source = 'unknown') {
   if (!obj || typeof obj !== 'object') return;
 
@@ -362,7 +368,7 @@ window.fetch = async function(...args) {
           }
         }
 
-        rememberReplyAuthors(data);
+        if (mayContainReplies(jsonStr)) rememberReplyAuthors(data);
 
         const beforeCount = userIdMap.size;
         extractUserIds(data, url);
@@ -522,6 +528,7 @@ XMLHttpRequest.prototype.send = function(...args) {
     this.addEventListener('load', function() {
       try {
         let jsonStr = this.responseText;
+        if (!mayContainReplies(jsonStr)) return;
         if (jsonStr.startsWith('for (;;);')) {
           jsonStr = jsonStr.substring(9);
         }
@@ -567,11 +574,16 @@ const THREADS_IG_APP_ID = '238260118697367';
 // so remember its doc_id (persisted by content.js) and fall back to the last
 // one known here. A stale doc_id just fails the query, which means "no tag".
 let repliesTabDocId = '29534784646118646';
+// Set when the Replies tab query fails (e.g. the doc_id above went stale), so
+// the rest of this page doesn't spend 2 requests per user on a check that
+// can't finish. Cleared by a fresh doc_id.
+let repliesTabQueryFailed = false;
 
 window.addEventListener('message', (event) => {
   if (event.source !== window) return;
   if (event.data?.type === 'threads-load-replies-doc-id' && event.data.docId) {
     repliesTabDocId = String(event.data.docId);
+    repliesTabQueryFailed = false;
   }
 });
 
@@ -592,6 +604,7 @@ function getRepliesTabQueryParams() {
   if (params) {
     if (params.id !== repliesTabDocId) {
       repliesTabDocId = params.id;
+      repliesTabQueryFailed = false;
       window.postMessage({ type: 'threads-replies-doc-id', docId: params.id }, '*');
     }
     return params;
@@ -681,6 +694,7 @@ async function runThreadsQuery(params, variables) {
 async function fetchReplierSignals(targetUserId) {
   const userId = String(targetUserId);
   const signals = {};
+  if (repliesTabQueryFailed) return signals;
 
   const threadCount = parseThreadCount(await runThreadsQuery(getQueryParams(THREADS_TAB_QUERY), {
     allow_page_info_for_lox_user: false,
@@ -706,6 +720,9 @@ async function fetchReplierSignals(targetUserId) {
   }));
   if (hasManyReplies !== null) {
     signals.hasManyReplies = hasManyReplies;
+  } else {
+    repliesTabQueryFailed = true;
+    console.warn('[Threads Extractor] Replies tab query failed; skipping replier checks for the rest of this page');
   }
   return signals;
 }
@@ -717,6 +734,7 @@ const cachedReplierChecks = new Map();
 let cachedReplierCheckQueue = Promise.resolve();
 
 async function checkCachedReplier(username) {
+  if (!isLoggedIn()) return null;
   // Server-rendered replies are only known after the initial page scan
   await initialScanDone;
   const userId = userIdMap.get(username);
@@ -937,7 +955,7 @@ function scanPageForUserIds() {
     if (content.includes('"pk"') || content.includes('"username"') || content.includes('"user"')) {
       try {
         const data = JSON.parse(content);
-        rememberReplyAuthors(data);
+        if (mayContainReplies(content)) rememberReplyAuthors(data);
         extractUserIds(data, `json-script#${i}`);
       } catch (e) {
         // Regex fallback - look for pk and username close together
