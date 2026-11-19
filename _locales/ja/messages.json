@@ -107,6 +107,18 @@
   "tabLocations": {
     "message": "地域統計"
   },
+  "tabTags": {
+    "message": "タグ"
+  },
+  "tagsFilterAll": {
+    "message": "すべて"
+  },
+  "tagsEmpty": {
+    "message": "タグ付きのアカウントはまだありません。\nThreads を見ていると自動で増えていきます。"
+  },
+  "tagsNote": {
+    "message": "「すべて」には新規を含みません。改名データは閲覧中に順次補完されます。低フォロワー・高リプは返信を見かけたアカウントのみ判定します。"
+  },
   "noLocationStats": {
     "message": "まだ地域データがありません。\nThreads を閲覧して地域情報を取得してください。"
   },
@@ -232,5 +244,44 @@
   },
   "disposableToggle": {
     "message": "ランダムID"
+  },
+  "usernameChangeAccount": {
+    "message": "改名×$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeTooltip": {
+    "message": "$RAW$。変更回数のみで、以前のユーザーネームはわかりません。",
+    "placeholders": {
+      "raw": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeToggle": {
+    "message": "改名"
+  },
+  "replyOnlyAccount": {
+    "message": "低フォロワー・高リプ"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "このアカウントは自分のスレッドが $THREADS$ 件、フォロワーが $FOLLOWERS$ 人しかいないのに、他の人のスレッドに $REPLIES$ 件以上返信しています。",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "低フォロワー・高リプ"
   }
 }

@@ -9,6 +9,10 @@ import { formatLocation } from './locationMapper.js';
 import { fetchProfileByUserId, updateButtonWithFetchResult } from './profileFetcher.js';
 import { isDisposableHandle } from './disposableHandle.js';
 import { createDisposableTag } from './disposableTag.js';
+import { hasUsernameChange } from './usernameChange.js';
+import { createUsernameChangeTag } from './usernameChangeTag.js';
+import { createReplyOnlyTag } from './replyOnlyTag.js';
+import { isLowFollowerReplier } from './replyOnly.js';
 
 // Cross-browser compatibility
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -229,7 +233,7 @@ export async function createLocationBadge(profileInfo) {
   badge.className = 'threads-friendships-location-badge';
 
   // Get showFlags setting, custom emojis, and disposable-account setting
-  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled']);
+  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true, replyOnlyEnabled = true, usernameChangeEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled', 'replyOnlyEnabled', 'usernameChangeEnabled']);
   const joinedLabel = browserAPI.i18n.getMessage('joined') || 'Joined';
 
   const locationText = document.createElement('span');
@@ -280,12 +284,28 @@ export async function createLocationBadge(profileInfo) {
     badge.appendChild(newTag);
   }
 
+  // Add username-change (改名) tag right after [新帳號] if enabled and the
+  // profile sheet listed former usernames (see lib/usernameChange.js)
+  if (usernameChangeEnabled && hasUsernameChange(profileInfo)) {
+    const usernameChangeTag = createUsernameChangeTag(profileInfo);
+    usernameChangeTag.style.marginLeft = '4px';
+    badge.appendChild(usernameChangeTag);
+  }
+
   // Add disposable-handle (隨機帳號) tag if enabled and the username matches the
   // Threads system-default format. Does not affect location / new-user logic.
   if (disposableAccountEnabled && isDisposableHandle(profileInfo.username).isDisposable) {
     const disposableTag = createDisposableTag();
     disposableTag.style.marginLeft = '4px';
     badge.appendChild(disposableTag);
+  }
+
+  // Add low-follower replier (低粉高留言) tag if a post-context fetch found it.
+  // User lists never run the check themselves; this only reuses cached results.
+  if (replyOnlyEnabled && isLowFollowerReplier(profileInfo)) {
+    const replyOnlyTag = createReplyOnlyTag(profileInfo);
+    replyOnlyTag.style.marginLeft = '4px';
+    badge.appendChild(replyOnlyTag);
   }
 
   return badge;

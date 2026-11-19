@@ -107,6 +107,18 @@
   "tabLocations": {
     "message": "위치 통계"
   },
+  "tabTags": {
+    "message": "태그"
+  },
+  "tagsFilterAll": {
+    "message": "전체"
+  },
+  "tagsEmpty": {
+    "message": "아직 태그된 계정이 없습니다.\nThreads를 둘러보면 자동으로 쌓입니다."
+  },
+  "tagsNote": {
+    "message": "\"전체\"에는 신규가 포함되지 않습니다. 이름 변경 정보는 둘러보는 동안 채워지며, 저팔로워 고댓글은 답글을 단 것이 확인된 계정만 확인합니다."
+  },
   "noLocationStats": {
     "message": "아직 위치 데이터가 없습니다.\nThreads를 탐색하여 위치 정보를 추출하세요."
   },
@@ -232,5 +244,44 @@
   },
   "disposableToggle": {
     "message": "랜덤 아이디"
+  },
+  "usernameChangeAccount": {
+    "message": "이름 변경×$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeTooltip": {
+    "message": "$RAW$. 변경 횟수만 표시되며 이전 사용자 이름은 알 수 없습니다.",
+    "placeholders": {
+      "raw": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeToggle": {
+    "message": "이름 변경"
+  },
+  "replyOnlyAccount": {
+    "message": "저팔로워 고댓글"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "이 계정은 직접 작성한 스레드가 $THREADS$개, 팔로워가 $FOLLOWERS$명뿐이지만 다른 사람의 스레드에 답글을 $REPLIES$개 넘게 남겼습니다.",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "저팔로워 고댓글"
   }
 }

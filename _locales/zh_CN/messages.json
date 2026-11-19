@@ -107,6 +107,18 @@
   "tabLocations": {
     "message": "地点统计"
   },
+  "tabTags": {
+    "message": "标签"
+  },
+  "tagsFilterAll": {
+    "message": "全部"
+  },
+  "tagsEmpty": {
+    "message": "目前没有带标签的账号。\n浏览 Threads 时会自动累积。"
+  },
+  "tagsNote": {
+    "message": "「全部」不含新账号。改名数据会在你浏览时陆续补上；低粉高回复只检查看到在回复的账号。"
+  },
   "noLocationStats": {
     "message": "尚无地点数据。\n浏览 Threads 以提取地点信息。"
   },
@@ -232,5 +244,44 @@
   },
   "disposableToggle": {
     "message": "随机账号"
+  },
+  "usernameChangeAccount": {
+    "message": "改名×$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeTooltip": {
+    "message": "$RAW$。只能看到改名次数，看不到之前的用户名。",
+    "placeholders": {
+      "raw": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeToggle": {
+    "message": "改名"
+  },
+  "replyOnlyAccount": {
+    "message": "低粉高回复"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "此账号只有 $THREADS$ 篇帖子、$FOLLOWERS$ 个粉丝，却在别人的帖子下回复超过 $REPLIES$ 条。",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "低粉高回复"
   }
 }

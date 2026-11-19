@@ -7,6 +7,11 @@ import { fetchProfileByUserId, getUserIdByUsername, updateButtonWithFetchResult 
 import { showRateLimitToast, showLoginRequiredBanner } from './lib/notifications.js';
 import { queueFetch, processFetchQueue, processFollowersFetchQueue } from './lib/queueManager.js';
 import { createFeedVisibilityObserver, createFollowersVisibilityObserver } from './lib/autoFetchObservers.js';
+import { isReplyOnlyEnabled, createReplyOnlyTag } from './lib/replyOnlyTag.js';
+import { isLowFollowerReplier } from './lib/replyOnly.js';
+import { createProfileRefresh } from './lib/profileRefresh.js';
+import { hasUsernameChange } from './lib/usernameChange.js';
+import { createUsernameChangeTag, insertUsernameChangeTag } from './lib/usernameChangeTag.js';
 import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
 
 'use strict';
@@ -46,6 +51,31 @@ const state = {
   rateLimitedUntil: 0, // Timestamp when rate limit cooldown ends
   isUserLoggedIn: null // null = unknown, true = logged in, false = logged out
 }
+
+// Fill in what cached profiles are missing (outdated schema, unsettled replier
+// check) once their post badge is on screen, under the same rules as the main
+// auto-fetch (see lib/profileRefresh.js). Twice the normal delay, and it waits
+// for the main auto-fetch queue.
+const profileRefresh = createProfileRefresh({
+  state,
+  profileCache,
+  delayMs: FETCH_DELAY_MS * 2,
+  getEnabled: async () => {
+    const { usernameChangeEnabled = true, replyOnlyEnabled = true } =
+      await browserAPI.storage.local.get(['usernameChangeEnabled', 'replyOnlyEnabled']);
+    // Schema v2 only adds former usernames, so a refresh is only worth it
+    // while that tag is on
+    return { refresh: usernameChangeEnabled, replier: replyOnlyEnabled };
+  },
+  onUpdated: (profileInfo, badge) => {
+    if (hasUsernameChange(profileInfo) && !badge.querySelector('.threads-username-change-tag')) {
+      insertUsernameChangeTag(badge, createUsernameChangeTag(profileInfo));
+    }
+    if (isLowFollowerReplier(profileInfo) && !badge.querySelector('.threads-reply-only-tag')) {
+      badge.appendChild(createReplyOnlyTag(profileInfo));
+    }
+  }
+});
 
 // Inject the network interceptor script
 function injectScript() {
@@ -112,6 +142,17 @@ window.addEventListener('message', (event) => {
       fetchQueue.length = 0;
       state.isFetching = false;
     }
+
+    // Logged back in: restart the cached-profile queue the login gate stopped
+    if (wasLoggedIn === false && state.isUserLoggedIn === true) {
+      profileRefresh.resume();
+    }
+  }
+
+  // Persist the Replies tab doc_id so the low-follower replier check works on
+  // pages where Threads hasn't loaded that query yet
+  if (event.data?.type === 'threads-replies-doc-id' && event.data.docId) {
+    browserAPI.storage.local.set({ repliesTabDocId: event.data.docId });
   }
 
   // Listen for new user ID discoveries from injected script and persist them
@@ -341,6 +382,8 @@ function addFetchButtons() {
             timeParent.parentElement.insertBefore(badge, timeParent.nextSibling);
           }
         }
+
+        profileRefresh.observe(badge, profileInfo);
       }
       return;
     }
@@ -407,8 +450,10 @@ function addFetchButtons() {
       const userId = await getUserIdByUsername(username);
 
       if (userId) {
-        // Request profile fetch using shared utility
-        const result = await fetchProfileByUserId(userId);
+        // Request profile fetch using shared utility. The low-follower replier
+        // check only runs in post context (see lib/replyOnly.js), not user lists.
+        const checkReplyOnly = !isUserList && await isReplyOnlyEnabled();
+        const result = await fetchProfileByUserId(userId, { checkReplyOnly });
 
         if (result) {
           if (result._loginRequired) {
@@ -646,6 +691,13 @@ function init() {
     console.warn('[Threads Extractor] Failed to load cached user IDs:', err);
   });
 
+  // Pass the last known Replies tab doc_id to injected script
+  browserAPI.storage.local.get(['repliesTabDocId']).then(({ repliesTabDocId }) => {
+    if (repliesTabDocId) {
+      window.postMessage({ type: 'threads-load-replies-doc-id', docId: repliesTabDocId }, '*');
+    }
+  });
+
   // Enable auto-fetch after initial delay (wait for bulk-route-definitions to load)
   setTimeout(() => {
     state.autoFetchReady = true;
@@ -722,6 +774,7 @@ browserAPI.runtime.onMessage.addListener((message) => {
     console.log('[Threads Extractor] Auto-query', state.autoQueryEnabled ? 'enabled' : 'disabled');
     if (state.autoQueryEnabled) {
       processFetchQueue(fetchQueue, state, profileCache, FETCH_DELAY_MS);
+      profileRefresh.resume();
     }
   } else if (message.type === 'AUTO_QUERY_FOLLOWERS_CHANGED') {
     state.autoQueryFollowersEnabled = message.enabled;
@@ -733,6 +786,14 @@ browserAPI.runtime.onMessage.addListener((message) => {
   } else if (message.type === 'DISPOSABLE_ACCOUNT_CHANGED') {
     console.log('[Threads Extractor] Disposable-account tag', message.enabled ? 'enabled' : 'disabled');
     // Rebuild badges so the disposable-account tag appears/disappears
+    updateBadgesForFlagsChange();
+  } else if (message.type === 'USERNAME_CHANGE_CHANGED') {
+    console.log('[Threads Extractor] Username-change tag', message.enabled ? 'enabled' : 'disabled');
+    // Rebuild badges so the username-change tag appears/disappears
+    updateBadgesForFlagsChange();
+  } else if (message.type === 'REPLY_ONLY_CHANGED') {
+    console.log('[Threads Extractor] Low-follower replier tag', message.enabled ? 'enabled' : 'disabled');
+    // Rebuild badges so the low-follower replier tag appears/disappears
     updateBadgesForFlagsChange();
   } else if (message.type === 'CUSTOM_EMOJIS_CHANGED') {
     console.log('[Threads Extractor] Custom emojis changed, refreshing badges');

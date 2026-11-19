@@ -3,6 +3,10 @@ import { isNewUser } from './dateParser.js';
 import { formatLocation } from './locationMapper.js';
 import { isDisposableHandle } from './disposableHandle.js';
 import { createDisposableTag } from './disposableTag.js';
+import { hasUsernameChange } from './usernameChange.js';
+import { createUsernameChangeTag } from './usernameChangeTag.js';
+import { createReplyOnlyTag, isReplyOnlyEnabled } from './replyOnlyTag.js';
+import { isLowFollowerReplier } from './replyOnly.js';
 
 // Cross-browser compatibility
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -51,7 +55,7 @@ export async function createProfileBadge(profileInfo) {
   const newLabel = browserAPI.i18n.getMessage('newUser') || 'NEW';
 
   // Get showFlags setting, custom emojis, and disposable-account setting
-  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled']);
+  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true, replyOnlyEnabled = true, usernameChangeEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled', 'replyOnlyEnabled', 'usernameChangeEnabled']);
 
   if (profileInfo.location) {
     // Get custom emoji for this location (if set)
@@ -89,10 +93,21 @@ export async function createProfileBadge(profileInfo) {
     badge.appendChild(newTag);
   }
 
+  // Add username-change (改名) tag right after [新帳號] if enabled and the
+  // profile sheet listed former usernames (see lib/usernameChange.js)
+  if (usernameChangeEnabled && hasUsernameChange(profileInfo)) {
+    badge.appendChild(createUsernameChangeTag(profileInfo));
+  }
+
   // Add disposable-handle (隨機帳號) tag if enabled and the username matches the
   // Threads system-default format. Does not affect location / new-user logic.
   if (disposableAccountEnabled && isDisposableHandle(profileInfo.username).isDisposable) {
     badge.appendChild(createDisposableTag());
+  }
+
+  // Add low-follower replier (低粉高留言) tag if enabled (see lib/replyOnly.js)
+  if (replyOnlyEnabled && isLowFollowerReplier(profileInfo)) {
+    badge.appendChild(createReplyOnlyTag(profileInfo));
   }
 
   return badge;
@@ -142,6 +157,7 @@ export async function autoFetchProfile(username, btn, profileCache) {
   }
 
   // Request profile fetch
+  const checkReplyOnly = await isReplyOnlyEnabled();
   const fetchRequestId = Math.random().toString(36).substring(7);
   const result = await new Promise((resolve) => {
     const handler = (event) => {
@@ -154,12 +170,13 @@ export async function autoFetchProfile(username, btn, profileCache) {
     window.postMessage({
       type: 'threads-fetch-request',
       requestId: fetchRequestId,
-      userId: userId
+      userId: userId,
+      checkReplyOnly
     }, '*');
     setTimeout(() => {
       window.removeEventListener('message', handler);
       resolve(null);
-    }, 10000);
+    }, checkReplyOnly ? 20000 : 10000); // the replier check adds up to three requests
   });
 
   if (result) {

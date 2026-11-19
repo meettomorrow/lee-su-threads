@@ -104,6 +104,18 @@
   "tabLocations": {
     "message": "Location Stats"
   },
+  "tabTags": {
+    "message": "Tags"
+  },
+  "tagsFilterAll": {
+    "message": "All"
+  },
+  "tagsEmpty": {
+    "message": "No tagged accounts yet.\nThey add up as you browse Threads."
+  },
+  "tagsNote": {
+    "message": "\"All\" leaves out NEW. Rename data fills in as you browse; reply-heavy is only checked for accounts seen replying."
+  },
   "noLocationStats": {
     "message": "No location data yet.\nBrowse Threads to capture profile locations."
   },
@@ -229,5 +241,44 @@
   },
   "disposableToggle": {
     "message": "Random handle"
+  },
+  "usernameChangeAccount": {
+    "message": "Renamed ×$COUNT$",
+    "placeholders": {
+      "count": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeTooltip": {
+    "message": "$RAW$. Only the number of changes is shown, not the former usernames.",
+    "placeholders": {
+      "raw": {
+        "content": "$1"
+      }
+    }
+  },
+  "usernameChangeToggle": {
+    "message": "Renamed"
+  },
+  "replyOnlyAccount": {
+    "message": "Reply-heavy"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "This account has only $THREADS$ thread(s) of its own and $FOLLOWERS$ follower(s), yet has replied more than $REPLIES$ times under other people's threads.",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "Reply-heavy"
   }
 }

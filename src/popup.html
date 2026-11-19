@@ -40,6 +40,10 @@
         --scrollbar-thumb: rgba(255, 255, 255, 0.3);
         --input-placeholder: #555555;
         --danger-hover: rgba(239, 68, 68, 0.25);
+        /* Tag colors by signal type, same as styles.css */
+        --tag-age: rgb(248, 113, 113);
+        --tag-username: rgb(167, 139, 250);
+        --tag-behaviour: rgb(45, 212, 191);
       }
 
       :root[data-theme="light"] {
@@ -59,6 +63,9 @@
         --scrollbar-thumb: rgba(0, 0, 0, 0.25);
         --input-placeholder: #999999;
         --danger-hover: rgba(239, 68, 68, 0.12);
+        --tag-age: rgb(220, 38, 38);
+        --tag-username: rgb(124, 58, 237);
+        --tag-behaviour: rgb(15, 118, 110);
       }
 
       body {
@@ -470,11 +477,80 @@
         text-overflow: ellipsis;
       }
 
-      .new-user-tag {
+      .profile-tag {
         margin-left: 6px;
-        color: #ef4444;
         font-weight: 600;
         font-size: 11px;
+      }
+
+      .profile-tag-newUser {
+        color: var(--tag-age);
+      }
+
+      .profile-tag-usernameChange,
+      .profile-tag-disposable {
+        color: var(--tag-username);
+      }
+
+      .profile-tag-replyHeavy {
+        color: var(--tag-behaviour);
+      }
+
+      /* Tags tab */
+      .tag-chips {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin-bottom: 8px;
+      }
+
+      .tag-chip {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 4px 10px;
+        border: 1px solid var(--border-color);
+        border-radius: 999px;
+        background: var(--bg-overlay-3);
+        color: var(--text-primary);
+        font-size: 12px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background 0.2s;
+      }
+
+      .tag-chip:hover {
+        background: var(--bg-overlay-8);
+      }
+
+      .tag-chip[aria-pressed="true"] {
+        background: var(--bg-overlay-15);
+        border-color: var(--bg-overlay-20);
+      }
+
+      .tag-chip-newUser span:first-child {
+        color: var(--tag-age);
+      }
+
+      .tag-chip-usernameChange span:first-child,
+      .tag-chip-disposable span:first-child {
+        color: var(--tag-username);
+      }
+
+      .tag-chip-replyHeavy span:first-child {
+        color: var(--tag-behaviour);
+      }
+
+      .tag-chip-count {
+        color: var(--text-secondary);
+        font-variant-numeric: tabular-nums;
+      }
+
+      .tags-note {
+        margin: 0 0 10px;
+        font-size: 11px;
+        line-height: 1.5;
+        color: var(--text-secondary);
       }
 
       .profile-meta {
@@ -1085,6 +1161,20 @@
           </div>
         </div>
         <div class="stat-card">
+          <div class="stat-label" data-i18n="usernameChangeToggle">Renamed</div>
+          <div class="toggle-group single">
+            <label class="toggle-switch">
+              <input
+                type="checkbox"
+                id="usernameChangeToggle"
+                checked
+                aria-label="Toggle username change tag"
+              />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="stat-card">
           <div class="stat-label" data-i18n="disposableToggle">Random handle</div>
           <div class="toggle-group single">
             <label class="toggle-switch">
@@ -1093,6 +1183,20 @@
                 id="disposableToggle"
                 checked
                 aria-label="Toggle disposable (default handle) account tag"
+              />
+              <span class="toggle-slider"></span>
+            </label>
+          </div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-label" data-i18n="replyOnlyToggle">Reply-heavy</div>
+          <div class="toggle-group single">
+            <label class="toggle-switch">
+              <input
+                type="checkbox"
+                id="replyOnlyToggle"
+                checked
+                aria-label="Toggle low-follower replier account tag"
               />
               <span class="toggle-slider"></span>
             </label>
@@ -1110,6 +1214,9 @@
         </button>
         <button class="tab-btn" data-tab="locations" data-i18n="tabLocations">
           Location Stats
+        </button>
+        <button class="tab-btn" data-tab="tags" data-i18n="tabTags">
+          Tags
         </button>
       </div>
 
@@ -1136,6 +1243,14 @@
             </div>
           </div>
         </div>
+      </div>
+
+      <div id="tagsTab" class="tab-content">
+        <div class="tag-chips" id="tagChips" role="group" aria-label="Filter by tag"></div>
+        <p class="tags-note" data-i18n="tagsNote">
+          Rename data fills in as you browse; reply-heavy is only checked for accounts seen replying.
+        </p>
+        <div class="profile-list" id="tagList"></div>
       </div>
 
       <div id="locationsTab" class="tab-content">

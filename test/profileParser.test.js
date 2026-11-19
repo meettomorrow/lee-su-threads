@@ -1,5 +1,6 @@
 import { describe, it, expect } from 'vitest';
 import { parseProfileResponse } from '../src/lib/profileParser.js';
+import { PROFILE_SCHEMA_VERSION } from '../src/lib/profileSchema.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -123,26 +124,43 @@ describe('parseProfileResponse', () => {
   });
 
   describe('former username handling', () => {
-    it('should filter out Japanese former username field', () => {
+    it('should parse Japanese former username field without affecting joined/location', () => {
       const payload = fs.readFileSync(path.join(__dirname, 'fixtures/profile-former-username-ja.txt'), 'utf8');
       const result = parseProfileResponse(payload);
 
       expect(result.joined).toBe('2025年12月');
       expect(result.location).toBe('日本');
       expect(result.displayName).toBeUndefined(); // Name field should be filtered
-      // Former username field should not appear in any extracted data
-      expect(JSON.stringify(result)).not.toContain('Instagramで1回変更');
+      expect(result.formerUsernames).toEqual({ raw: 'Instagramで1回変更', count: 1, platform: 'instagram' });
     });
 
-    it('should filter out Chinese former username field', () => {
+    it('should parse Chinese former username field without affecting joined/location', () => {
       const payload = fs.readFileSync(path.join(__dirname, 'fixtures/profile-former-username-zh.txt'), 'utf8');
       const result = parseProfileResponse(payload);
 
       expect(result.joined).toBe('2025年12月');
       expect(result.location).toBe('台灣');
       expect(result.displayName).toBeUndefined(); // Name field should be filtered
-      // Former username field should not appear in any extracted data
-      expect(JSON.stringify(result)).not.toContain('在 Instagram 變更過 1 次');
+      expect(result.formerUsernames).toEqual({ raw: '在 Instagram 變更過 1 次', count: 1, platform: 'instagram' });
+    });
+
+    it('should parse a username change made on Threads', () => {
+      const payload = loadFixture('profile-former-username-threads-zh.txt');
+      const result = parseProfileResponse(payload);
+
+      expect(result.joined).toBe('2025年12月');
+      expect(result.location).toBe('台灣');
+      expect(result.formerUsernames).toEqual({ raw: '在 Threads 變更過 2 次', count: 2, platform: 'threads' });
+    });
+
+    it('should set formerUsernames to null when the row is absent', () => {
+      const result = parseProfileResponse(loadFixture('profile-basic-zh.txt'));
+      expect(result.formerUsernames).toBeNull();
+    });
+
+    it('should stamp the current schema version', () => {
+      const result = parseProfileResponse(loadFixture('profile-basic-zh.txt'));
+      expect(result.schemaVersion).toBe(PROFILE_SCHEMA_VERSION);
     });
   });
 

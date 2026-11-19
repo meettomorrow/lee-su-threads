@@ -3,6 +3,9 @@
  * Extracted for testability
  */
 
+import { parseFormerUsernames } from './usernameChange.js';
+import { PROFILE_SCHEMA_VERSION } from './profileSchema.js';
+
 function extractProfileInfo(obj, result = {}) {
   if (!obj || typeof obj !== 'object') return result;
 
@@ -124,7 +127,7 @@ function parseProfileResponse(responseText) {
       const locationLabels = ['Based in', '所在地點', '所在地', '위치', '거주지'];
       const verifiedLabels = ['Verified by Meta', 'Meta 驗證', 'Meta 验证', 'Metaにより認証', 'Metaにより認証済み', 'Meta認証', 'Meta 인증', 'Meta 인증 완료'];
       const nameLabels = ['Name', '名稱', '名前', '이름']; // Exclude these
-      const formerUsernameLabels = ['Former usernames', 'Previous usernames', '先前的用戶名稱', '先前的使用者名稱', '先前的用户名称', '以前のユーザーネーム', '이전 사용자 이름']; // Exclude these
+      const formerUsernameLabels = ['Former usernames', 'Previous usernames', '先前的用戶名稱', '先前的使用者名稱', '先前的用户名称', '以前のユーザーネーム', '이전 사용자 이름']; // Not a joined/location pair; parsed separately below
 
       // Filter out name and former username fields
       const relevantPairs = pairs.filter(p =>
@@ -142,6 +145,16 @@ function parseProfileResponse(responseText) {
       if (locationPair) {
         profileInfo.location = locationPair.value;
       }
+
+      // Former usernames: kept out of relevantPairs (so the position-based
+      // fallback below is unaffected) but read for the username-change tag
+      // null = checked, never renamed
+      const formerPair = pairs.find(p => formerUsernameLabels.includes(p.label));
+      profileInfo.formerUsernames = formerPair ? parseFormerUsernames(formerPair.value) : null;
+
+      // Which parser produced this; outdated cached profiles get re-fetched
+      // (see lib/profileSchema.js)
+      profileInfo.schemaVersion = PROFILE_SCHEMA_VERSION;
 
       const verifiedPair = relevantPairs.find(p => verifiedLabels.includes(p.label));
       if (verifiedPair) {

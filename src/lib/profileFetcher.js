@@ -5,10 +5,14 @@
 /**
  * Fetch profile information by user ID using postMessage to injected script
  * @param {string} userId - The user ID to fetch profile for
- * @param {number} timeoutMs - Timeout in milliseconds (default: 10000)
+ * @param {Object} [options]
+ * @param {number} [options.timeoutMs] - Timeout in milliseconds (default: 10000, or 20000 with checkReplyOnly)
+ * @param {boolean} [options.checkReplyOnly] - Also run the low-follower replier check (post context only)
  * @returns {Promise<Object|null>} Profile info object or null if failed
  */
-export async function fetchProfileByUserId(userId, timeoutMs = 10000) {
+export async function fetchProfileByUserId(userId, { timeoutMs, checkReplyOnly = false } = {}) {
+  // The low-follower replier check can add up to three sequential requests
+  timeoutMs ??= checkReplyOnly ? 20000 : 10000;
   const fetchRequestId = Math.random().toString(36).substring(7);
 
   return new Promise((resolve) => {
@@ -24,7 +28,40 @@ export async function fetchProfileByUserId(userId, timeoutMs = 10000) {
     window.postMessage({
       type: 'threads-fetch-request',
       requestId: fetchRequestId,
-      userId: userId
+      userId: userId,
+      checkReplyOnly
+    }, '*');
+
+    setTimeout(() => {
+      window.removeEventListener('message', handler);
+      resolve(null);
+    }, timeoutMs);
+  });
+}
+
+/**
+ * Run the low-follower replier check for a profile already in cache
+ * @param {string} username - Username (without @)
+ * @param {number} timeoutMs - Timeout in milliseconds (default: 60000; checks queue one at a time)
+ * @returns {Promise<Object|null>} Replier signals, or null if the user wasn't seen replying
+ */
+export async function checkCachedReplier(username, timeoutMs = 60000) {
+  const requestId = Math.random().toString(36).substring(7);
+
+  return new Promise((resolve) => {
+    const handler = (event) => {
+      if (event.data?.type === 'threads-replier-check-response' &&
+          event.data?.requestId === requestId) {
+        window.removeEventListener('message', handler);
+        resolve(event.data.signals);
+      }
+    };
+    window.addEventListener('message', handler);
+
+    window.postMessage({
+      type: 'threads-replier-check-request',
+      requestId: requestId,
+      username: username
     }, '*');
 
     setTimeout(() => {

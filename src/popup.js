@@ -1,6 +1,7 @@
 // Popup script for Threads Profile Extractor
-import { isNewUser } from './lib/dateParser.js';
 import { formatLocation } from './lib/locationMapper.js';
+import { getProfileTags, TAG_ORDER } from './lib/profileTags.js';
+import { REPLY_PAGE_SIZE } from './lib/replyOnly.js';
 import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
 import 'emoji-picker-element';
 
@@ -60,12 +61,17 @@ document.addEventListener('DOMContentLoaded', () => {
   const autoQueryToggle = document.getElementById('autoQueryToggle');
   const autoQueryFollowersToggle = document.getElementById('autoQueryFollowersToggle');
   const showFlagsToggle = document.getElementById('showFlagsToggle');
+  const usernameChangeToggle = document.getElementById('usernameChangeToggle');
   const disposableToggle = document.getElementById('disposableToggle');
+  const replyOnlyToggle = document.getElementById('replyOnlyToggle');
   const locationFilter = document.getElementById('locationFilter');
   const onboardingLink = document.getElementById('onboardingLink');
   const tabBtns = document.querySelectorAll('.tab-btn');
   const profilesTab = document.getElementById('profilesTab');
   const locationsTab = document.getElementById('locationsTab');
+  const tagsTab = document.getElementById('tagsTab');
+  const tagChipsEl = document.getElementById('tagChips');
+  const tagListEl = document.getElementById('tagList');
   const contentEl = document.querySelector('.content');
 
   // Variables used throughout
@@ -73,6 +79,7 @@ document.addEventListener('DOMContentLoaded', () => {
   let filterText = '';
   let filterNoLocation = false; // Special flag for filtering profiles without location
   let activeTab = 'profiles';
+  let tagFilter = 'all'; // 'all' (every tag except newUser) or a key from TAG_ORDER
   let rateLimitCountdownInterval = null;
 
   // Rate limit handling functions
@@ -233,25 +240,33 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // Tab switching
+  function switchTab(tab) {
+    activeTab = tab;
+    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === tab));
+    profilesTab.classList.toggle('active', tab === 'profiles');
+    locationsTab.classList.toggle('active', tab === 'locations');
+    tagsTab.classList.toggle('active', tab === 'tags');
+  }
+
   tabBtns.forEach(btn => {
     btn.addEventListener('click', () => {
       const tab = btn.dataset.tab;
-      activeTab = tab;
-
-      // Update button states
-      tabBtns.forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-
-      // Update tab content visibility
-      profilesTab.classList.toggle('active', tab === 'profiles');
-      locationsTab.classList.toggle('active', tab === 'locations');
+      switchTab(tab);
 
       // Render the appropriate content
       if (tab === 'locations') {
         renderLocationStats();
+      } else if (tab === 'tags') {
+        renderTagsTab();
       }
     });
   });
+
+  // Re-render whatever shows tags after a tag toggle changes
+  function rerenderTagViews() {
+    renderProfileList();
+    if (activeTab === 'tags') renderTagsTab();
+  }
 
   // Load and handle auto-query setting
   browserAPI.storage.local.get(['autoQueryEnabled']).then((result) => {
@@ -279,11 +294,18 @@ document.addEventListener('DOMContentLoaded', () => {
     'autoQueryFollowersEnabled',
     'showFlags',
     'disposableAccountEnabled',
+    'replyOnlyEnabled',
+    'usernameChangeEnabled',
     'rateLimitedUntil'
   ]).then((result) => {
     // disposable-account tag is a purely local display setting, so it stays
     // available even while rate limited (it never hits the network).
     disposableToggle.checked = result.disposableAccountEnabled !== false;
+    // username-change tag only reads data already in the profile response.
+    usernameChangeToggle.checked = result.usernameChangeEnabled !== false;
+    // reply-only check piggybacks on profile fetches, which already pause while
+    // rate limited, so its toggle can stay available too.
+    replyOnlyToggle.checked = result.replyOnlyEnabled !== false;
 
     // Check if currently rate limited
     const rateLimitedUntil = result.rateLimitedUntil || 0;
@@ -324,12 +346,36 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   });
 
+  usernameChangeToggle.addEventListener('change', () => {
+    const enabled = usernameChangeToggle.checked;
+    browserAPI.storage.local.set({ usernameChangeEnabled: enabled }).then(rerenderTagViews);
+    browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0]?.id) {
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'USERNAME_CHANGE_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
+      }
+    });
+  });
+
   disposableToggle.addEventListener('change', () => {
     const enabled = disposableToggle.checked;
-    browserAPI.storage.local.set({ disposableAccountEnabled: enabled });
+    browserAPI.storage.local.set({ disposableAccountEnabled: enabled }).then(rerenderTagViews);
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
         browserAPI.tabs.sendMessage(tabs[0].id, { type: 'DISPOSABLE_ACCOUNT_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
+      }
+    });
+  });
+
+  replyOnlyToggle.addEventListener('change', () => {
+    const enabled = replyOnlyToggle.checked;
+    browserAPI.storage.local.set({ replyOnlyEnabled: enabled }).then(rerenderTagViews);
+    browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0]?.id) {
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'REPLY_ONLY_CHANGED', enabled }).catch(() => {
           // Content script not loaded yet - that's ok
         });
       }
@@ -394,15 +440,111 @@ document.addEventListener('DOMContentLoaded', () => {
       if (headerProfileCountEl) headerProfileCountEl.textContent = count;
 
       renderProfileList();
+      if (activeTab === 'tags') renderTagsTab();
     }).catch((err) => {
       console.error('Failed to load profiles:', err);
     });
   }
 
+  // Storage keys for the tag toggles (see lib/profileTags.js)
+  const TAG_SETTING_KEYS = ['usernameChangeEnabled', 'disposableAccountEnabled', 'replyOnlyEnabled'];
+
+  // Tag label for chips: the plain name, without counts
+  function tagName(tag) {
+    switch (tag) {
+      case 'newUser': return browserAPI.i18n.getMessage('newUser') || 'NEW';
+      case 'usernameChange': return browserAPI.i18n.getMessage('usernameChangeToggle') || 'Renamed';
+      case 'disposable': return browserAPI.i18n.getMessage('disposableAccount') || 'Random handle';
+      case 'replyHeavy': return browserAPI.i18n.getMessage('replyOnlyAccount') || 'Reply-heavy';
+      default: return tag;
+    }
+  }
+
+  // Bracketed tag shown after a profile name, with the same text and tooltip as on Threads
+  function createTagSpan(tag, data) {
+    const span = document.createElement('span');
+    span.className = `profile-tag profile-tag-${tag}`;
+    let label = tagName(tag);
+    let tooltip = '';
+    if (tag === 'usernameChange') {
+      const { raw = '', count = null } = data.formerUsernames || {};
+      if (Number.isInteger(count)) {
+        label = browserAPI.i18n.getMessage('usernameChangeAccount', [String(count)]) || `Renamed ×${count}`;
+      }
+      tooltip = browserAPI.i18n.getMessage('usernameChangeTooltip', [raw]) || raw;
+    } else if (tag === 'disposable') {
+      tooltip = browserAPI.i18n.getMessage('disposableAccountTooltip') || '';
+    } else if (tag === 'replyHeavy') {
+      tooltip = browserAPI.i18n.getMessage('replyOnlyAccountTooltip',
+        [String(data.threadCount), String(data.followerCount), String(REPLY_PAGE_SIZE)]) || '';
+    }
+    span.textContent = `[${label}]`;
+    if (tooltip) span.title = tooltip;
+    return span;
+  }
+
+  // One row in the profile / tag lists
+  function createProfileItem(username, data, tags, { showFlags = true, customLocationEmojis = {} } = {}) {
+    const profileItem = document.createElement('div');
+    profileItem.className = 'profile-item';
+    profileItem.setAttribute('data-username', username);
+
+    // Avatar
+    if (data.profileImage) {
+      const img = document.createElement('img');
+      img.src = data.profileImage;
+      img.className = 'profile-avatar';
+      img.alt = username;
+      profileItem.appendChild(img);
+    } else {
+      const avatarPlaceholder = document.createElement('div');
+      avatarPlaceholder.className = 'profile-avatar';
+      profileItem.appendChild(avatarPlaceholder);
+    }
+
+    // Profile info
+    const profileInfo = document.createElement('div');
+    profileInfo.className = 'profile-info';
+
+    // Profile name
+    const profileName = document.createElement('div');
+    profileName.className = 'profile-name';
+    profileName.textContent = data.displayName || username;
+
+    for (const tag of tags) {
+      profileName.appendChild(createTagSpan(tag, data));
+    }
+
+    // Profile meta
+    const profileMeta = document.createElement('div');
+    profileMeta.className = 'profile-meta';
+    profileMeta.textContent = `@${username}`;
+
+    if (data.location) {
+      profileMeta.appendChild(document.createTextNode(' • '));
+      // Get custom emoji for this location (if set)
+      const customEmoji = customLocationEmojis[data.location] || null;
+      // Display location with flag emoji or custom emoji
+      const displayText = formatLocation(data.location, false, showFlags, customEmoji);
+      profileMeta.appendChild(document.createTextNode(displayText));
+    }
+
+    profileInfo.appendChild(profileName);
+    profileInfo.appendChild(profileMeta);
+    profileItem.appendChild(profileInfo);
+
+    // Add click handler
+    profileItem.addEventListener('click', () => {
+      browserAPI.tabs.create({ url: `https://www.threads.com/@${username}` });
+    });
+
+    return profileItem;
+  }
+
   // Render the profile list
   async function renderProfileList() {
-    // Get showFlags setting and custom emojis
-    const { showFlags = true, customLocationEmojis = {} } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis']);
+    // Get showFlags setting, custom emojis and tag toggles
+    const settings = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', ...TAG_SETTING_KEYS]);
 
     let entries = Object.entries(profiles);
 
@@ -447,71 +589,83 @@ document.addEventListener('DOMContentLoaded', () => {
     // Sort by timestamp (most recent first)
     entries.sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
 
-    const newLabel = browserAPI.i18n.getMessage('newUser') || 'NEW';
-
     profileListEl.textContent = '';
 
     entries.forEach(([username, data]) => {
-      const isNew = isNewUser(data.joined);
-
-      const profileItem = document.createElement('div');
-      profileItem.className = 'profile-item';
-      profileItem.setAttribute('data-username', username);
-
-      // Avatar
-      if (data.profileImage) {
-        const img = document.createElement('img');
-        img.src = data.profileImage;
-        img.className = 'profile-avatar';
-        img.alt = username;
-        profileItem.appendChild(img);
-      } else {
-        const avatarPlaceholder = document.createElement('div');
-        avatarPlaceholder.className = 'profile-avatar';
-        profileItem.appendChild(avatarPlaceholder);
-      }
-
-      // Profile info
-      const profileInfo = document.createElement('div');
-      profileInfo.className = 'profile-info';
-
-      // Profile name
-      const profileName = document.createElement('div');
-      profileName.className = 'profile-name';
-      profileName.textContent = data.displayName || username;
-
-      if (isNew) {
-        const newTag = document.createElement('span');
-        newTag.className = 'new-user-tag';
-        newTag.textContent = `[${newLabel}]`;
-        profileName.appendChild(newTag);
-      }
-
-      // Profile meta
-      const profileMeta = document.createElement('div');
-      profileMeta.className = 'profile-meta';
-      profileMeta.textContent = `@${username}`;
-
-      if (data.location) {
-        profileMeta.appendChild(document.createTextNode(' • '));
-        // Get custom emoji for this location (if set)
-        const customEmoji = customLocationEmojis[data.location] || null;
-        // Display location with flag emoji or custom emoji
-        const displayText = formatLocation(data.location, false, showFlags, customEmoji);
-        profileMeta.appendChild(document.createTextNode(displayText));
-      }
-
-      profileInfo.appendChild(profileName);
-      profileInfo.appendChild(profileMeta);
-      profileItem.appendChild(profileInfo);
-
-      // Add click handler
-      profileItem.addEventListener('click', () => {
-        browserAPI.tabs.create({ url: `https://www.threads.com/@${username}` });
-      });
-
-      profileListEl.appendChild(profileItem);
+      profileListEl.appendChild(createProfileItem(username, data, getProfileTags(data, settings), settings));
     });
+  }
+
+  // Render the Tags tab: filter chips with counts, then the matching profiles.
+  // "All" leaves out [新帳號], which would swamp the rarer tags; it still has
+  // its own chip.
+  async function renderTagsTab() {
+    const settings = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', ...TAG_SETTING_KEYS]);
+    const enabledTags = TAG_ORDER.filter(tag => {
+      if (tag === 'usernameChange') return settings.usernameChangeEnabled !== false;
+      if (tag === 'disposable') return settings.disposableAccountEnabled !== false;
+      if (tag === 'replyHeavy') return settings.replyOnlyEnabled !== false;
+      return true;
+    });
+    if (tagFilter !== 'all' && !enabledTags.includes(tagFilter)) tagFilter = 'all';
+
+    const tagged = [];
+    const counts = { all: 0 };
+    for (const tag of enabledTags) counts[tag] = 0;
+    for (const [username, data] of Object.entries(profiles)) {
+      const tags = getProfileTags(data, settings);
+      if (tags.length === 0) continue;
+      tagged.push([username, data, tags]);
+      for (const tag of tags) counts[tag]++;
+      if (tags.some(tag => tag !== 'newUser')) counts.all++;
+    }
+
+    // Chips
+    tagChipsEl.textContent = '';
+    for (const key of ['all', ...enabledTags]) {
+      const chip = document.createElement('button');
+      chip.type = 'button';
+      chip.className = `tag-chip tag-chip-${key}`;
+      chip.setAttribute('aria-pressed', String(tagFilter === key));
+      const name = document.createElement('span');
+      name.textContent = key === 'all' ? (browserAPI.i18n.getMessage('tagsFilterAll') || 'All') : tagName(key);
+      const count = document.createElement('span');
+      count.className = 'tag-chip-count';
+      count.textContent = counts[key];
+      chip.append(name, count);
+      chip.addEventListener('click', () => {
+        tagFilter = key;
+        renderTagsTab();
+      });
+      tagChipsEl.appendChild(chip);
+    }
+
+    // List
+    const shown = tagged
+      .filter(([, , tags]) => tagFilter === 'all' ? tags.some(tag => tag !== 'newUser') : tags.includes(tagFilter))
+      .sort((a, b) => (b[1].timestamp || 0) - (a[1].timestamp || 0));
+
+    tagListEl.textContent = '';
+    if (shown.length === 0) {
+      const emptyState = document.createElement('div');
+      emptyState.className = 'empty-state';
+      const icon = document.createElement('div');
+      icon.className = 'empty-state-icon';
+      icon.textContent = '🏷️';
+      const text = document.createElement('div');
+      text.className = 'empty-state-text';
+      const msg = browserAPI.i18n.getMessage('tagsEmpty') || 'No tagged accounts yet.\nThey add up as you browse Threads.';
+      msg.split('\n').forEach((line, index) => {
+        if (index > 0) text.appendChild(document.createElement('br'));
+        text.appendChild(document.createTextNode(line));
+      });
+      emptyState.append(icon, text);
+      tagListEl.appendChild(emptyState);
+      return;
+    }
+    for (const [username, data, tags] of shown) {
+      tagListEl.appendChild(createProfileItem(username, data, tags, settings));
+    }
   }
 
   // Hide export button on iOS Safari (downloads don't work reliably)
@@ -992,9 +1146,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterNoLocation = false;
         filterText = location;
         locationFilter.value = location;
-        tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'profiles'));
-        profilesTab.classList.add('active');
-        locationsTab.classList.remove('active');
+        switchTab('profiles');
         renderProfileList();
       });
 
@@ -1167,10 +1319,7 @@ document.addEventListener('DOMContentLoaded', () => {
         filterNoLocation = true;
         filterText = '';
         locationFilter.value = '';
-        activeTab = 'profiles';
-        tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'profiles'));
-        profilesTab.classList.add('active');
-        locationsTab.classList.remove('active');
+        switchTab('profiles');
         renderProfileList();
       });
 
@@ -1183,10 +1332,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // If a location is pre-selected, switch to locations tab
   if (preSelectLocation) {
-    // Switch to locations tab
-    tabBtns.forEach(b => b.classList.toggle('active', b.dataset.tab === 'locations'));
-    profilesTab.classList.remove('active');
-    locationsTab.classList.add('active');
+    switchTab('locations');
     // Render location stats to trigger the auto-focus
     renderLocationStats();
   }

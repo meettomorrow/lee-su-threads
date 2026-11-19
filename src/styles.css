@@ -17,6 +17,18 @@
 }
 
 .threads-fetch-btn:hover:not(:disabled) {
+  color: rgb(80, 80, 80);
+}
+
+/* Dark mode: Threads' own theme class, with the OS setting as a fallback
+   unless Threads is explicitly in light mode */
+@media (prefers-color-scheme: dark) {
+  html:not(.__fb-light-mode) .threads-fetch-btn:hover:not(:disabled) {
+    color: rgb(168, 168, 168);
+  }
+}
+
+.__fb-dark-mode .threads-fetch-btn:hover:not(:disabled) {
   color: rgb(168, 168, 168);
 }
 
@@ -285,32 +297,67 @@
   color: rgb(119, 119, 119);
 }
 
-/* New user tag */
+/* Profile tags - bracketed plain text, colored by what kind of signal they are:
+     red    = account age   ([新帳號] / [NEW])
+     violet = username      ([改名], [隨機帳號]; the two never
+                             appear together, since a renamed handle no longer
+                             matches the system default format)
+     teal   = behaviour     ([低粉高留言] / [Reply-heavy])
+   Light values pass WCAG AA (>= 4.5) on white; dark values on Threads' #101010.
+
+   Dark variants follow Threads' own theme class on <html> (__fb-dark-mode /
+   __fb-light-mode), not just the OS setting: a user can pick Light in Threads
+   while the OS is dark. The media query is only a fallback for when Threads
+   has not set either class. */
 .threads-new-user-tag {
   margin-left: 4px;
-  color: rgb(239, 68, 68);
+  color: rgb(220, 38, 38);
   font-weight: 600;
 }
 
-/* Random-handle (隨機帳號) tag - a factual signal in the same family as the
-   [新帳號]/[NEW] marker: bracketed plain text, no emoji. Purple keeps it
-   distinct from the red new-user tag when both appear side by side. */
-.threads-disposable-tag {
+.threads-disposable-tag,
+.threads-username-change-tag {
   margin-left: 4px;
-  color: rgb(139, 92, 246);
+  color: rgb(124, 58, 237);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: help;
+}
+
+.threads-reply-only-tag {
+  margin-left: 4px;
+  color: rgb(15, 118, 110);
   font-weight: 600;
   white-space: nowrap;
   cursor: help;
 }
 
 @media (prefers-color-scheme: dark) {
-  .threads-disposable-tag {
+  html:not(.__fb-light-mode) .threads-new-user-tag {
+    color: rgb(248, 113, 113);
+  }
+
+  html:not(.__fb-light-mode) .threads-disposable-tag,
+  html:not(.__fb-light-mode) .threads-username-change-tag {
     color: rgb(167, 139, 250);
+  }
+
+  html:not(.__fb-light-mode) .threads-reply-only-tag {
+    color: rgb(45, 212, 191);
   }
 }
 
-.__fb-dark-mode .threads-disposable-tag {
+.__fb-dark-mode .threads-new-user-tag {
+  color: rgb(248, 113, 113);
+}
+
+.__fb-dark-mode .threads-disposable-tag,
+.__fb-dark-mode .threads-username-change-tag {
   color: rgb(167, 139, 250);
+}
+
+.__fb-dark-mode .threads-reply-only-tag {
+  color: rgb(45, 212, 191);
 }
 
 /* Location badge in followers/following list */
@@ -344,19 +391,22 @@
   transform: scale(1.05);
 }
 
-.threads-friendships-location-badge span {
+/* Only the location text (a class-less span). Tags inside the badge carry
+   their own class and keep their own color. */
+.threads-friendships-location-badge span:not([class]) {
   color: inherit;
 }
 
-/* Dark mode support for badge - using both system preference AND Threads' own dark mode */
+/* Dark mode support for badge - Threads' own dark mode class, with the OS
+   setting as a fallback unless Threads is explicitly in light mode */
 @media (prefers-color-scheme: dark) {
-  .threads-friendships-location-badge {
+  html:not(.__fb-light-mode) .threads-friendships-location-badge {
     background: rgba(255, 255, 255, 0.15) !important;
     color: rgb(243, 245, 247) !important;
     box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
   }
 
-  .threads-friendships-location-badge span {
+  html:not(.__fb-light-mode) .threads-friendships-location-badge span:not([class]) {
     color: rgb(243, 245, 247) !important;
   }
 }
@@ -368,7 +418,7 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.3) !important;
 }
 
-.__fb-dark-mode .threads-friendships-location-badge span {
+.__fb-dark-mode .threads-friendships-location-badge span:not([class]) {
   color: rgb(243, 245, 247) !important;
 }
 
@@ -411,21 +461,36 @@
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
 }
 
-/* Dark mode support */
+/* Dark mode: Threads' own theme class, with the OS setting as a fallback
+   unless Threads is explicitly in light mode */
 @media (prefers-color-scheme: dark) {
-  .threads-friendships-fetch-btn {
+  html:not(.__fb-light-mode) .threads-friendships-fetch-btn {
     background: rgba(54, 54, 54, 1);
     color: rgb(243, 245, 247);
     box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
   }
 
-  .threads-friendships-fetch-btn:hover:not(:disabled) {
+  html:not(.__fb-light-mode) .threads-friendships-fetch-btn:hover:not(:disabled) {
     background: rgba(74, 74, 74, 1);
   }
 
-  .threads-friendships-fetch-btn:disabled {
+  html:not(.__fb-light-mode) .threads-friendships-fetch-btn:disabled {
     background: rgba(54, 54, 54, 0.6);
   }
+}
+
+.__fb-dark-mode .threads-friendships-fetch-btn {
+  background: rgba(54, 54, 54, 1);
+  color: rgb(243, 245, 247);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
+}
+
+.__fb-dark-mode .threads-friendships-fetch-btn:hover:not(:disabled) {
+  background: rgba(74, 74, 74, 1);
+}
+
+.__fb-dark-mode .threads-friendships-fetch-btn:disabled {
+  background: rgba(54, 54, 54, 0.6);
 }
 
 /* Floating panel */
@@ -581,10 +646,6 @@
   .threads-profile-info-badge,
   .threads-profile-info-badge::before {
     color: rgb(119, 119, 119);
-  }
-
-  .threads-fetch-btn:hover:not(:disabled) {
-    color: rgb(80, 80, 80);
   }
 
   #threads-extractor-panel {
