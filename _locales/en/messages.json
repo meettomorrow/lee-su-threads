@@ -104,6 +104,18 @@
   "tabLocations": {
     "message": "Location Stats"
   },
+  "tabTags": {
+    "message": "Tags"
+  },
+  "tagsFilterAll": {
+    "message": "All"
+  },
+  "tagsEmpty": {
+    "message": "No tagged accounts yet.\nThey add up as you browse Threads."
+  },
+  "tagsNote": {
+    "message": "\"All\" leaves out NEW. Rename data fills in as you browse; reply-heavy is only checked for accounts seen replying."
+  },
   "noLocationStats": {
     "message": "No location data yet.\nBrowse Threads to capture profile locations."
   },

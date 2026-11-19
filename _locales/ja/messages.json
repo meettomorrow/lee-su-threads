@@ -107,6 +107,18 @@
   "tabLocations": {
     "message": "地域統計"
   },
+  "tabTags": {
+    "message": "タグ"
+  },
+  "tagsFilterAll": {
+    "message": "すべて"
+  },
+  "tagsEmpty": {
+    "message": "タグ付きのアカウントはまだありません。\nThreads を見ていると自動で増えていきます。"
+  },
+  "tagsNote": {
+    "message": "「すべて」には新規を含みません。改名データは閲覧中に順次補完されます。低フォロワーのリプ専は返信を見かけたアカウントのみ判定します。"
+  },
   "noLocationStats": {
     "message": "まだ地域データがありません。\nThreads を閲覧して地域情報を取得してください。"
   },

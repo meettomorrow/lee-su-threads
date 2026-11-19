@@ -110,6 +110,18 @@
   "tabLocations": {
     "message": "地點統計"
   },
+  "tabTags": {
+    "message": "標籤"
+  },
+  "tagsFilterAll": {
+    "message": "全部"
+  },
+  "tagsEmpty": {
+    "message": "目前沒有帶標籤的帳號。\n瀏覽 Threads 時會自動累積。"
+  },
+  "tagsNote": {
+    "message": "「全部」不含新帳號。改名資料會在你瀏覽時陸續補上；低粉高留言只檢查看過在留言的帳號。"
+  },
   "noLocationStats": {
     "message": "尚無地點資料。\n瀏覽 Threads 以擷取地點資訊。"
   },
