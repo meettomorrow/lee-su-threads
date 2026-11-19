@@ -1,12 +1,13 @@
 // Content script for Threads Profile Info Extractor
 import { findPostContainer, detectActiveTab, isUserListContext, findFollowButtonContainer, findUsernameFromTimeElement } from './lib/domHelpers.js';
 import { injectLocationUIForUser, createLocationBadge } from './lib/friendshipsUI.js';
-import { displayProfileInfo, autoFetchProfile, createProfileBadge } from './lib/postUI.js';
+import { displayProfileInfo, autoFetchProfile, createProfileBadge, addReplierTagFromCache } from './lib/postUI.js';
 import { isSingleUserNotification, findIconElement, extractIconColor } from './lib/notificationDetector.js';
 import { fetchProfileByUserId, getUserIdByUsername, updateButtonWithFetchResult } from './lib/profileFetcher.js';
 import { showRateLimitToast, showLoginRequiredBanner } from './lib/notifications.js';
 import { queueFetch, processFetchQueue, processFollowersFetchQueue } from './lib/queueManager.js';
 import { createFeedVisibilityObserver, createFollowersVisibilityObserver } from './lib/autoFetchObservers.js';
+import { isReplyOnlyEnabled } from './lib/replyOnlyTag.js';
 import { polyfillCountryFlagEmojis } from 'country-flag-emoji-polyfill';
 
 'use strict';
@@ -112,6 +113,12 @@ window.addEventListener('message', (event) => {
       fetchQueue.length = 0;
       state.isFetching = false;
     }
+  }
+
+  // Persist the Replies tab doc_id so the low-follower replier check works on
+  // pages where Threads hasn't loaded that query yet
+  if (event.data?.type === 'threads-replies-doc-id' && event.data.docId) {
+    browserAPI.storage.local.set({ repliesTabDocId: event.data.docId });
   }
 
   // Listen for new user ID discoveries from injected script and persist them
@@ -341,6 +348,8 @@ function addFetchButtons() {
             timeParent.parentElement.insertBefore(badge, timeParent.nextSibling);
           }
         }
+
+        addReplierTagFromCache(profileInfo, badge, profileCache);
       }
       return;
     }
@@ -407,8 +416,10 @@ function addFetchButtons() {
       const userId = await getUserIdByUsername(username);
 
       if (userId) {
-        // Request profile fetch using shared utility
-        const result = await fetchProfileByUserId(userId);
+        // Request profile fetch using shared utility. The low-follower replier
+        // check only runs in post context (see lib/replyOnly.js), not user lists.
+        const checkReplyOnly = !isUserList && await isReplyOnlyEnabled();
+        const result = await fetchProfileByUserId(userId, { checkReplyOnly });
 
         if (result) {
           if (result._loginRequired) {
@@ -646,6 +657,13 @@ function init() {
     console.warn('[Threads Extractor] Failed to load cached user IDs:', err);
   });
 
+  // Pass the last known Replies tab doc_id to injected script
+  browserAPI.storage.local.get(['repliesTabDocId']).then(({ repliesTabDocId }) => {
+    if (repliesTabDocId) {
+      window.postMessage({ type: 'threads-load-replies-doc-id', docId: repliesTabDocId }, '*');
+    }
+  });
+
   // Enable auto-fetch after initial delay (wait for bulk-route-definitions to load)
   setTimeout(() => {
     state.autoFetchReady = true;
@@ -733,6 +751,10 @@ browserAPI.runtime.onMessage.addListener((message) => {
   } else if (message.type === 'DISPOSABLE_ACCOUNT_CHANGED') {
     console.log('[Threads Extractor] Disposable-account tag', message.enabled ? 'enabled' : 'disabled');
     // Rebuild badges so the disposable-account tag appears/disappears
+    updateBadgesForFlagsChange();
+  } else if (message.type === 'REPLY_ONLY_CHANGED') {
+    console.log('[Threads Extractor] Low-follower replier tag', message.enabled ? 'enabled' : 'disabled');
+    // Rebuild badges so the low-follower replier tag appears/disappears
     updateBadgesForFlagsChange();
   } else if (message.type === 'CUSTOM_EMOJIS_CHANGED') {
     console.log('[Threads Extractor] Custom emojis changed, refreshing badges');

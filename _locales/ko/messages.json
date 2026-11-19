@@ -232,5 +232,25 @@
   },
   "disposableToggle": {
     "message": "랜덤 아이디"
+  },
+  "replyOnlyAccount": {
+    "message": "저팔로워 댓글 전용"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "이 계정은 직접 작성한 스레드가 $THREADS$개, 팔로워가 $FOLLOWERS$명뿐이지만 다른 사람의 스레드에 답글을 $REPLIES$개 넘게 남겼습니다.",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "저팔로워 댓글 전용"
   }
 }

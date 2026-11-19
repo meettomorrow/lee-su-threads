@@ -313,6 +313,26 @@
   color: rgb(167, 139, 250);
 }
 
+/* Low-follower replier (低粉高留言) tag - same bracketed family; amber keeps it distinct
+   from the red new-user and purple random-handle tags. */
+.threads-reply-only-tag {
+  margin-left: 4px;
+  color: rgb(217, 119, 6);
+  font-weight: 600;
+  white-space: nowrap;
+  cursor: help;
+}
+
+@media (prefers-color-scheme: dark) {
+  .threads-reply-only-tag {
+    color: rgb(251, 191, 36);
+  }
+}
+
+.__fb-dark-mode .threads-reply-only-tag {
+  color: rgb(251, 191, 36);
+}
+
 /* Location badge in followers/following list */
 .threads-friendships-location-badge {
   display: inline-flex;

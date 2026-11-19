@@ -22,7 +22,9 @@ function handleAsyncMessage(message, sender, sendResponse) {
       if (username) {
         cache[username] = {
           ...message.data,
-          timestamp: Date.now()
+          // A cached profile updated with replier signals keeps its original
+          // timestamp, so the location still expires on schedule
+          timestamp: message.data.timestamp ?? Date.now()
         };
         browserAPI.storage.local.set({ profileCache: cache });
       }

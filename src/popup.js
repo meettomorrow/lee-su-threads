@@ -61,6 +61,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const autoQueryFollowersToggle = document.getElementById('autoQueryFollowersToggle');
   const showFlagsToggle = document.getElementById('showFlagsToggle');
   const disposableToggle = document.getElementById('disposableToggle');
+  const replyOnlyToggle = document.getElementById('replyOnlyToggle');
   const locationFilter = document.getElementById('locationFilter');
   const onboardingLink = document.getElementById('onboardingLink');
   const tabBtns = document.querySelectorAll('.tab-btn');
@@ -279,11 +280,15 @@ document.addEventListener('DOMContentLoaded', () => {
     'autoQueryFollowersEnabled',
     'showFlags',
     'disposableAccountEnabled',
+    'replyOnlyEnabled',
     'rateLimitedUntil'
   ]).then((result) => {
     // disposable-account tag is a purely local display setting, so it stays
     // available even while rate limited (it never hits the network).
     disposableToggle.checked = result.disposableAccountEnabled !== false;
+    // reply-only check piggybacks on profile fetches, which already pause while
+    // rate limited, so its toggle can stay available too.
+    replyOnlyToggle.checked = result.replyOnlyEnabled !== false;
 
     // Check if currently rate limited
     const rateLimitedUntil = result.rateLimitedUntil || 0;
@@ -330,6 +335,18 @@ document.addEventListener('DOMContentLoaded', () => {
     browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
       if (tabs[0]?.id) {
         browserAPI.tabs.sendMessage(tabs[0].id, { type: 'DISPOSABLE_ACCOUNT_CHANGED', enabled }).catch(() => {
+          // Content script not loaded yet - that's ok
+        });
+      }
+    });
+  });
+
+  replyOnlyToggle.addEventListener('change', () => {
+    const enabled = replyOnlyToggle.checked;
+    browserAPI.storage.local.set({ replyOnlyEnabled: enabled });
+    browserAPI.tabs.query({ active: true, currentWindow: true }).then((tabs) => {
+      if (tabs[0]?.id) {
+        browserAPI.tabs.sendMessage(tabs[0].id, { type: 'REPLY_ONLY_CHANGED', enabled }).catch(() => {
           // Content script not loaded yet - that's ok
         });
       }

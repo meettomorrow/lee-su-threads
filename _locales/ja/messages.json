@@ -232,5 +232,25 @@
   },
   "disposableToggle": {
     "message": "ランダムID"
+  },
+  "replyOnlyAccount": {
+    "message": "低フォロワーのリプ専"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "このアカウントは自分のスレッドが $THREADS$ 件、フォロワーが $FOLLOWERS$ 人しかいないのに、他の人のスレッドに $REPLIES$ 件以上返信しています。",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "低フォロワーのリプ専"
   }
 }

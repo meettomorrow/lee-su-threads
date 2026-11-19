@@ -235,5 +235,25 @@
   },
   "disposableToggle": {
     "message": "隨機帳號"
+  },
+  "replyOnlyAccount": {
+    "message": "低粉高留言"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "此帳號只有 $THREADS$ 篇串文、$FOLLOWERS$ 位追蹤者，卻在別人的串文底下回覆超過 $REPLIES$ 則。",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "低粉高留言"
   }
 }

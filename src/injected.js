@@ -1,5 +1,14 @@
 // Injected script to intercept fetch/XHR responses for profile data
 import { parseProfileResponse } from './lib/profileParser.js';
+import {
+  MAX_THREADS,
+  LOW_FOLLOWER_THRESHOLD,
+  REPLY_PAGE_SIZE,
+  parseThreadCount,
+  parseProfilePage,
+  parseHasManyReplies,
+  collectReplyAuthorIds
+} from './lib/replyOnly.js';
 
 'use strict';
 
@@ -131,6 +140,9 @@ function captureSessionTokens(bodyParsed) {
 const userIdMap = new Map();
 window.__threadsUserIdMap = userIdMap;
 let pendingNewUserIds = {}; // Buffer for new discoveries to broadcast
+// User IDs seen replying under someone's thread - the only accounts the
+// low-follower replier check spends requests on
+const knownReplierIds = new Set();
 
 // Listen for cached user IDs from content script
 window.addEventListener('message', (event) => {
@@ -173,6 +185,12 @@ function addUserId(username, userId, source = '') {
     return true;
   }
   return false;
+}
+
+function rememberReplyAuthors(data) {
+  for (const authorId of collectReplyAuthorIds(data)) {
+    knownReplierIds.add(authorId);
+  }
 }
 
 function extractUserIds(obj, source = 'unknown') {
@@ -344,6 +362,8 @@ window.fetch = async function(...args) {
           }
         }
 
+        rememberReplyAuthors(data);
+
         const beforeCount = userIdMap.size;
         extractUserIds(data, url);
         const afterCount = userIdMap.size;
@@ -496,6 +516,20 @@ XMLHttpRequest.prototype.send = function(...args) {
     });
   }
 
+  // Remember reply authors from feed/thread GraphQL responses so the
+  // low-follower replier check knows who to look at
+  if (xhrUrl && xhrUrl.includes('graphql/query')) {
+    this.addEventListener('load', function() {
+      try {
+        let jsonStr = this.responseText;
+        if (jsonStr.startsWith('for (;;);')) {
+          jsonStr = jsonStr.substring(9);
+        }
+        rememberReplyAuthors(JSON.parse(jsonStr));
+      } catch (e) { /* not JSON */ }
+    });
+  }
+
   // Handle about_this_profile
   if (xhrUrl && xhrUrl.includes('about_this_profile_async_action')) {
     logRequest('XHR', xhrUrl, {
@@ -523,8 +557,180 @@ XMLHttpRequest.prototype.send = function(...args) {
   return originalXHRSend.apply(this, args);
 };
 
+// ========== LOW-FOLLOWER REPLIER CHECK ==========
+const THREADS_TAB_QUERY = 'BarcelonaProfileThreadsTabDirectQuery';
+const PROFILE_PAGE_QUERY = 'BarcelonaProfilePageDirectQuery';
+const REPLIES_TAB_QUERY = 'BarcelonaProfileRepliesTabDirectQuery';
+const THREADS_IG_APP_ID = '238260118697367';
+
+// The Replies tab module is only loaded once a profile page has been opened,
+// so remember its doc_id (persisted by content.js) and fall back to the last
+// one known here. A stale doc_id just fails the query, which means "no tag".
+let repliesTabDocId = '29534784646118646';
+
+window.addEventListener('message', (event) => {
+  if (event.source !== window) return;
+  if (event.data?.type === 'threads-load-replies-doc-id' && event.data.docId) {
+    repliesTabDocId = String(event.data.docId);
+  }
+});
+
+// The doc_id and Relay provided variables rotate with Threads deploys, so read
+// them from the page's own module registry instead of hard-coding them.
+function getQueryParams(queryName) {
+  for (const moduleName of [`${queryName}$Parameters`, `${queryName}$Parameters.threads`]) {
+    try {
+      const params = window.require?.(moduleName)?.params;
+      if (params?.id) return params;
+    } catch (e) { /* module not loaded */ }
+  }
+  return null;
+}
+
+function getRepliesTabQueryParams() {
+  const params = getQueryParams(REPLIES_TAB_QUERY);
+  if (params) {
+    if (params.id !== repliesTabDocId) {
+      repliesTabDocId = params.id;
+      window.postMessage({ type: 'threads-replies-doc-id', docId: params.id }, '*');
+    }
+    return params;
+  }
+  // Same profile-tab family: the Threads tab's provided variables are accepted
+  // by the Replies tab query too
+  const threadsTabParams = getQueryParams(THREADS_TAB_QUERY);
+  if (!threadsTabParams) return null;
+  return {
+    id: repliesTabDocId,
+    name: REPLIES_TAB_QUERY,
+    providedVariables: threadsTabParams.providedVariables
+  };
+}
+
+/**
+ * Run one of Threads' own persisted GraphQL queries.
+ * @param {Object|null} params - Relay query params ({ id, name, providedVariables })
+ * @returns {Promise<Object|null>} parsed response body, or null on failure
+ */
+async function runThreadsQuery(params, variables) {
+  if (!params) {
+    console.warn('[Threads Extractor] Profile query not available on this page; skipping');
+    return null;
+  }
+
+  const allVariables = { ...variables };
+  for (const [name, provider] of Object.entries(params.providedVariables || {})) {
+    try {
+      allVariables[name] = provider.get();
+    } catch (e) { /* leave it out */ }
+  }
+
+  const body = new URLSearchParams();
+  body.append('av', sessionTokens.__user || '0');
+  body.append('__user', '0');
+  body.append('__a', sessionTokens.__a || '1');
+  body.append('__comet_req', sessionTokens.__comet_req || '29');
+  body.append('fb_dtsg', sessionTokens.fb_dtsg || '');
+  body.append('jazoest', sessionTokens.jazoest || '');
+  body.append('lsd', sessionTokens.lsd || '');
+  body.append('fb_api_caller_class', 'RelayModern');
+  body.append('fb_api_req_friendly_name', params.name);
+  body.append('server_timestamps', 'true');
+  body.append('variables', JSON.stringify(allVariables));
+  body.append('doc_id', params.id);
+
+  const csrfToken = document.cookie.match(/(?:^|;\s*)csrftoken=([^;]+)/)?.[1] || '';
+
+  try {
+    const response = await originalFetch('/graphql/query', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'X-CSRFToken': csrfToken,
+        'X-IG-App-ID': THREADS_IG_APP_ID,
+        'X-FB-LSD': sessionTokens.lsd || '',
+        'X-FB-Friendly-Name': params.name
+      },
+      body,
+      credentials: 'include'
+    });
+
+    if (response.status === 429) {
+      console.warn(`[Threads Extractor] ⚠️ Rate limited (429) on ${params.name}! Notifying content script...`);
+      window.dispatchEvent(new CustomEvent('threads-rate-limited'));
+      return null;
+    }
+
+    let text = await response.text();
+    if (text.startsWith('for (;;);')) {
+      text = text.substring(9);
+    }
+    return JSON.parse(text);
+  } catch (e) {
+    console.error(`[Threads Extractor] Error running ${params.name}:`, e);
+    return null;
+  }
+}
+
+/**
+ * Gather the 低粉高留言 signals for a user, cheapest gate first, stopping as
+ * soon as one rules the user out. See lib/replyOnly.js.
+ * @returns {Promise<Object>} whichever of threadCount / followerCount /
+ *   blocking / hasManyReplies could be determined
+ */
+async function fetchReplierSignals(targetUserId) {
+  const userId = String(targetUserId);
+  const signals = {};
+
+  const threadCount = parseThreadCount(await runThreadsQuery(getQueryParams(THREADS_TAB_QUERY), {
+    allow_page_info_for_lox_user: false,
+    first: MAX_THREADS + 1,
+    userID: userId
+  }));
+  if (threadCount === null) return signals;
+  signals.threadCount = threadCount;
+  if (threadCount > MAX_THREADS) return signals;
+
+  const profile = parseProfilePage(await runThreadsQuery(getQueryParams(PROFILE_PAGE_QUERY), {
+    canSeeFeedsTab: true,
+    showLinkedIGStats: false,
+    userID: userId
+  }));
+  if (!profile) return signals;
+  Object.assign(signals, profile);
+  if (profile.blocking || profile.followerCount >= LOW_FOLLOWER_THRESHOLD) return signals;
+
+  const hasManyReplies = parseHasManyReplies(await runThreadsQuery(getRepliesTabQueryParams(), {
+    first: REPLY_PAGE_SIZE,
+    userID: userId
+  }));
+  if (hasManyReplies !== null) {
+    signals.hasManyReplies = hasManyReplies;
+  }
+  return signals;
+}
+
+// Replier check for a profile whose location came from cache. A thread can
+// show many cached repliers at once, so checks run one at a time and once per
+// user per page load.
+const cachedReplierChecks = new Map();
+let cachedReplierCheckQueue = Promise.resolve();
+
+async function checkCachedReplier(username) {
+  // Server-rendered replies are only known after the initial page scan
+  await initialScanDone;
+  const userId = userIdMap.get(username);
+  if (!userId || !knownReplierIds.has(String(userId))) return null;
+  if (!cachedReplierChecks.has(userId)) {
+    const check = cachedReplierCheckQueue.then(() => fetchReplierSignals(userId));
+    cachedReplierCheckQueue = check.catch(() => {});
+    cachedReplierChecks.set(userId, check);
+  }
+  return cachedReplierChecks.get(userId);
+}
+
 // ========== FETCH PROFILE INFO ==========
-async function fetchProfileInfo(targetUserId) {
+async function fetchProfileInfo(targetUserId, { checkReplyOnly = false } = {}) {
   if (!isLoggedIn()) {
     console.warn('[Threads Extractor] User is not logged in. Cannot fetch profile info.');
     return { _loginRequired: true };
@@ -606,6 +812,10 @@ async function fetchProfileInfo(targetUserId) {
       if (!profileInfo.username) {
         profileInfo.username = `user_${targetUserId}`;
         profileInfo._userIdOnly = true;
+      }
+      // Only accounts seen replying are worth the extra profile queries
+      if (checkReplyOnly && knownReplierIds.has(String(targetUserId))) {
+        Object.assign(profileInfo, await fetchReplierSignals(targetUserId));
       }
       console.log('[Threads Extractor] Fetched profile info:', profileInfo);
       window.dispatchEvent(new CustomEvent('threads-profile-extracted', { detail: profileInfo }));
@@ -727,6 +937,7 @@ function scanPageForUserIds() {
     if (content.includes('"pk"') || content.includes('"username"') || content.includes('"user"')) {
       try {
         const data = JSON.parse(content);
+        rememberReplyAuthors(data);
         extractUserIds(data, `json-script#${i}`);
       } catch (e) {
         // Regex fallback - look for pk and username close together
@@ -798,13 +1009,24 @@ window.addEventListener('message', async (event) => {
 
   // Handle profile fetch request
   if (event.data?.type === 'threads-fetch-request') {
-    const { requestId, userId } = event.data;
+    const { requestId, userId, checkReplyOnly } = event.data;
     console.log(`[Threads Extractor] Profile fetch request for user ID: ${userId}`);
-    const result = await fetchProfileInfo(userId);
+    const result = await fetchProfileInfo(userId, { checkReplyOnly: checkReplyOnly === true });
     window.postMessage({
       type: 'threads-fetch-response',
       requestId: requestId,
       result: result
+    }, '*');
+  }
+
+  // Handle low-follower replier check for a profile already in cache
+  if (event.data?.type === 'threads-replier-check-request') {
+    const { requestId, username } = event.data;
+    const signals = await checkCachedReplier(username);
+    window.postMessage({
+      type: 'threads-replier-check-response',
+      requestId: requestId,
+      signals: signals
     }, '*');
   }
 
@@ -839,14 +1061,15 @@ console.log('  - window.__threadsScanTokens() - Scan page for session tokens');
 console.log('  - window.__threadsScanAll() - Scan for both tokens and users');
 
 // Auto-scan after page loads
-if (document.readyState === 'complete') {
-  setTimeout(() => {
-    scanPageForSessionTokens();
-    scanPageForUserIds();
-  }, 1000);
-} else {
-  window.addEventListener('load', () => setTimeout(() => {
+let resolveInitialScan;
+const initialScanDone = new Promise((resolve) => { resolveInitialScan = resolve; });
+function runInitialScan() {
   scanPageForSessionTokens();
   scanPageForUserIds();
-}, 1000));
+  resolveInitialScan();
+}
+if (document.readyState === 'complete') {
+  setTimeout(runInitialScan, 1000);
+} else {
+  window.addEventListener('load', () => setTimeout(runInitialScan, 1000));
 }

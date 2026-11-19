@@ -229,5 +229,25 @@
   },
   "disposableToggle": {
     "message": "Random handle"
+  },
+  "replyOnlyAccount": {
+    "message": "Reply-heavy"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "This account has only $THREADS$ thread(s) of its own and $FOLLOWERS$ follower(s), yet has replied more than $REPLIES$ times under other people's threads.",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "Reply-heavy"
   }
 }

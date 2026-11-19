@@ -3,6 +3,9 @@ import { isNewUser } from './dateParser.js';
 import { formatLocation } from './locationMapper.js';
 import { isDisposableHandle } from './disposableHandle.js';
 import { createDisposableTag } from './disposableTag.js';
+import { createReplyOnlyTag, isReplyOnlyEnabled } from './replyOnlyTag.js';
+import { isLowFollowerReplier, isReplierCheckSettled } from './replyOnly.js';
+import { checkCachedReplier } from './profileFetcher.js';
 
 // Cross-browser compatibility
 const browserAPI = typeof browser !== 'undefined' ? browser : chrome;
@@ -51,7 +54,7 @@ export async function createProfileBadge(profileInfo) {
   const newLabel = browserAPI.i18n.getMessage('newUser') || 'NEW';
 
   // Get showFlags setting, custom emojis, and disposable-account setting
-  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled']);
+  const { showFlags = true, customLocationEmojis = {}, disposableAccountEnabled = true, replyOnlyEnabled = true } = await browserAPI.storage.local.get(['showFlags', 'customLocationEmojis', 'disposableAccountEnabled', 'replyOnlyEnabled']);
 
   if (profileInfo.location) {
     // Get custom emoji for this location (if set)
@@ -95,7 +98,35 @@ export async function createProfileBadge(profileInfo) {
     badge.appendChild(createDisposableTag());
   }
 
+  // Add low-follower replier (低粉高留言) tag if enabled (see lib/replyOnly.js)
+  if (replyOnlyEnabled && isLowFollowerReplier(profileInfo)) {
+    badge.appendChild(createReplyOnlyTag(profileInfo));
+  }
+
   return badge;
+}
+
+/**
+ * A cached profile may predate the low-follower replier check, or have been
+ * cached where the user wasn't seen replying. Fill in the missing signals and
+ * add the tag to `badge` if they qualify.
+ * @param {Object} profileInfo - Cached profile info
+ * @param {HTMLElement} badge - The post badge showing this profile
+ * @param {Map} profileCache - Profile cache
+ */
+export async function addReplierTagFromCache(profileInfo, badge, profileCache) {
+  if (isReplierCheckSettled(profileInfo) || !(await isReplyOnlyEnabled())) return;
+
+  const signals = await checkCachedReplier(profileInfo.username);
+  if (!signals || Object.keys(signals).length === 0) return;
+
+  const updated = { ...(profileCache.get(profileInfo.username) ?? profileInfo), ...signals };
+  profileCache.set(updated.username, updated);
+  browserAPI.runtime.sendMessage({ type: 'PROFILE_INFO_EXTRACTED', data: updated });
+
+  if (isLowFollowerReplier(updated) && badge.isConnected && !badge.querySelector('.threads-reply-only-tag')) {
+    badge.appendChild(createReplyOnlyTag(updated));
+  }
 }
 
 /**
@@ -142,6 +173,7 @@ export async function autoFetchProfile(username, btn, profileCache) {
   }
 
   // Request profile fetch
+  const checkReplyOnly = await isReplyOnlyEnabled();
   const fetchRequestId = Math.random().toString(36).substring(7);
   const result = await new Promise((resolve) => {
     const handler = (event) => {
@@ -154,12 +186,13 @@ export async function autoFetchProfile(username, btn, profileCache) {
     window.postMessage({
       type: 'threads-fetch-request',
       requestId: fetchRequestId,
-      userId: userId
+      userId: userId,
+      checkReplyOnly
     }, '*');
     setTimeout(() => {
       window.removeEventListener('message', handler);
       resolve(null);
-    }, 10000);
+    }, checkReplyOnly ? 20000 : 10000); // the replier check adds up to three requests
   });
 
   if (result) {

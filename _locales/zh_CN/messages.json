@@ -232,5 +232,25 @@
   },
   "disposableToggle": {
     "message": "随机账号"
+  },
+  "replyOnlyAccount": {
+    "message": "低粉只回复"
+  },
+  "replyOnlyAccountTooltip": {
+    "message": "此账号只有 $THREADS$ 篇帖子、$FOLLOWERS$ 个粉丝，却在别人的帖子下回复超过 $REPLIES$ 条。",
+    "placeholders": {
+      "threads": {
+        "content": "$1"
+      },
+      "followers": {
+        "content": "$2"
+      },
+      "replies": {
+        "content": "$3"
+      }
+    }
+  },
+  "replyOnlyToggle": {
+    "message": "低粉只回复"
   }
 }
