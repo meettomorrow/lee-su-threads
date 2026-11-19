@@ -117,7 +117,7 @@
     "message": "아직 태그된 계정이 없습니다.\nThreads를 둘러보면 자동으로 쌓입니다."
   },
   "tagsNote": {
-    "message": "\"전체\"에는 신규가 포함되지 않습니다. 이름 변경 정보는 둘러보는 동안 채워지며, 저팔로워 댓글 전용은 답글을 단 것이 확인된 계정만 확인합니다."
+    "message": "\"전체\"에는 신규가 포함되지 않습니다. 이름 변경 정보는 둘러보는 동안 채워지며, 저팔로워 고댓글은 답글을 단 것이 확인된 계정만 확인합니다."
   },
   "noLocationStats": {
     "message": "아직 위치 데이터가 없습니다.\nThreads를 탐색하여 위치 정보를 추출하세요."
@@ -265,7 +265,7 @@
     "message": "이름 변경"
   },
   "replyOnlyAccount": {
-    "message": "저팔로워 댓글 전용"
+    "message": "저팔로워 고댓글"
   },
   "replyOnlyAccountTooltip": {
     "message": "이 계정은 직접 작성한 스레드가 $THREADS$개, 팔로워가 $FOLLOWERS$명뿐이지만 다른 사람의 스레드에 답글을 $REPLIES$개 넘게 남겼습니다.",
@@ -282,6 +282,6 @@
     }
   },
   "replyOnlyToggle": {
-    "message": "저팔로워 댓글 전용"
+    "message": "저팔로워 고댓글"
   }
 }
