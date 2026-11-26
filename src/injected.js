@@ -1,6 +1,6 @@
 // Injected script to intercept fetch/XHR responses for profile data
 import { parseProfileResponse } from './lib/profileParser.js';
-import { isGraphQLQueryUrl } from './lib/graphqlEndpoint.js';
+import { isGraphQLQueryUrl, toUrlString } from './lib/requestUrl.js';
 import {
   MAX_THREADS,
   LOW_FOLLOWER_THRESHOLD,
@@ -248,7 +248,7 @@ function extractUserIds(obj, source = 'unknown') {
 // ========== FETCH INTERCEPTOR ==========
 const originalFetch = window.fetch;
 window.fetch = async function(...args) {
-  const url = args[0]?.url || args[0];
+  const url = toUrlString(args[0]);
   const options = args[1] || {};
 
   // Extract friendly name from headers for GraphQL queries
@@ -408,7 +408,7 @@ const originalXHRSend = XMLHttpRequest.prototype.send;
 const originalXHRSetRequestHeader = XMLHttpRequest.prototype.setRequestHeader;
 
 XMLHttpRequest.prototype.open = function(method, url, ...rest) {
-  this._threadsUrl = url;
+  this._threadsUrl = toUrlString(url);
   this._threadsMethod = method;
   this._threadsHeaders = {};
   return originalXHROpen.apply(this, [method, url, ...rest]);
