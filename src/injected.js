@@ -248,7 +248,7 @@ function extractUserIds(obj, source = 'unknown') {
 // ========== FETCH INTERCEPTOR ==========
 const originalFetch = window.fetch;
 window.fetch = async function(...args) {
-  const url = toUrlString(args[0]);
+  const url = toUrlString(args[0]); // always a string ('' if unknown)
   const options = args[1] || {};
 
   // Extract friendly name from headers for GraphQL queries
@@ -274,20 +274,20 @@ window.fetch = async function(...args) {
   }
 
   // Log interesting requests (reduced logging, only for about_this_profile)
-  if (typeof url === 'string' && url.includes('about_this_profile')) {
+  if (url.includes('about_this_profile')) {
     console.group(`%c[Threads Extractor] 🔍 API Request: ${url.substring(0, 100)}...`, 'color: #3b82f6; font-weight: bold;');
     console.log('%cFull URL:', 'color: #10b981;', url);
     console.groupEnd();
   }
 
-  if (typeof url === 'string' && url.includes('about_this_profile_async_action')) {
+  if (url.includes('about_this_profile_async_action')) {
     logRequest('FETCH', url, options);
   }
 
   const response = await originalFetch.apply(this, args);
 
   // Extract user IDs from responses
-  if (typeof url === 'string') {
+  if (url) {
     try {
       const clone = response.clone();
       const text = await clone.text();
@@ -381,7 +381,7 @@ window.fetch = async function(...args) {
     } catch (e) { /* not JSON */ }
   }
 
-  if (typeof url === 'string' && url.includes('about_this_profile_async_action')) {
+  if (url.includes('about_this_profile_async_action')) {
     try {
       const clone = response.clone();
       const text = await clone.text();

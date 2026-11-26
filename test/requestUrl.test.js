@@ -10,6 +10,7 @@ describe('isGraphQLQueryUrl', () => {
 
   it('matches the newer /api/graphql endpoint', () => {
     expect(isGraphQLQueryUrl('/api/graphql')).toBe(true);
+    expect(isGraphQLQueryUrl('/api/graphql?doc_id=1')).toBe(true);
     expect(isGraphQLQueryUrl('https://www.threads.com/api/graphql')).toBe(true);
     expect(isGraphQLQueryUrl('https://www.threads.com/api/graphql/?foo=1')).toBe(true);
     expect(isGraphQLQueryUrl('https://www.threads.com/api/graphql?foo=1')).toBe(true);
