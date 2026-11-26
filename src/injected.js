@@ -1,5 +1,6 @@
 // Injected script to intercept fetch/XHR responses for profile data
 import { parseProfileResponse } from './lib/profileParser.js';
+import { isGraphQLQueryUrl } from './lib/graphqlEndpoint.js';
 import {
   MAX_THREADS,
   LOW_FOLLOWER_THRESHOLD,
@@ -338,7 +339,7 @@ window.fetch = async function(...args) {
                                    url.includes('BarcelonaFriendshipsFollowersTabQuery') ||
                                    url.includes('BarcelonaFriendshipsFollowingTabQuery');
 
-        if (url.includes('graphql/query') && isFriendshipsQuery) {
+        if (isGraphQLQueryUrl(url) && isFriendshipsQuery) {
           console.log('%c[Threads Extractor] 📋 Intercepted Followers/Following dialog!', 'color: #3b82f6; font-weight: bold;');
           console.log('  Friendly name:', friendlyName);
 
@@ -480,7 +481,7 @@ XMLHttpRequest.prototype.send = function(...args) {
                              friendlyName === 'BarcelonaFriendshipsFollowersTabQuery' ||
                              friendlyName === 'BarcelonaFriendshipsFollowingTabQuery';
 
-  if (xhrUrl && xhrUrl.includes('graphql/query') && isFriendshipsQuery) {
+  if (isGraphQLQueryUrl(xhrUrl) && isFriendshipsQuery) {
     this.addEventListener('load', function() {
       try {
         console.log('%c[Threads Extractor] 📋 Intercepted Followers/Following dialog (XHR)!', 'color: #3b82f6; font-weight: bold;');
@@ -524,7 +525,7 @@ XMLHttpRequest.prototype.send = function(...args) {
 
   // Remember reply authors from feed/thread GraphQL responses so the
   // low-follower replier check knows who to look at
-  if (xhrUrl && xhrUrl.includes('graphql/query')) {
+  if (isGraphQLQueryUrl(xhrUrl)) {
     this.addEventListener('load', function() {
       try {
         let jsonStr = this.responseText;
